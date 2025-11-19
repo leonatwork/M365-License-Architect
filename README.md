@@ -59,6 +59,9 @@ No installation is required. This tool is designed to run client-side in any mod
 5.  **Export:** Use the CSV Export button to download your calculation for further processing in Excel.
 
 ---
+## Special thanks 
+Thanks to Aaron Dinnage https://m365maps.com/ where most of the information for this came from
+---
 
 ## 📄 License
 
