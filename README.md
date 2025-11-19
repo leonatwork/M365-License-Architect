@@ -4,7 +4,7 @@
 
 The **License Architect** is a single-page web application designed to simplify complex M365 licensing scenarios. It validates requirements in real-time, calculates cost-efficiency (including Break-Even analysis for E5), and visualizes the "As-Is" vs. "To-Be" state with a high-end Glassmorphism UI.
 
-![License Architect Screenshot](https://via.placeholder.com/800x400?text=License+Architect+Preview)
+<img width="1623" height="1142" alt="architect1" src="https://github.com/user-attachments/assets/e768cf4b-8b43-40a7-8848-caab53d78cd3" />
 
 ---
 
