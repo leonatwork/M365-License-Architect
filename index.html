@@ -732,16 +732,77 @@
 
         function closeModal() { document.getElementById('compModal').classList.add('hidden'); }
         
+        // ---------------------------------------------------------
+        // DATA MANAGEMENT (EXPORT & IMPORT)
+        // ---------------------------------------------------------
+
         function exportCSV() {
-            if(!quoteItems.length) return alert("Empty.");
-            let csv = "Persona,Count,Base,Addons,Price,Total\n" + quoteItems.map(i => `"${i.persona}",${i.count},"${i.base}","${i.addons.join('|')}",${i.price},${i.price*i.count}`).join("\n");
-            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='quote.csv'; a.click();
+            if (!quoteItems.length) return alert("Die Liste ist leer. Bitte füge erst Personas hinzu.");
+            
+            // Header: Wir fügen 'CurrentLic' hinzu, damit der Import vollständige Daten hat
+            let csv = "Persona,Count,Base,Addons,Price,Total,CurrentLic\n";
+            
+            csv += quoteItems.map(i => {
+                // Felder in Anführungszeichen setzen, um Kommas im Text abzufangen
+                // Addons werden mit Pipe | getrennt, um Konflikte mit CSV-Kommas zu vermeiden
+                return `"${i.persona}",${i.count},"${i.base}","${i.addons.join('|')}",${i.price},${(i.price * i.count).toFixed(2)},"${i.currentLic}"`;
+            }).join("\n");
+
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+            a.download = 'M365_Quote_Export.csv';
+            a.click();
         }
-        
+
         function handleFileSelect(input) {
-             const reader = new FileReader();
-            reader.onload = e => { alert("Import logic simplified."); };
-            reader.readAsText(input.files[0]);
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split('\n');
+
+                // Header überspringen (Start bei i=1)
+                let importedCount = 0;
+                
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+
+                    // CSV Parser: Splittet am Komma, ignoriert aber Kommas innerhalb von Anführungszeichen
+                    const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+
+                    if (cols.length < 5) continue; // Ungültige Zeile überspringen
+
+                    const clean = (str) => str ? str.replace(/^"|"$/g, '').trim() : '';
+
+                    const newItem = {
+                        persona: clean(cols[0]),
+                        count: parseInt(cols[1]) || 1,
+                        base: clean(cols[2]),
+                        addons: clean(cols[3]) ? clean(cols[3]).split('|') : [],
+                        price: parseFloat(cols[4]) || 0,
+                        currentLic: cols[6] ? clean(cols[6]) : "None" 
+                    };
+
+                    // Features rekonstruieren
+                    newItem.features = [...(FEATURES_MAP[newItem.base] || [])];
+                    
+                    if(newItem.addons.some(a => a.includes("Teams"))) {
+                        newItem.features = newItem.features.filter(f => f !== "No Teams");
+                        if(!newItem.features.includes("Teams Collaboration")) newItem.features.push("Teams Collaboration");
+                    }
+
+                    quoteItems.push(newItem);
+                    importedCount++;
+                }
+
+                renderTable();
+                alert(`${importedCount} Personas erfolgreich importiert!`);
+                input.value = ''; // Input zurücksetzen
+            };
+            reader.readAsText(file);
         }
     </script>
 </body>
