@@ -84,10 +84,17 @@
                 
                 <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-8 relative overflow-hidden group">
                     <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-indigo-900 to-ultramarine"></div>
-                    <h2 class="text-sm font-bold text-slate-900 dark:text-white uppercase mb-6 flex items-center gap-3 tracking-wider">
-                        <span class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-300"><i class="fas fa-id-badge"></i></span>
-                        1. Profile & Context
-                    </h2>
+                    
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-sm font-bold text-slate-900 dark:text-white uppercase flex items-center gap-3 tracking-wider">
+                            <span class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-300"><i class="fas fa-id-badge"></i></span>
+                            1. Profile & Context
+                        </h2>
+                        <button onclick="resetForm()" class="text-[10px] uppercase font-bold tracking-wider text-slate-400 hover:text-red-500 transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-700">
+                            <i class="fas fa-eraser"></i> Clear Form
+                        </button>
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
                         
                         <div class="md:col-span-12 mb-2">
@@ -345,8 +352,8 @@
                         </div>
 
                         <div class="p-6 bg-slate-50 dark:bg-[#0f172a] border-t border-slate-200 dark:border-slate-700">
-                            <button onclick="addToQuote()" class="bg-gradient-to-r from-curry via-yellow-500 to-curry text-white font-bold shadow-lg hover:shadow-curry/50 hover:scale-[1.02] transition-all duration-200 w-full py-4 rounded-xl text-sm uppercase tracking-[0.15em] flex justify-center items-center gap-3 group">
-                                <i class="fas fa-plus-circle text-lg group-hover:rotate-90 transition-transform duration-300"></i> Add to Quote
+                            <button id="actionBtn" onclick="addToQuote()" class="bg-gradient-to-r from-curry via-yellow-500 to-curry text-white font-bold shadow-lg hover:shadow-curry/50 hover:scale-[1.02] transition-all duration-200 w-full py-4 rounded-xl text-sm uppercase tracking-[0.15em] flex justify-center items-center gap-3 group">
+                                <i class="fas fa-plus-circle text-lg group-hover:rotate-90 transition-transform duration-300"></i> <span id="actionBtnText">Add to Quote</span>
                             </button>
                         </div>
                     </div>
@@ -385,17 +392,42 @@
                     </tfoot>
                 </table>
             </div>
+
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 fade-in-up" id="costDashboard" style="display: none;">
+                <div class="bg-slate-100 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
+                    <div class="flex justify-between items-end mb-2">
+                        <div class="text-xs font-bold uppercase text-indigo-900 dark:text-indigo-300">Base Licenses</div>
+                        <div class="text-sm font-mono font-bold text-indigo-700 dark:text-indigo-400" id="dashBaseVal">€0.00</div>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
+                        <div class="bg-indigo-600 h-3 rounded-full transition-all duration-500" id="dashBaseBar" style="width: 0%"></div>
+                    </div>
+                    <div class="text-[10px] text-right mt-1 text-slate-500" id="dashBasePct">0%</div>
+                </div>
+                
+                <div class="bg-slate-100 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
+                    <div class="flex justify-between items-end mb-2">
+                        <div class="text-xs font-bold uppercase text-curry-600 dark:text-yellow-500">Add-ons & Upgrades</div>
+                        <div class="text-sm font-mono font-bold text-curry-600 dark:text-yellow-500" id="dashAddonVal">€0.00</div>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
+                        <div class="bg-curry h-3 rounded-full transition-all duration-500" id="dashAddonBar" style="width: 0%"></div>
+                    </div>
+                    <div class="text-[10px] text-right mt-1 text-slate-500" id="dashAddonPct">0%</div>
+                </div>
+            </div>
+
         </div>
     </main>
 
-    <div id="compModal" class="fixed inset-0 z-[100] hidden" role="dialog">
+    <div id="compModal" class="fixed inset-0 z-[100] hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="fixed inset-0 bg-slate-900/90 backdrop-blur-md transition-opacity" onclick="closeModal()"></div>
         <div class="fixed inset-0 z-[101] overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-4">
                 <div class="relative bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-3xl w-full border border-white/10 transition-all transform scale-100 overflow-hidden">
                     <div class="bg-gradient-to-r from-indigo-900 to-indigo-800 px-10 py-8 flex justify-between items-center relative">
                          <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-curry to-yellow-500"></div>
-                        <h3 class="text-white font-bold text-2xl tracking-wide">License Comparison</h3>
+                        <h3 id="modalTitle" class="text-white font-bold text-2xl tracking-wide">License Comparison</h3>
                         <button onclick="closeModal()" class="text-white/70 hover:text-white transition bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times text-xl"></i></button>
                     </div>
                     <div class="p-10">
@@ -444,6 +476,11 @@
             "M365 Copilot": 30.00,
             "Visio Plan 2": 12.70, "Project Plan 3": 25.30,
             "Power Automate Premium": 14.00, "Teams Rooms Pro": 33.70,
+            // NEW BUSINESS PREMIUM UPGRADES
+            "Defender Suite for BizPrem": 10.00,
+            "Purview Suite for BizPrem": 10.00,
+            "BizPrem E5 Upgrade": 15.00,
+            // TEAMS
             "Teams_F": 0.50, "Teams_BizBasic": 1.00, "Teams_BizStd": 2.00, "Teams_BizPrem": 2.00,
             "Teams_E1": 1.00, "Teams_OE3": 8.30, "Teams_ME3": 8.00, "Teams_ME5": 8.00
         };
@@ -471,12 +508,34 @@
             "M365 E5": ["Win OS", "Intune", "Entra P2", "Desktop Apps", "Web Apps (Edit)", "Exch 100GB", "SharePoint", "Def XDR", "Comp E5", "PowerBI", "Teams Phone", "No Teams"]
         };
 
+        // IDs for Form Persistence
+        const FORM_IDS = [
+            'personaName', 'userCount', 'workstyle', 'currentLicense', 
+            'needMailbox', 'largeMailbox', 'desktopApps', 'webEdit', 
+            'teamsCollab', 'teamsPhone', 
+            'mdmMobile', 'mdmDesktop', 'winOS', 
+            'sec_def_p1', 'sec_def_p2', 'sec_ca', 'sec_risk_ca', 'sec_casb', 
+            'comp_dlp', 'comp_labeling', 'comp_ediscovery', 
+            'adv_epm', 'adv_remotehelp', 'adv_copilot', 
+            'add_visio', 'add_project', 'add_powerauto', 'add_rooms', 'serverProt'
+        ];
+
         let quoteItems = [];
         let currentCalc = {};
         let isMonthly = false;
+        let editingIndex = -1; // -1 means adding new, >= 0 means editing index
 
         function init() {
-            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            // System Theme Listener
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            mediaQuery.addEventListener('change', e => {
+                if (!('theme' in localStorage)) {
+                    if (e.matches) document.documentElement.classList.add('dark');
+                    else document.documentElement.classList.remove('dark');
+                }
+            });
+            
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && mediaQuery.matches)) {
                 document.documentElement.classList.add('dark');
             }
             recalc();
@@ -518,7 +577,65 @@
             recalc();
         }
 
+        function resetForm() {
+            FORM_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (el.type === 'checkbox') el.checked = false;
+                else if (el.tagName === 'SELECT') el.selectedIndex = 0;
+                else el.value = '';
+            });
+            // Set defaults
+            document.getElementById('userCount').value = 10;
+            document.getElementById('workstyle').value = 'office';
+            document.getElementById('currentLicense').value = 'None';
+            
+            // Exit edit mode
+            editingIndex = -1;
+            updateActionButton();
+            
+            recalc();
+        }
+
+        function editPersona(idx) {
+            const item = quoteItems[idx];
+            if (!item.inputs) return alert("Cannot edit items created with an older version.");
+            
+            // Restore inputs
+            FORM_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if(!el) return;
+                const savedVal = item.inputs[id];
+                if (el.type === 'checkbox') el.checked = savedVal;
+                else el.value = savedVal;
+            });
+
+            // Set edit mode
+            editingIndex = idx;
+            updateActionButton();
+            
+            // Update calculation based on loaded values
+            recalc();
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateActionButton() {
+            const btn = document.getElementById('actionBtn');
+            const txt = document.getElementById('actionBtnText');
+            
+            if (editingIndex > -1) {
+                txt.innerText = "Update Persona";
+                btn.className = "bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 text-white font-bold shadow-lg hover:shadow-indigo-500/50 hover:scale-[1.02] transition-all duration-200 w-full py-4 rounded-xl text-sm uppercase tracking-[0.15em] flex justify-center items-center gap-3 group";
+            } else {
+                txt.innerText = "Add to Quote";
+                btn.className = "bg-gradient-to-r from-curry via-yellow-500 to-curry text-white font-bold shadow-lg hover:shadow-curry/50 hover:scale-[1.02] transition-all duration-200 w-full py-4 rounded-xl text-sm uppercase tracking-[0.15em] flex justify-center items-center gap-3 group";
+            }
+        }
+
         function recalc() {
+            // Build input object dynamically based on FORM_IDS to save state later
             const i = {
                 count: parseInt(document.getElementById('userCount').value) || 1,
                 style: document.getElementById('workstyle').value,
@@ -582,13 +699,19 @@
                             if (needsAdvSec) addons.push("M365 F5 Security Add-on"); 
                         }
                     } else {
-                        if (needsAdvSec || needsAdvComp || i.phone) {
-                            base = "M365 E5"; reason = "E5 required (Security/Comp/Voice)."; alt = "M365 E3";
-                        } else if (i.mdm || i.win || i.ca || i.def1 || needsIntuneAdv) {
-                            if (i.count < 300) {
-                                base = "Business Premium"; reason = "SMB Option (Intune/Sec)."; alt = "M365 E3";
+                        // Logic Updated: Prefer Business Premium if count <= 300 even for Adv Security
+                        if (i.mdm || i.win || i.ca || i.def1 || needsIntuneAdv || needsAdvSec || needsAdvComp) {
+                            if (i.count <= 300 && !i.phone) { // BP limit & Phone check
+                                base = "Business Premium"; 
+                                reason = "SMB High Security (BizPrem + Add-ons)."; 
+                                alt = "M365 E5";
                             } else {
-                                base = "M365 E3"; reason = "Enterprise Standard (Intune/Sec)."; alt = "Business Premium";
+                                // If > 300 or needs Phone (Ent Voice), jump to E5 logic
+                                if (needsAdvSec || needsAdvComp || i.phone) {
+                                    base = "M365 E5"; reason = "E5 required (Security/Comp/Voice or >300 users)."; alt = "M365 E3";
+                                } else {
+                                    base = "M365 E3"; reason = "Enterprise Standard (Intune/Sec)."; alt = "Business Premium";
+                                }
                             }
                         } else if (i.desktop) {
                             base = i.count < 300 ? "Business Standard" : "O365 E3";
@@ -641,14 +764,22 @@
             if (i.rooms) addons.push("Teams Rooms Pro");
 
             
-            // Security & Compliance Add-ons
+            // Security & Compliance Add-ons Logic
             if (!base.includes("E5")) {
                 if (base === "Business Premium") {
-                     if (needsAdvComp) addons.push("M365 E5 Compliance Add-on");
-                     if (needsAdvSec) addons.push("M365 E5 Security Add-on");
+                     // NEW SMB LOGIC
+                     if (needsAdvComp && needsAdvSec) {
+                         addons.push("BizPrem E5 Upgrade");
+                     } else if (needsAdvComp) {
+                         addons.push("Purview Suite for BizPrem");
+                     } else if (needsAdvSec) {
+                         addons.push("Defender Suite for BizPrem");
+                     }
                 } else if (base.includes("F")) {
                     if (needsAdvComp) addons.push("M365 F5 Compliance Add-on");
+                    if (needsAdvSec) addons.push("M365 F5 Security Add-on"); // F3 can use F5 Security
                 } else {
+                    // Enterprise (E3)
                     if (needsAdvComp) addons.push("M365 E5 Compliance Add-on");
                     if (needsAdvSec) addons.push("M365 E5 Security Add-on"); 
                 }
@@ -668,8 +799,9 @@
                 let keep = [];
                 if (i.teams && tPrice > 0) keep.push("Teams EEA");
                 flatAddons.forEach(fa => {
+                    // Addons NOT in E5 (Keep paying for them)
                     if (fa.includes("Copilot") || fa.includes("Visio") || fa.includes("Project") || fa.includes("Power") || fa.includes("Rooms") || fa.includes("Server") || fa.includes("Intune") || fa.includes("EPM") || fa.includes("Remote")) {
-                        e5P += (PRICES[fa] || 0) * mult; // Add extra costs with mult
+                        e5P += (PRICES[fa] || 0) * mult; 
                         keep.push(fa);
                     }
                 });
@@ -702,7 +834,6 @@
             document.getElementById('recReason').innerText = c.reason;
             
             // Delta
-            // Apply Mult to Current License as well for fair comparison
             const currentPrice = (PRICES[c.currentLic] || 0) * mult; 
             const delta = c.price - currentPrice;
             let deltaHtml = "";
@@ -741,7 +872,28 @@
         }
 
         function addToQuote() {
-            quoteItems.push({...currentCalc, persona: document.getElementById('personaName').value || "Persona " + (quoteItems.length+1)});
+            // CAPTURE INPUT STATE FOR EDITING LATER
+            const inputState = {};
+            FORM_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    inputState[id] = (el.type === 'checkbox') ? el.checked : el.value;
+                }
+            });
+
+            const item = {...currentCalc, persona: document.getElementById('personaName').value || "Persona " + (quoteItems.length+1), inputs: inputState};
+
+            if (editingIndex > -1) {
+                // UPDATE EXISTING
+                quoteItems[editingIndex] = item;
+                editingIndex = -1; // Reset edit mode
+                updateActionButton();
+            } else {
+                // ADD NEW
+                quoteItems.push(item);
+            }
+            
+            resetForm(); // Clear form after adding/updating
             renderTable();
         }
 
@@ -749,10 +901,24 @@
             const tb = document.getElementById('quoteBody');
             tb.innerHTML = "";
             let grand = 0;
+            
+            // VARIABLES FOR DASHBOARD
+            let totalBaseCost = 0;
+            let totalAddonCost = 0;
+            const mult = isMonthly ? 1.2 : 1.0;
+
             quoteItems.forEach((item, idx) => {
                 const total = item.price * item.count;
                 grand += total;
                 
+                // CALC SPLIT FOR DASHBOARD
+                const baseUnit = (PRICES[item.base] || 0) * mult;
+                const lineBase = baseUnit * item.count;
+                const lineAddon = total - lineBase;
+                
+                totalBaseCost += lineBase;
+                totalAddonCost += lineAddon;
+
                 let addonHtml = item.addons.length > 0 
                     ? item.addons.map(a => {
                         let color = a.includes("Teams") ? "badge-blue" : a.includes("Security") ? "badge-red" : a.includes("Copilot") ? "badge-purple" : "badge-yellow";
@@ -760,21 +926,44 @@
                     }).join("") 
                     : "<span class='text-slate-400 italic text-xs'>-</span>";
 
+                // Edit Button Styling: Highlight if currently editing this row
+                const editBtnStyle = (idx === editingIndex) ? "text-indigo-600 bg-indigo-50 rounded-full ring-2 ring-indigo-200" : "text-blue-500 hover:text-blue-600";
+
                 tb.innerHTML += `
-                <tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition">
+                <tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition ${idx === editingIndex ? 'bg-indigo-50/50' : ''}">
                     <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">${item.persona} <span class="text-xs text-slate-500 dark:text-slate-400 block">${item.count} Users</span></td>
                     <td class="px-6 py-4 text-indigo-900 dark:text-indigo-300 font-bold whitespace-nowrap">${item.base}</td>
                     <td class="px-6 py-4 leading-relaxed">${addonHtml}</td>
                     <td class="px-6 py-4 text-right whitespace-nowrap font-mono text-slate-600 dark:text-slate-300">€${item.price.toFixed(2)}</td>
                     <td class="px-6 py-4 text-right whitespace-nowrap font-bold font-mono text-primary-600 dark:text-primary-400">€${total.toFixed(2)}</td>
                     <td class="px-6 py-4 text-center flex justify-center gap-3 items-center">
-                        <button onclick="showComparison(${idx})" class="text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition p-1" title="Compare"><i class="fas fa-balance-scale text-lg"></i></button>
+                        <button onclick="editPersona(${idx})" class="${editBtnStyle} transition p-1" title="Edit"><i class="fas fa-pen"></i></button>
+                        <button onclick="showComparison(${idx})" class="text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition p-1" title="Compare"><i class="fas fa-balance-scale"></i></button>
                         <button onclick="quoteItems.splice(${idx},1);renderTable()" class="text-red-400 hover:text-red-600 transition p-1" title="Remove"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
             });
             document.getElementById('grandTotal').innerText = "€" + grand.toFixed(2);
             document.getElementById('quoteCount').innerText = quoteItems.length + " Personas";
+
+            // UPDATE DASHBOARD
+            if (quoteItems.length > 0) {
+                document.getElementById('costDashboard').style.display = "grid";
+                
+                const basePct = grand > 0 ? Math.round((totalBaseCost / grand) * 100) : 0;
+                const addonPct = grand > 0 ? Math.round((totalAddonCost / grand) * 100) : 0;
+
+                document.getElementById('dashBaseBar').style.width = basePct + "%";
+                document.getElementById('dashAddonBar').style.width = addonPct + "%";
+
+                document.getElementById('dashBaseVal').innerText = "€" + totalBaseCost.toFixed(2);
+                document.getElementById('dashBasePct').innerText = basePct + "% of Total";
+                
+                document.getElementById('dashAddonVal').innerText = "€" + totalAddonCost.toFixed(2);
+                document.getElementById('dashAddonPct').innerText = addonPct + "% of Total";
+            } else {
+                document.getElementById('costDashboard').style.display = "none";
+            }
         }
 
         function showComparison(idx) {
@@ -830,16 +1019,29 @@
         // DATA MANAGEMENT (EXPORT & IMPORT)
         // ---------------------------------------------------------
 
+        function escapeCSV(str) {
+            if (!str) return "";
+            // Prevent Injection: if starts with = + - @
+            if (/^[=+\-@]/.test(str)) {
+                return "'" + str;
+            }
+            return str.replace(/"/g, '""'); // Escape quotes
+        }
+
         function exportCSV() {
             if (!quoteItems.length) return alert("Die Liste ist leer. Bitte füge erst Personas hinzu.");
             
-            // Header: Wir fügen 'CurrentLic' hinzu, damit der Import vollständige Daten hat
+            // Header
             let csv = "Persona,Count,Base,Addons,Price,Total,CurrentLic\n";
             
             csv += quoteItems.map(i => {
-                // Felder in Anführungszeichen setzen, um Kommas im Text abzufangen
-                // Addons werden mit Pipe | getrennt, um Konflikte mit CSV-Kommas zu vermeiden
-                return `"${i.persona}",${i.count},"${i.base}","${i.addons.join('|')}",${i.price},${(i.price * i.count).toFixed(2)},"${i.currentLic}"`;
+                // Sanitized Output
+                const pName = escapeCSV(i.persona);
+                const pBase = escapeCSV(i.base);
+                const pAddons = escapeCSV(i.addons.join('|'));
+                const pCur = escapeCSV(i.currentLic);
+                
+                return `"${pName}",${i.count},"${pBase}","${pAddons}",${i.price},${(i.price * i.count).toFixed(2)},"${pCur}"`;
             }).join("\n");
 
             const a = document.createElement('a');
@@ -857,17 +1059,16 @@
                 const text = e.target.result;
                 const lines = text.split('\n');
 
-                // Header überspringen (Start bei i=1)
                 let importedCount = 0;
                 
                 for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (!line) continue;
 
-                    // CSV Parser: Splittet am Komma, ignoriert aber Kommas innerhalb von Anführungszeichen
+                    // CSV Parser
                     const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 
-                    if (cols.length < 5) continue; // Ungültige Zeile überspringen
+                    if (cols.length < 5) continue; 
 
                     const clean = (str) => str ? str.replace(/^"|"$/g, '').trim() : '';
 
@@ -880,21 +1081,22 @@
                         currentLic: cols[6] ? clean(cols[6]) : "None" 
                     };
 
-                    // Features rekonstruieren
+                    // Reconstruct Features
                     newItem.features = [...(FEATURES_MAP[newItem.base] || [])];
-                    
                     if(newItem.addons.some(a => a.includes("Teams"))) {
                         newItem.features = newItem.features.filter(f => f !== "No Teams");
                         if(!newItem.features.includes("Teams Collaboration")) newItem.features.push("Teams Collaboration");
                     }
 
+                    // Note: Imported items do NOT have 'inputs' state, so they are not fully editable yet.
+                    // Future improvement: Reverse-engineer inputs from base/addons.
                     quoteItems.push(newItem);
                     importedCount++;
                 }
 
                 renderTable();
                 alert(`${importedCount} Personas erfolgreich importiert!`);
-                input.value = ''; // Input zurücksetzen
+                input.value = ''; 
             };
             reader.readAsText(file);
         }
