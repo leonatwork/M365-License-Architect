@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de" class="h-full antialiased">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light.css" />
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -15,10 +19,10 @@
                 fontFamily: { sans: ['Inter', 'sans-serif'] },
                 extend: {
                     colors: {
-                        curry: { DEFAULT: '#CB9D2A', 500: '#CB9D2A', 600: '#b88d22' }, 
-                        indigo: { DEFAULT: '#002B4F', 900: '#002B4F', 800: '#0b365a' }, 
+                        curry: { DEFAULT: '#CB9D2A', 500: '#CB9D2A', 600: '#b88d22' },
+                        indigo: { DEFAULT: '#002B4F', 900: '#002B4F', 800: '#0b365a' },
                         ultramarine: '#254A9A',
-                        slate: { 850: '#1e293b', 900: '#0f172a', 950: '#020617' } 
+                        slate: { 850: '#1e293b', 900: '#0f172a', 950: '#020617' }
                     },
                     backgroundImage: {
                         'gradient-mesh': "radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%)",
@@ -29,47 +33,89 @@
         }
     </script>
     <style>
-        body { transition: background-color 0.5s ease, color 0.3s ease; }
-        
+        body {
+            transition: background-color 0.5s ease, color 0.3s ease;
+        }
+
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
 
         /* Animation Utilities */
-        .chevron { transition: transform 0.2s ease; }
-        .open .chevron { transform: rotate(180deg); }
-        .fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        .chevron {
+            transition: transform 0.2s ease;
+        }
+
+        .open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-[#020617] min-h-screen flex flex-col font-sans selection:bg-curry selection:text-white bg-gradient-light dark:bg-gradient-mesh bg-fixed bg-cover text-slate-900 dark:text-slate-100" onload="init()">
+
+<body
+    class="bg-slate-50 dark:bg-[#020617] min-h-screen flex flex-col font-sans selection:bg-curry selection:text-white bg-gradient-light dark:bg-gradient-mesh bg-fixed bg-cover text-slate-900 dark:text-slate-100"
+    onload="init()">
 
     <div class="sticky top-4 z-50 px-4">
-        <nav class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/70 border-white/40 dark:bg-[#0f172a]/90 dark:border-white/10 rounded-2xl px-6 py-4 flex justify-between items-center max-w-[1600px] mx-auto">
+        <nav
+            class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/70 border-white/40 dark:bg-[#0f172a]/90 dark:border-white/10 rounded-2xl px-6 py-4 flex justify-between items-center max-w-[1600px] mx-auto">
             <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-900 to-ultramarine flex items-center justify-center text-white shadow-lg ring-1 ring-white/20">
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-900 to-ultramarine flex items-center justify-center text-white shadow-lg ring-1 ring-white/20">
                     <i class="fas fa-cloud text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight leading-none">License Architect</h1>
-                    <div class="text-[11px] font-bold text-transparent bg-clip-text bg-gradient-to-r from-curry to-yellow-500 uppercase tracking-wider mt-0.5">by Leon Machnik</div>
+                    <h1 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight leading-none">License
+                        Architect</h1>
+                    <div
+                        class="text-[11px] font-bold text-transparent bg-clip-text bg-gradient-to-r from-curry to-yellow-500 uppercase tracking-wider mt-0.5">
+                        by Leon Machnik</div>
                 </div>
             </div>
-            
+
             <div class="flex items-center gap-3">
                 <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="handleFileSelect(this)">
-                
-                <div class="hidden md:flex items-center gap-1 bg-slate-100/50 dark:bg-slate-900/50 p-1 rounded-lg border border-slate-200/50 dark:border-white/5 backdrop-blur-sm">
-                    <button onclick="document.getElementById('csvInput').click()" class="px-3 py-1.5 text-xs font-semibold rounded-md hover:bg-white dark:hover:bg-slate-700 transition text-slate-600 dark:text-slate-200 flex items-center gap-2">
+
+                <div
+                    class="hidden md:flex items-center gap-1 bg-slate-100/50 dark:bg-slate-900/50 p-1 rounded-lg border border-slate-200/50 dark:border-white/5 backdrop-blur-sm">
+                    <button onclick="document.getElementById('csvInput').click()"
+                        class="px-3 py-1.5 text-xs font-semibold rounded-md hover:bg-white dark:hover:bg-slate-700 transition text-slate-600 dark:text-slate-200 flex items-center gap-2">
                         <i class="fas fa-upload"></i> Import
                     </button>
-                    <button onclick="exportCSV()" class="px-3 py-1.5 text-xs font-semibold rounded-md hover:bg-white dark:hover:bg-slate-700 transition text-slate-600 dark:text-slate-200 flex items-center gap-2">
+                    <button onclick="exportCSV()"
+                        class="px-3 py-1.5 text-xs font-semibold rounded-md hover:bg-white dark:hover:bg-slate-700 transition text-slate-600 dark:text-slate-200 flex items-center gap-2">
                         <i class="fas fa-download"></i> Export
                     </button>
                 </div>
-                <button onclick="toggleTheme()" class="w-10 h-10 rounded-full backdrop-blur-md border shadow-sm flex items-center justify-center text-slate-600 dark:text-curry hover:scale-110 transition-transform duration-200 border-slate-200 dark:border-white/10 bg-white/50 dark:bg-slate-800/80">
+                <button onclick="toggleTheme()"
+                    class="w-10 h-10 rounded-full backdrop-blur-md border shadow-sm flex items-center justify-center text-slate-600 dark:text-curry hover:scale-110 transition-transform duration-200 border-slate-200 dark:border-white/10 bg-white/50 dark:bg-slate-800/80">
                     <i class="fas fa-sun hidden dark:block text-yellow-400"></i>
                     <i class="fas fa-moon dark:hidden"></i>
                 </button>
@@ -79,49 +125,86 @@
 
     <main class="flex-grow container mx-auto px-4 py-8 max-w-[1600px]">
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-            
+
             <div class="xl:col-span-7 space-y-6 fade-in-up" style="animation-delay: 0.1s;">
-                
-                <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-8 relative overflow-hidden group">
-                    <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-indigo-900 to-ultramarine"></div>
-                    
+
+                <div
+                    class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-8 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-indigo-900 to-ultramarine">
+                    </div>
+
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-sm font-bold text-slate-900 dark:text-white uppercase flex items-center gap-3 tracking-wider">
-                            <span class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-300"><i class="fas fa-id-badge"></i></span>
+                        <h2
+                            class="text-sm font-bold text-slate-900 dark:text-white uppercase flex items-center gap-3 tracking-wider">
+                            <span
+                                class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-300"><i
+                                    class="fas fa-id-badge"></i></span>
                             1. Profile & Context
                         </h2>
-                        <button onclick="resetForm()" class="text-[10px] uppercase font-bold tracking-wider text-slate-400 hover:text-red-500 transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-700">
+                        <button onclick="resetForm()"
+                            class="text-[10px] uppercase font-bold tracking-wider text-slate-400 hover:text-red-500 transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-700">
                             <i class="fas fa-eraser"></i> Clear Form
                         </button>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-                        
+
                         <div class="md:col-span-12 mb-2">
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-100 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
-                                 <div class="flex flex-col mb-2 sm:mb-0">
-                                    <span class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 tracking-widest">Commitment Term</span>
-                                    <span class="text-xs text-slate-700 dark:text-slate-300 font-medium">NCE Pricing Model</span>
-                                 </div>
-                                 <div class="flex items-center bg-white dark:bg-slate-950 rounded-lg p-1 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                    <button onclick="setTerm('annual')" id="btnAnnual" class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-xs font-bold transition-all bg-indigo-900 text-white shadow-md ring-1 ring-black/5">Annual</button>
-                                    <button onclick="setTerm('monthly')" id="btnMonthly" class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-xs font-bold transition-all text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800">Monthly (+20%)</button>
-                                 </div>
+                            <div
+                                class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-100 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <div class="flex flex-col mb-2 sm:mb-0">
+                                    <span
+                                        class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 tracking-widest">Commitment
+                                        Term</span>
+                                    <span class="text-xs text-slate-700 dark:text-slate-300 font-medium">NCE Pricing
+                                        Model</span>
+                                </div>
+                                <div
+                                    class="flex items-center bg-white dark:bg-slate-950 rounded-lg p-1 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                    <button onclick="setTerm('annual')" id="btnAnnual"
+                                        class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-xs font-bold transition-all bg-indigo-900 text-white shadow-md ring-1 ring-black/5">Annual</button>
+                                    <button onclick="setTerm('monthly')" id="btnMonthly"
+                                        class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-xs font-bold transition-all text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800">Monthly
+                                        (+20%)</button>
+                                </div>
                             </div>
                         </div>
 
+                        <div class="md:col-span-12 mb-2">
+                            <label
+                                class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">
+                                Schnellauswahl (Preset)
+                            </label>
+                            <select id="presetSelector" onchange="applyPreset(this.value)"
+                                class="w-full rounded-lg border-0 px-3 py-2.5 shadow-inner ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-curry sm:text-sm sm:leading-6 transition-all bg-white/80 text-slate-900 ring-gray-300 placeholder:text-gray-400 dark:bg-slate-950 dark:text-white dark:ring-slate-700 dark:placeholder-slate-500">
+                                <option value="Benutzerdefiniert">-- Benutzerdefiniert --</option>
+                                <option value="Marketing Team">📊 Marketing Team</option>
+                                <option value="Development Team">💻 Development Team</option>
+                                <option value="Executive / C-Level">👔 Executive / C-Level</option>
+                                <option value="Frontline Worker">🏭 Frontline Worker</option>
+                                <option value="IT Administrator">🔧 IT Administrator</option>
+                                <option value="Sales Team">📈 Sales Team</option>
+                                <option value="Finance / Compliance">💰 Finance / Compliance</option>
+                                <option value="Project Manager">📋 Project Manager</option>
+                            </select>
+                        </div>
+
                         <div class="md:col-span-6">
-                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">Persona Name</label>
-                            <input type="text" id="personaName" placeholder="e.g. Marketing Lead" 
+                            <label
+                                class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">Persona
+                                Name</label>
+                            <input type="text" id="personaName" placeholder="e.g. Marketing Lead"
                                 class="w-full rounded-lg border-0 px-3 py-2.5 shadow-inner ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-curry sm:text-sm sm:leading-6 transition-all bg-white/80 text-slate-900 ring-gray-300 placeholder:text-gray-400 dark:bg-slate-950 dark:text-white dark:ring-slate-700 dark:placeholder-slate-500">
                         </div>
                         <div class="md:col-span-3">
-                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">Qty</label>
+                            <label
+                                class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">Qty</label>
                             <input type="number" id="userCount" value="10" min="1" oninput="recalc()"
                                 class="w-full rounded-lg border-0 px-3 py-2.5 shadow-inner ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-curry transition-all bg-white/80 text-slate-900 ring-gray-300 placeholder:text-gray-400 dark:bg-slate-950 dark:text-white dark:ring-slate-700 dark:placeholder-slate-500">
                         </div>
                         <div class="md:col-span-3">
-                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">Workstyle</label>
+                            <label
+                                class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">Workstyle</label>
                             <select id="workstyle" onchange="recalc()"
                                 class="w-full rounded-lg border-0 px-3 py-2.5 shadow-inner ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-curry transition-all bg-white/80 text-slate-900 ring-gray-300 placeholder:text-gray-400 dark:bg-slate-950 dark:text-white dark:ring-slate-700 dark:placeholder-slate-500">
                                 <option value="office">Office</option>
@@ -130,7 +213,9 @@
                             </select>
                         </div>
                         <div class="md:col-span-12">
-                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">Current License (For Comparison)</label>
+                            <label
+                                class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">Current
+                                License (For Comparison)</label>
                             <select id="currentLicense" onchange="recalc()"
                                 class="w-full rounded-lg border-0 px-3 py-2.5 shadow-inner ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-curry transition-all bg-white/80 text-slate-900 ring-gray-300 placeholder:text-gray-400 dark:bg-slate-950 dark:text-white dark:ring-slate-700 dark:placeholder-slate-500">
                                 <option value="None">-- New Hire / No License --</option>
@@ -149,154 +234,287 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-6 fade-in-up border-l-4 border-l-curry" style="animation-delay: 0.2s;">
-                        <h3 class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 flex items-center gap-2 tracking-wide"><i class="fas fa-rocket text-curry"></i> 2. Productivity</h3>
+                    <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-6 fade-in-up border-l-4 border-l-curry"
+                        style="animation-delay: 0.2s;">
+                        <h3
+                            class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 flex items-center gap-2 tracking-wide">
+                            <i class="fas fa-rocket text-curry"></i> 2. Productivity
+                        </h3>
                         <div class="space-y-4">
                             <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Mailbox > 0GB</span>
-                                <input type="checkbox" id="needMailbox" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <span
+                                    class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Mailbox
+                                    > 0GB</span>
+                                <input type="checkbox" id="needMailbox"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                             <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Large Mailbox (50GB+)</span>
-                                <input type="checkbox" id="largeMailbox" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <span
+                                    class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Large
+                                    Mailbox (50GB+)</span>
+                                <input type="checkbox" id="largeMailbox"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                             <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Desktop Apps</span>
-                                <input type="checkbox" id="desktopApps" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <span
+                                    class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Desktop
+                                    Apps</span>
+                                <input type="checkbox" id="desktopApps"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                             <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Web Editing</span>
-                                <input type="checkbox" id="webEdit" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <span
+                                    class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Web
+                                    Editing</span>
+                                <input type="checkbox" id="webEdit"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                             <div class="h-px bg-slate-200 dark:bg-white/10 my-2"></div>
                             <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-bold text-indigo-600 dark:text-indigo-300">Teams Collaboration</span>
-                                <input type="checkbox" id="teamsCollab" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <span class="text-sm font-bold text-indigo-600 dark:text-indigo-300">Teams
+                                    Collaboration</span>
+                                <input type="checkbox" id="teamsCollab"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                             <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Teams Phone</span>
-                                <input type="checkbox" id="teamsPhone" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <span
+                                    class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Teams
+                                    Phone <i class="fas fa-info-circle text-slate-400 ml-1"
+                                        data-tooltip="VoIP-Telefonie über Microsoft Teams"></i></span>
+                                <input type="checkbox" id="teamsPhone"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                         </div>
                     </div>
 
-                    <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-6 fade-in-up border-l-4 border-l-curry" style="animation-delay: 0.3s;">
-                        <h3 class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 flex items-center gap-2 tracking-wide"><i class="fas fa-laptop text-curry"></i> 3. Endpoint & OS</h3>
+                    <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-6 fade-in-up border-l-4 border-l-curry"
+                        style="animation-delay: 0.3s;">
+                        <h3
+                            class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 flex items-center gap-2 tracking-wide">
+                            <i class="fas fa-laptop text-curry"></i> 3. Endpoint & OS
+                        </h3>
                         <div class="space-y-4">
                             <label class="flex justify-between items-center cursor-pointer group">
                                 <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Mobile MDM</span>
-                                <input type="checkbox" id="mdmMobile" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <input type="checkbox" id="mdmMobile"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                             <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Desktop MDM (Intune)</span>
-                                <input type="checkbox" id="mdmDesktop" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Desktop MDM
+                                    (Intune) <i class="fas fa-info-circle text-slate-400 ml-1"
+                                        data-tooltip="Mobile Device Management für Windows/Mac Geräte"></i></span>
+                                <input type="checkbox" id="mdmDesktop"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                             <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Windows OS (E3/E5)</span>
-                                <input type="checkbox" id="winOS" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Windows OS (E3/E5)
+                                    <i class="fas fa-info-circle text-slate-400 ml-1"
+                                        data-tooltip="Windows Enterprise Lizenz mit erweiterten Features"></i></span>
+                                <input type="checkbox" id="winOS"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                             <div class="h-px bg-slate-200 dark:bg-white/10 my-2"></div>
                             <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Defender P1 (AV)</span>
-                                <input type="checkbox" id="sec_def_p1" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Defender P1 (AV) <i
+                                        class="fas fa-info-circle text-slate-400 ml-1"
+                                        data-tooltip="Basis Antivirus und Endpoint Protection"></i></span>
+                                <input type="checkbox" id="sec_def_p1"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                             <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Defender P2 (XDR)</span>
-                                <input type="checkbox" id="sec_def_p2" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-6 fade-in-up border-l-4 border-l-curry" style="animation-delay: 0.4s;">
-                        <h3 class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 flex items-center gap-2 tracking-wide"><i class="fas fa-shield-alt text-curry"></i> 4. Security</h3>
-                        <div class="space-y-4">
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Cond. Access (P1)</span>
-                                <input type="checkbox" id="sec_ca" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
-                            </label>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Risk-Based CA (P2)</span>
-                                <input type="checkbox" id="sec_risk_ca" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
-                            </label>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Cloud Apps (CASB)</span>
-                                <input type="checkbox" id="sec_casb" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Defender P2 (XDR)
+                                    <i class="fas fa-info-circle text-slate-400 ml-1"
+                                        data-tooltip="Extended Detection & Response - Erweiterte Bedrohungserkennung"></i></span>
+                                <input type="checkbox" id="sec_def_p2"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                         </div>
                     </div>
 
-                    <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-6 fade-in-up border-l-4 border-l-curry" style="animation-delay: 0.5s;">
-                        <h3 class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 flex items-center gap-2 tracking-wide"><i class="fas fa-file-contract text-curry"></i> 5. Compliance</h3>
+                    <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-6 fade-in-up border-l-4 border-l-curry"
+                        style="animation-delay: 0.4s;">
+                        <h3
+                            class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 flex items-center gap-2 tracking-wide">
+                            <i class="fas fa-shield-alt text-curry"></i> 4. Security
+                        </h3>
                         <div class="space-y-4">
                             <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">DLP (Basic/Full)</span>
-                                <input type="checkbox" id="comp_dlp" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Cond. Access (P1)
+                                    <i class="fas fa-info-circle text-slate-400 ml-1"
+                                        data-tooltip="Bedingte Zugriffskontrolle ermöglicht Zugriff basierend auf Bedingungen wie Standort, Gerät oder Risiko"></i></span>
+                                <input type="checkbox" id="sec_ca"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                             <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Auto Labeling</span>
-                                <input type="checkbox" id="comp_labeling" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Risk-Based CA (P2)
+                                    <i class="fas fa-info-circle text-slate-400 ml-1"
+                                        data-tooltip="Erweiterte bedingte Zugriffskontrolle mit KI-basierter Risikoerkennung"></i></span>
+                                <input type="checkbox" id="sec_risk_ca"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                             <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Adv. eDiscovery</span>
-                                <input type="checkbox" id="comp_ediscovery" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Cloud Apps (CASB)
+                                    <i class="fas fa-info-circle text-slate-400 ml-1"
+                                        data-tooltip="Cloud App Security Broker - Überwacht und schützt Cloud-Anwendungen"></i></span>
+                                <input type="checkbox" id="sec_casb"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-6 fade-in-up border-l-4 border-l-curry"
+                        style="animation-delay: 0.5s;">
+                        <h3
+                            class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 flex items-center gap-2 tracking-wide">
+                            <i class="fas fa-file-contract text-curry"></i> 5. Compliance
+                        </h3>
+                        <div class="space-y-4">
+                            <label class="flex justify-between items-center cursor-pointer group">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">DLP (Basic/Full) <i
+                                        class="fas fa-info-circle text-slate-400 ml-1"
+                                        data-tooltip="Data Loss Prevention - Verhindert ungewollten Datenverlust"></i></span>
+                                <input type="checkbox" id="comp_dlp"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
+                            </label>
+                            <label class="flex justify-between items-center cursor-pointer group">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Auto Labeling <i
+                                        class="fas fa-info-circle text-slate-400 ml-1"
+                                        data-tooltip="Automatische Klassifizierung sensibler Daten"></i></span>
+                                <input type="checkbox" id="comp_labeling"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
+                            </label>
+                            <label class="flex justify-between items-center cursor-pointer group">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Adv. eDiscovery <i
+                                        class="fas fa-info-circle text-slate-400 ml-1"
+                                        data-tooltip="Erweiterte elektronische Beweissicherung für Compliance"></i></span>
+                                <input type="checkbox" id="comp_ediscovery"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()">
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl overflow-hidden fade-in-up border-l-4 border-l-curry" style="animation-delay: 0.6s;">
-                    <div onclick="toggleCollapse('advancedAddons')" class="flex justify-between items-center p-5 cursor-pointer hover:bg-white/50 dark:hover:bg-slate-700/50 transition">
-                        <h3 class="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase flex items-center gap-2 tracking-wide"><i class="fas fa-wand-magic-sparkles text-curry"></i> 6. Advanced Cloud & AI</h3>
+                <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl overflow-hidden fade-in-up border-l-4 border-l-curry"
+                    style="animation-delay: 0.6s;">
+                    <div onclick="toggleCollapse('advancedAddons')"
+                        class="flex justify-between items-center p-5 cursor-pointer hover:bg-white/50 dark:hover:bg-slate-700/50 transition">
+                        <h3
+                            class="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase flex items-center gap-2 tracking-wide">
+                            <i class="fas fa-wand-magic-sparkles text-curry"></i> 6. Advanced Cloud & AI
+                        </h3>
                         <i class="fas fa-chevron-down text-slate-400 chevron"></i>
                     </div>
-                    <div id="advancedAddons" class="hidden p-6 border-t border-slate-200 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 dark:bg-slate-800/50">
+                    <div id="advancedAddons"
+                        class="hidden p-6 border-t border-slate-200 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 dark:bg-slate-800/50">
                         <div>
-                            <h4 class="text-[10px] font-bold uppercase text-indigo-600 dark:text-indigo-300 mb-3 tracking-widest">Intune Suite</h4>
+                            <h4
+                                class="text-[10px] font-bold uppercase text-indigo-600 dark:text-indigo-300 mb-3 tracking-widest">
+                                Intune Suite</h4>
                             <div class="space-y-3">
-                                <label class="flex justify-between items-center cursor-pointer"><span class="text-sm text-slate-700 dark:text-slate-200">EPM (€5.50)</span><input type="checkbox" id="adv_epm" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()"></label>
-                                <label class="flex justify-between items-center cursor-pointer"><span class="text-sm text-slate-700 dark:text-slate-200">Remote Help (€5.50)</span><input type="checkbox" id="adv_remotehelp" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()"></label>
+                                <label class="flex justify-between items-center cursor-pointer"><span
+                                        class="text-sm text-slate-700 dark:text-slate-200">EPM (€5.50) <i
+                                            class="fas fa-info-circle text-slate-400 ml-1"
+                                            data-tooltip="Endpoint Privilege Management - Verwaltung von Admin-Rechten"></i></span><input
+                                        type="checkbox" id="adv_epm"
+                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                        onchange="recalc()"></label>
+                                <label class="flex justify-between items-center cursor-pointer"><span
+                                        class="text-sm text-slate-700 dark:text-slate-200">Remote Help (€5.50) <i
+                                            class="fas fa-info-circle text-slate-400 ml-1"
+                                            data-tooltip="Remote-Support-Tool für IT-Administratoren"></i></span><input
+                                        type="checkbox" id="adv_remotehelp"
+                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                        onchange="recalc()"></label>
                             </div>
                         </div>
                         <div>
-                            <h4 class="text-[10px] font-bold uppercase text-pink-500 dark:text-pink-400 mb-3 tracking-widest">AI / Copilot</h4>
-                            <label class="flex justify-between items-center cursor-pointer"><span class="text-sm text-slate-700 dark:text-slate-200 font-semibold">M365 Copilot (€30)</span><input type="checkbox" id="adv_copilot" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()"></label>
+                            <h4
+                                class="text-[10px] font-bold uppercase text-pink-500 dark:text-pink-400 mb-3 tracking-widest">
+                                AI / Copilot</h4>
+                            <label class="flex justify-between items-center cursor-pointer"><span
+                                    class="text-sm text-slate-700 dark:text-slate-200 font-semibold">M365 Copilot
+                                    (€30)</span><input type="checkbox" id="adv_copilot"
+                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                    onchange="recalc()"></label>
                         </div>
                     </div>
                 </div>
 
-                <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl overflow-hidden fade-in-up border-l-4 border-l-curry" style="animation-delay: 0.7s;">
-                    <div onclick="toggleCollapse('additionalProds')" class="flex justify-between items-center p-5 cursor-pointer hover:bg-white/50 dark:hover:bg-slate-700/50 transition">
-                        <h3 class="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase flex items-center gap-2 tracking-wide"><i class="fas fa-cubes text-curry"></i> 7. Additional Products</h3>
+                <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl overflow-hidden fade-in-up border-l-4 border-l-curry"
+                    style="animation-delay: 0.7s;">
+                    <div onclick="toggleCollapse('additionalProds')"
+                        class="flex justify-between items-center p-5 cursor-pointer hover:bg-white/50 dark:hover:bg-slate-700/50 transition">
+                        <h3
+                            class="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase flex items-center gap-2 tracking-wide">
+                            <i class="fas fa-cubes text-curry"></i> 7. Additional Products
+                        </h3>
                         <i class="fas fa-chevron-down text-slate-400 chevron"></i>
                     </div>
-                    <div id="additionalProds" class="hidden p-6 border-t border-slate-200 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 dark:bg-slate-800/50">
+                    <div id="additionalProds"
+                        class="hidden p-6 border-t border-slate-200 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 dark:bg-slate-800/50">
                         <div>
-                            <h4 class="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400 mb-3 tracking-widest">Visio & Project</h4>
+                            <h4
+                                class="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400 mb-3 tracking-widest">
+                                Visio & Project</h4>
                             <div class="space-y-3">
                                 <label class="flex justify-between items-center cursor-pointer">
-                                    <span class="text-sm text-slate-700 dark:text-slate-200">Visio Plan 2 (€12.70)</span>
-                                    <input type="checkbox" id="add_visio" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                    <span class="text-sm text-slate-700 dark:text-slate-200">Visio Plan 2
+                                        (€12.70)</span>
+                                    <input type="checkbox" id="add_visio"
+                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                        onchange="recalc()">
                                 </label>
                                 <label class="flex justify-between items-center cursor-pointer">
-                                    <span class="text-sm text-slate-700 dark:text-slate-200">Project Plan 3 (€25.30)</span>
-                                    <input type="checkbox" id="add_project" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                    <span class="text-sm text-slate-700 dark:text-slate-200">Project Plan 3
+                                        (€25.30)</span>
+                                    <input type="checkbox" id="add_project"
+                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                        onchange="recalc()">
                                 </label>
                             </div>
                         </div>
                         <div>
-                            <h4 class="text-[10px] font-bold uppercase text-orange-500 dark:text-orange-400 mb-3 tracking-widest">Infra, Power & Rooms</h4>
+                            <h4
+                                class="text-[10px] font-bold uppercase text-orange-500 dark:text-orange-400 mb-3 tracking-widest">
+                                Infra, Power & Rooms</h4>
                             <div class="space-y-3">
                                 <label class="flex justify-between items-center cursor-pointer">
-                                    <span class="text-sm text-slate-700 dark:text-slate-200">Power Auto. Prem. (€14)</span>
-                                    <input type="checkbox" id="add_powerauto" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                    <span class="text-sm text-slate-700 dark:text-slate-200">Power Auto. Prem.
+                                        (€14)</span>
+                                    <input type="checkbox" id="add_powerauto"
+                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                        onchange="recalc()">
                                 </label>
                                 <label class="flex justify-between items-center cursor-pointer">
-                                    <span class="text-sm text-slate-700 dark:text-slate-200">Teams Rooms Pro (€33.70)</span>
-                                    <input type="checkbox" id="add_rooms" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                    <span class="text-sm text-slate-700 dark:text-slate-200">Teams Rooms Pro
+                                        (€33.70)</span>
+                                    <input type="checkbox" id="add_rooms"
+                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                        onchange="recalc()">
                                 </label>
                                 <label class="flex justify-between items-center cursor-pointer">
-                                    <span class="text-sm text-slate-700 dark:text-slate-200">Defender Server (€2.80)</span>
-                                    <input type="checkbox" id="serverProt" class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer" onchange="recalc()">
+                                    <span class="text-sm text-slate-700 dark:text-slate-200">Defender Server
+                                        (€2.80)</span>
+                                    <input type="checkbox" id="serverProt"
+                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
+                                        onchange="recalc()">
                                 </label>
                             </div>
                         </div>
@@ -307,53 +525,76 @@
 
             <div class="xl:col-span-5">
                 <div class="sticky top-24 space-y-6 fade-in-up" style="animation-delay: 0.4s;">
-                    
-                    <div class="rounded-[2rem] shadow-2xl overflow-hidden bg-white dark:bg-[#0f172a] border border-white/20 dark:border-slate-700 relative transition-all group hover:shadow-curry/20 duration-500">
-                        <div class="bg-gradient-to-br from-indigo-900 to-indigo-800 p-10 text-white relative overflow-hidden">
-                            <div class="absolute -right-10 -top-10 w-48 h-48 bg-curry rounded-full blur-[90px] opacity-30 animate-pulse"></div>
-                            <div class="absolute -left-10 bottom-0 w-40 h-40 bg-blue-500 rounded-full blur-[70px] opacity-20"></div>
-                            
+
+                    <div
+                        class="rounded-[2rem] shadow-2xl overflow-hidden bg-white dark:bg-[#0f172a] border border-white/20 dark:border-slate-700 relative transition-all group hover:shadow-curry/20 duration-500">
+                        <div
+                            class="bg-gradient-to-br from-indigo-900 to-indigo-800 p-10 text-white relative overflow-hidden">
+                            <div
+                                class="absolute -right-10 -top-10 w-48 h-48 bg-curry rounded-full blur-[90px] opacity-30 animate-pulse">
+                            </div>
+                            <div
+                                class="absolute -left-10 bottom-0 w-40 h-40 bg-blue-500 rounded-full blur-[70px] opacity-20">
+                            </div>
+
                             <div class="relative z-10">
                                 <div class="flex justify-between items-start mb-2">
-                                    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">Recommended License</div>
+                                    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">
+                                        Recommended License</div>
                                     <i class="fas fa-award text-curry text-xl"></i>
                                 </div>
-                                <h2 class="text-5xl font-extrabold leading-none tracking-tight mb-3" id="recName">--</h2>
+                                <h2 class="text-5xl font-extrabold leading-none tracking-tight mb-3" id="recName">--
+                                </h2>
                                 <div class="text-sm font-medium text-yellow-400" id="recAddon"></div>
-                                
+
                                 <div class="mt-8 pt-6 border-t border-white/10 flex justify-between items-end">
-                                    <div class="text-xs font-medium text-white/60 uppercase tracking-wider">Est. Monthly / User</div>
+                                    <div class="text-xs font-medium text-white/60 uppercase tracking-wider">Est. Monthly
+                                        / User</div>
                                     <div class="text-right">
-                                        <div class="text-5xl font-bold text-white tracking-tight font-mono" id="recPrice">€0.00</div>
+                                        <div class="text-5xl font-bold text-white tracking-tight font-mono"
+                                            id="recPrice">€0.00</div>
                                         <div class="text-xs font-bold mt-1" id="priceDelta">--</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-slate-50/80 dark:bg-[#0f172a] px-10 py-5 border-b border-slate-200 dark:border-slate-700 backdrop-blur-sm">
+                        <div
+                            class="bg-slate-50/80 dark:bg-[#0f172a] px-10 py-5 border-b border-slate-200 dark:border-slate-700 backdrop-blur-sm">
                             <div class="flex flex-wrap gap-2" id="featureTags"></div>
                         </div>
 
                         <div class="p-10 bg-white dark:bg-[#0f172a]">
-                            <h3 class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 tracking-widest">Reasoning</h3>
-                            <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-200 mb-8 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-white/5" id="recReason">Select your requirements to begin...</p>
-                            
-                            <div class="rounded-xl bg-slate-100/80 dark:bg-slate-950 p-5 border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                            <h3
+                                class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 tracking-widest">
+                                Reasoning</h3>
+                            <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-200 mb-8 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-white/5"
+                                id="recReason">Select your requirements to begin...</p>
+
+                            <div
+                                class="rounded-xl bg-slate-100/80 dark:bg-slate-950 p-5 border border-slate-200 dark:border-slate-700 flex justify-between items-center">
                                 <div>
-                                    <span class="text-[10px] font-bold uppercase text-slate-400 block mb-0.5 tracking-wider">Runner Up</span>
-                                    <span class="text-sm font-bold text-slate-700 dark:text-white" id="altName">--</span>
+                                    <span
+                                        class="text-[10px] font-bold uppercase text-slate-400 block mb-0.5 tracking-wider">Runner
+                                        Up</span>
+                                    <span class="text-sm font-bold text-slate-700 dark:text-white"
+                                        id="altName">--</span>
                                 </div>
                                 <div class="text-right">
-                                    <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700" id="altDiff">--</span>
+                                    <span
+                                        class="text-[10px] font-bold px-2 py-1 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                                        id="altDiff">--</span>
                                     <div class="text-xs font-mono text-slate-400 mt-1" id="altPrice">--</div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="p-6 bg-slate-50 dark:bg-[#0f172a] border-t border-slate-200 dark:border-slate-700">
-                            <button id="actionBtn" onclick="addToQuote()" class="bg-gradient-to-r from-curry via-yellow-500 to-curry text-white font-bold shadow-lg hover:shadow-curry/50 hover:scale-[1.02] transition-all duration-200 w-full py-4 rounded-xl text-sm uppercase tracking-[0.15em] flex justify-center items-center gap-3 group">
-                                <i class="fas fa-plus-circle text-lg group-hover:rotate-90 transition-transform duration-300"></i> <span id="actionBtnText">Add to Quote</span>
+                            <button id="actionBtn" onclick="addToQuote()"
+                                class="bg-gradient-to-r from-curry via-yellow-500 to-curry text-white font-bold shadow-lg hover:shadow-curry/50 hover:scale-[1.02] transition-all duration-200 w-full py-4 rounded-xl text-sm uppercase tracking-[0.15em] flex justify-center items-center gap-3 group">
+                                <i
+                                    class="fas fa-plus-circle text-lg group-hover:rotate-90 transition-transform duration-300"></i>
+                                <span id="actionBtnText">Add to Quote</span>
                             </button>
                         </div>
                     </div>
@@ -362,15 +603,19 @@
             </div>
         </div>
 
-        <div class="mt-12 backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-10 fade-in-up" style="animation-delay: 0.6s;">
+        <div class="mt-12 backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-10 fade-in-up"
+            style="animation-delay: 0.6s;">
             <div class="flex justify-between items-center mb-8">
-                <h3 class="font-bold text-2xl text-slate-900 dark:text-white"><i class="fas fa-file-invoice text-curry mr-3"></i> Quote Summary</h3>
-                <div class="text-sm font-mono bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700" id="quoteCount">0 Personas</div>
+                <h3 class="font-bold text-2xl text-slate-900 dark:text-white"><i
+                        class="fas fa-file-invoice text-curry mr-3"></i> Quote Summary</h3>
+                <div class="text-sm font-mono bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
+                    id="quoteCount">0 Personas</div>
             </div>
-            
+
             <div class="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
                 <table class="w-full text-sm text-left">
-                    <thead class="bg-slate-50 dark:bg-[#020617] text-xs uppercase font-bold text-slate-500 dark:text-slate-400">
+                    <thead
+                        class="bg-slate-50 dark:bg-[#020617] text-xs uppercase font-bold text-slate-500 dark:text-slate-400">
                         <tr>
                             <th class="px-6 py-5">Persona</th>
                             <th class="px-6 py-5">Base</th>
@@ -380,12 +625,18 @@
                             <th class="px-6 py-5 text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="quoteBody" class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-[#0f172a] text-slate-700 dark:text-slate-200">
-                        <tr><td colspan="6" class="px-6 py-16 text-center text-slate-400 italic">No personas added. Build your quote above.</td></tr>
-                    </tbody>
-                    <tfoot class="bg-slate-50 dark:bg-[#020617] font-bold text-slate-900 dark:text-white border-t-2 border-slate-200 dark:border-slate-700">
+                    <tbody id="quoteBody"
+                        class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-[#0f172a] text-slate-700 dark:text-slate-200">
                         <tr>
-                            <td colspan="4" class="text-right px-6 py-5 uppercase text-xs tracking-wider">Monthly Total:</td>
+                            <td colspan="6" class="px-6 py-16 text-center text-slate-400 italic">No personas added.
+                                Build your quote above.</td>
+                        </tr>
+                    </tbody>
+                    <tfoot
+                        class="bg-slate-50 dark:bg-[#020617] font-bold text-slate-900 dark:text-white border-t-2 border-slate-200 dark:border-slate-700">
+                        <tr>
+                            <td colspan="4" class="text-right px-6 py-5 uppercase text-xs tracking-wider">Monthly Total:
+                            </td>
                             <td class="text-right text-curry text-2xl px-6 py-5 font-mono" id="grandTotal">€0.00</td>
                             <td></td>
                         </tr>
@@ -393,25 +644,34 @@
                 </table>
             </div>
 
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 fade-in-up" id="costDashboard" style="display: none;">
-                <div class="bg-slate-100 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 fade-in-up" id="costDashboard"
+                style="display: none;">
+                <div
+                    class="bg-slate-100 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
                     <div class="flex justify-between items-end mb-2">
-                        <div class="text-xs font-bold uppercase text-indigo-900 dark:text-indigo-300">Base Licenses</div>
-                        <div class="text-sm font-mono font-bold text-indigo-700 dark:text-indigo-400" id="dashBaseVal">€0.00</div>
+                        <div class="text-xs font-bold uppercase text-indigo-900 dark:text-indigo-300">Base Licenses
+                        </div>
+                        <div class="text-sm font-mono font-bold text-indigo-700 dark:text-indigo-400" id="dashBaseVal">
+                            €0.00</div>
                     </div>
                     <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
-                        <div class="bg-indigo-600 h-3 rounded-full transition-all duration-500" id="dashBaseBar" style="width: 0%"></div>
+                        <div class="bg-indigo-600 h-3 rounded-full transition-all duration-500" id="dashBaseBar"
+                            style="width: 0%"></div>
                     </div>
                     <div class="text-[10px] text-right mt-1 text-slate-500" id="dashBasePct">0%</div>
                 </div>
-                
-                <div class="bg-slate-100 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
+
+                <div
+                    class="bg-slate-100 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
                     <div class="flex justify-between items-end mb-2">
-                        <div class="text-xs font-bold uppercase text-curry-600 dark:text-yellow-500">Add-ons & Upgrades</div>
-                        <div class="text-sm font-mono font-bold text-curry-600 dark:text-yellow-500" id="dashAddonVal">€0.00</div>
+                        <div class="text-xs font-bold uppercase text-curry-600 dark:text-yellow-500">Add-ons & Upgrades
+                        </div>
+                        <div class="text-sm font-mono font-bold text-curry-600 dark:text-yellow-500" id="dashAddonVal">
+                            €0.00</div>
                     </div>
                     <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
-                        <div class="bg-curry h-3 rounded-full transition-all duration-500" id="dashAddonBar" style="width: 0%"></div>
+                        <div class="bg-curry h-3 rounded-full transition-all duration-500" id="dashAddonBar"
+                            style="width: 0%"></div>
                     </div>
                     <div class="text-[10px] text-right mt-1 text-slate-500" id="dashAddonPct">0%</div>
                 </div>
@@ -420,41 +680,63 @@
         </div>
     </main>
 
-    <div id="compModal" class="fixed inset-0 z-[100] hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div id="compModal" class="fixed inset-0 z-[100] hidden" role="dialog" aria-modal="true"
+        aria-labelledby="modalTitle">
         <div class="fixed inset-0 bg-slate-900/90 backdrop-blur-md transition-opacity" onclick="closeModal()"></div>
         <div class="fixed inset-0 z-[101] overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-4">
-                <div class="relative bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-3xl w-full border border-white/10 transition-all transform scale-100 overflow-hidden">
-                    <div class="bg-gradient-to-r from-indigo-900 to-indigo-800 px-10 py-8 flex justify-between items-center relative">
-                         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-curry to-yellow-500"></div>
+                <div
+                    class="relative bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-3xl w-full border border-white/10 transition-all transform scale-100 overflow-hidden">
+                    <div
+                        class="bg-gradient-to-r from-indigo-900 to-indigo-800 px-10 py-8 flex justify-between items-center relative">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-curry to-yellow-500"></div>
                         <h3 id="modalTitle" class="text-white font-bold text-2xl tracking-wide">License Comparison</h3>
-                        <button onclick="closeModal()" class="text-white/70 hover:text-white transition bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times text-xl"></i></button>
+                        <button onclick="closeModal()"
+                            class="text-white/70 hover:text-white transition bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center"><i
+                                class="fas fa-times text-xl"></i></button>
                     </div>
                     <div class="p-10">
                         <div class="grid grid-cols-2 gap-8 mb-10">
-                            <div class="text-center p-6 rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-[#020617] relative overflow-hidden">
-                                <div class="text-[10px] uppercase text-slate-500 font-bold tracking-widest mb-2">Current</div>
-                                <div class="font-bold text-xl text-slate-800 dark:text-white" id="modCurrentName">--</div>
+                            <div
+                                class="text-center p-6 rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-[#020617] relative overflow-hidden">
+                                <div class="text-[10px] uppercase text-slate-500 font-bold tracking-widest mb-2">Current
+                                </div>
+                                <div class="font-bold text-xl text-slate-800 dark:text-white" id="modCurrentName">--
+                                </div>
                             </div>
-                            <div class="text-center p-6 rounded-2xl border border-indigo-200 bg-indigo-50 dark:border-indigo-900 dark:bg-indigo-950 relative overflow-hidden ring-1 ring-indigo-500/30">
-                                <div class="absolute top-0 right-0 p-2 text-indigo-200 opacity-20 text-4xl"><i class="fas fa-arrow-right"></i></div>
-                                <div class="text-[10px] uppercase text-indigo-600 dark:text-indigo-300 font-bold tracking-widest mb-2">Recommended</div>
+                            <div
+                                class="text-center p-6 rounded-2xl border border-indigo-200 bg-indigo-50 dark:border-indigo-900 dark:bg-indigo-950 relative overflow-hidden ring-1 ring-indigo-500/30">
+                                <div class="absolute top-0 right-0 p-2 text-indigo-200 opacity-20 text-4xl"><i
+                                        class="fas fa-arrow-right"></i></div>
+                                <div
+                                    class="text-[10px] uppercase text-indigo-600 dark:text-indigo-300 font-bold tracking-widest mb-2">
+                                    Recommended</div>
                                 <div class="font-bold text-xl text-indigo-700 dark:text-white" id="modRecName">--</div>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                            <div class="bg-green-50/50 dark:bg-green-900/10 p-6 rounded-2xl border border-green-100 dark:border-green-900/30">
-                                <h4 class="text-xs font-bold text-green-700 dark:text-green-400 uppercase mb-4 border-b border-green-200 dark:border-green-800 pb-3 flex items-center gap-2"><i class="fas fa-plus-circle"></i> Gained Features</h4>
+                            <div
+                                class="bg-green-50/50 dark:bg-green-900/10 p-6 rounded-2xl border border-green-100 dark:border-green-900/30">
+                                <h4
+                                    class="text-xs font-bold text-green-700 dark:text-green-400 uppercase mb-4 border-b border-green-200 dark:border-green-800 pb-3 flex items-center gap-2">
+                                    <i class="fas fa-plus-circle"></i> Gained Features
+                                </h4>
                                 <ul id="listGained" class="text-sm space-y-3 text-slate-700 dark:text-slate-300"></ul>
                             </div>
-                            <div class="bg-red-50/50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/30">
-                                <h4 class="text-xs font-bold text-red-700 dark:text-red-400 uppercase mb-4 border-b border-red-200 dark:border-red-800 pb-3 flex items-center gap-2"><i class="fas fa-minus-circle"></i> Lost Features</h4>
+                            <div
+                                class="bg-red-50/50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/30">
+                                <h4
+                                    class="text-xs font-bold text-red-700 dark:text-red-400 uppercase mb-4 border-b border-red-200 dark:border-red-800 pb-3 flex items-center gap-2">
+                                    <i class="fas fa-minus-circle"></i> Lost Features
+                                </h4>
                                 <ul id="listLost" class="text-sm space-y-3 text-slate-700 dark:text-slate-300"></ul>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-slate-50 dark:bg-slate-900 px-10 py-6 flex justify-end border-t border-slate-200 dark:border-slate-700">
-                        <button onclick="closeModal()" class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3 rounded-xl font-bold text-sm hover:scale-105 transition transform shadow-lg">Done</button>
+                    <div
+                        class="bg-slate-50 dark:bg-slate-900 px-10 py-6 flex justify-end border-t border-slate-200 dark:border-slate-700">
+                        <button onclick="closeModal()"
+                            class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3 rounded-xl font-bold text-sm hover:scale-105 transition transform shadow-lg">Done</button>
                     </div>
                 </div>
             </div>
@@ -465,11 +747,11 @@
         // CONFIG
         const PRICES = {
             "None": 0,
-            "M365 F1": 1.60, "M365 F3": 7.00, 
+            "M365 F1": 1.60, "M365 F3": 7.00,
             "Business Basic": 4.60, "Business Standard": 9.70, "Business Premium": 18.60,
-            "O365 E1": 7.40, "O365 E3": 23.10, 
+            "O365 E1": 7.40, "O365 E3": 23.10,
             "M365 E3": 29.70, "M365 E5": 51.70,
-            "Entra ID P2": 8.40, "M365 E5 Security Add-on": 11.20, "M365 E5 Compliance Add-on": 11.20, 
+            "Entra ID P2": 8.40, "M365 E5 Security Add-on": 11.20, "M365 E5 Compliance Add-on": 11.20,
             "M365 F5 Security Add-on": 8.00, "M365 F5 Compliance Add-on": 8.00,
             "Defender for Business Servers": 2.80,
             "Intune Suite Add-on": 9.40, "EPM Add-on": 5.50, "Remote Help Add-on": 5.50,
@@ -504,19 +786,135 @@
             "Business Premium": ["Intune", "Def Biz", "Entra P1", "Desktop Apps", "Web Apps (Edit)", "Exch 50GB", "SharePoint", "Teams Collaboration", "Win OS (VDA)"],
             "O365 E1": ["Web Apps (Edit)", "Exch 50GB", "SharePoint", "Teams Collaboration"],
             "O365 E3": ["Desktop Apps", "Web Apps (Edit)", "Exch 100GB", "SharePoint", "Comp Basic", "Teams Collaboration"],
-            "M365 E3": ["Win OS", "Intune", "Entra P1", "Desktop Apps", "Web Apps (Edit)", "Exch 100GB", "SharePoint", "Def P1", "Comp Basic", "No Teams"], 
+            "M365 E3": ["Win OS", "Intune", "Entra P1", "Desktop Apps", "Web Apps (Edit)", "Exch 100GB", "SharePoint", "Def P1", "Comp Basic", "No Teams"],
             "M365 E5": ["Win OS", "Intune", "Entra P2", "Desktop Apps", "Web Apps (Edit)", "Exch 100GB", "SharePoint", "Def XDR", "Comp E5", "PowerBI", "Teams Phone", "No Teams"]
         };
 
+        const PERSONA_PRESETS = {
+            "Benutzerdefiniert": {},
+            "Marketing Team": {
+                personaName: "Marketing Team",
+                workstyle: "office",
+                desktopApps: true,
+                webEdit: true,
+                teamsCollab: true,
+                mdmMobile: true,
+                sec_ca: true,
+                comp_dlp: true
+            },
+            "Development Team": {
+                personaName: "Development Team",
+                workstyle: "office",
+                desktopApps: true,
+                webEdit: true,
+                teamsCollab: true,
+                mdmDesktop: true,
+                sec_ca: true,
+                sec_def_p1: true,
+                winOS: true
+            },
+            "Executive / C-Level": {
+                personaName: "Executive",
+                workstyle: "office",
+                desktopApps: true,
+                largeMailbox: true,
+                teamsPhone: true,
+                teamsCollab: true,
+                mdmMobile: true,
+                mdmDesktop: true,
+                sec_risk_ca: true,
+                sec_def_p2: true,
+                comp_labeling: true,
+                adv_copilot: true
+            },
+            "Frontline Worker": {
+                personaName: "Frontline Worker",
+                workstyle: "frontline",
+                webEdit: true,
+                teamsCollab: true,
+                mdmMobile: true,
+                needMailbox: false
+            },
+            "IT Administrator": {
+                personaName: "IT Admin",
+                workstyle: "office",
+                desktopApps: true,
+                teamsCollab: true,
+                mdmDesktop: true,
+                winOS: true,
+                sec_ca: true,
+                sec_def_p2: true,
+                adv_remotehelp: true
+            },
+            "Sales Team": {
+                personaName: "Sales Team",
+                workstyle: "office",
+                desktopApps: true,
+                largeMailbox: true,
+                teamsPhone: true,
+                teamsCollab: true,
+                mdmMobile: true,
+                sec_ca: true,
+                add_visio: true
+            },
+            "Finance / Compliance": {
+                personaName: "Finance Team",
+                workstyle: "office",
+                desktopApps: true,
+                teamsCollab: true,
+                sec_risk_ca: true,
+                sec_def_p2: true,
+                comp_dlp: true,
+                comp_labeling: true,
+                comp_ediscovery: true
+            },
+            "Project Manager": {
+                personaName: "Project Manager",
+                workstyle: "office",
+                desktopApps: true,
+                teamsCollab: true,
+                mdmMobile: true,
+                sec_ca: true,
+                add_project: true,
+                add_visio: true
+            }
+        };
+
+        function applyPreset(presetName) {
+            if (presetName === "Benutzerdefiniert") return;
+
+            const preset = PERSONA_PRESETS[presetName];
+            if (!preset) return;
+
+            // Reset form first (but keep count if desired, though resetForm resets it to 10)
+            // Or just overwrite values. Let's overwrite values.
+            // First clear checkboxes to ensure clean state
+            FORM_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.type === 'checkbox') el.checked = false;
+            });
+
+            // Apply preset values
+            Object.keys(preset).forEach(key => {
+                const el = document.getElementById(key);
+                if (el) {
+                    if (el.type === 'checkbox') el.checked = preset[key];
+                    else el.value = preset[key];
+                }
+            });
+
+            recalc();
+        }
+
         // IDs for Form Persistence
         const FORM_IDS = [
-            'personaName', 'userCount', 'workstyle', 'currentLicense', 
-            'needMailbox', 'largeMailbox', 'desktopApps', 'webEdit', 
-            'teamsCollab', 'teamsPhone', 
-            'mdmMobile', 'mdmDesktop', 'winOS', 
-            'sec_def_p1', 'sec_def_p2', 'sec_ca', 'sec_risk_ca', 'sec_casb', 
-            'comp_dlp', 'comp_labeling', 'comp_ediscovery', 
-            'adv_epm', 'adv_remotehelp', 'adv_copilot', 
+            'personaName', 'userCount', 'workstyle', 'currentLicense',
+            'needMailbox', 'largeMailbox', 'desktopApps', 'webEdit',
+            'teamsCollab', 'teamsPhone',
+            'mdmMobile', 'mdmDesktop', 'winOS',
+            'sec_def_p1', 'sec_def_p2', 'sec_ca', 'sec_risk_ca', 'sec_casb',
+            'comp_dlp', 'comp_labeling', 'comp_ediscovery',
+            'adv_epm', 'adv_remotehelp', 'adv_copilot',
             'add_visio', 'add_project', 'add_powerauto', 'add_rooms', 'serverProt'
         ];
 
@@ -534,11 +932,18 @@
                     else document.documentElement.classList.remove('dark');
                 }
             });
-            
+
             if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && mediaQuery.matches)) {
                 document.documentElement.classList.add('dark');
             }
             recalc();
+
+            // Initialize Tooltips
+            tippy('[data-tooltip]', {
+                content: (reference) => reference.getAttribute('data-tooltip'),
+                theme: document.documentElement.classList.contains('dark') ? '' : 'light',
+                animation: 'scale',
+            });
         }
 
         function toggleTheme() {
@@ -558,14 +963,14 @@
             el.classList.toggle('hidden');
             parent.classList.toggle('open');
             const chev = parent.querySelector('.chevron');
-            if(chev) chev.style.transform = el.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+            if (chev) chev.style.transform = el.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
         }
 
         function setTerm(term) {
             const btnA = document.getElementById('btnAnnual');
             const btnM = document.getElementById('btnMonthly');
-            
-            if(term === 'annual') {
+
+            if (term === 'annual') {
                 isMonthly = false;
                 btnA.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-md text-xs font-bold transition-all bg-indigo-900 text-white shadow-md ring-1 ring-black/5";
                 btnM.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-md text-xs font-bold transition-all text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800";
@@ -589,22 +994,22 @@
             document.getElementById('userCount').value = 10;
             document.getElementById('workstyle').value = 'office';
             document.getElementById('currentLicense').value = 'None';
-            
+
             // Exit edit mode
             editingIndex = -1;
             updateActionButton();
-            
+
             recalc();
         }
 
         function editPersona(idx) {
             const item = quoteItems[idx];
             if (!item.inputs) return alert("Cannot edit items created with an older version.");
-            
+
             // Restore inputs
             FORM_IDS.forEach(id => {
                 const el = document.getElementById(id);
-                if(!el) return;
+                if (!el) return;
                 const savedVal = item.inputs[id];
                 if (el.type === 'checkbox') el.checked = savedVal;
                 else el.value = savedVal;
@@ -613,10 +1018,10 @@
             // Set edit mode
             editingIndex = idx;
             updateActionButton();
-            
+
             // Update calculation based on loaded values
             recalc();
-            
+
             // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -624,7 +1029,7 @@
         function updateActionButton() {
             const btn = document.getElementById('actionBtn');
             const txt = document.getElementById('actionBtnText');
-            
+
             if (editingIndex > -1) {
                 txt.innerText = "Update Persona";
                 btn.className = "bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 text-white font-bold shadow-lg hover:shadow-indigo-500/50 hover:scale-[1.02] transition-all duration-200 w-full py-4 rounded-xl text-sm uppercase tracking-[0.15em] flex justify-center items-center gap-3 group";
@@ -661,7 +1066,7 @@
                 project: document.getElementById('add_project').checked,
                 pauto: document.getElementById('add_powerauto').checked,
                 rooms: document.getElementById('add_rooms').checked,
-                serverProt: document.getElementById('serverProt').checked 
+                serverProt: document.getElementById('serverProt').checked
             };
 
             // NCE Multiplier Logic
@@ -680,12 +1085,12 @@
             if (i.style === 'standalone') {
                 base = "None";
                 reason = "Standalone Mode: Only selected Add-ons are calculated.";
-                alt = "None"; 
+                alt = "None";
             } else {
                 if (i.copilot) {
-                     base = "M365 E3"; reason = "M365 Copilot selected: Requires E3/E5."; alt = "M365 E5";
+                    base = "M365 E3"; reason = "M365 Copilot selected: Requires E3/E5."; alt = "M365 E5";
                 } else if (needsIntuneAdv && (i.current === "None" || i.current.includes("Business") || i.current.includes("F") || i.current.includes("O365"))) {
-                     base = "M365 E3"; reason = "Intune Suite Add-ons need M365 E3 base."; alt = "Business Premium";
+                    base = "M365 E3"; reason = "Intune Suite Add-ons need M365 E3 base."; alt = "Business Premium";
                 } else {
                     if (i.style === 'frontline') {
                         if (i.phone || i.win || needsIntuneAdv) {
@@ -696,14 +1101,14 @@
                             base = i.web ? "M365 F3" : "M365 F1";
                             reason = i.web ? "F3 for Web Edit." : "F1 for Read-only.";
                             alt = i.web ? "M365 F1" : "M365 F3";
-                            if (needsAdvSec) addons.push("M365 F5 Security Add-on"); 
+                            if (needsAdvSec) addons.push("M365 F5 Security Add-on");
                         }
                     } else {
                         // Logic Updated: Prefer Business Premium if count <= 300 even for Adv Security
                         if (i.mdm || i.win || i.ca || i.def1 || needsIntuneAdv || needsAdvSec || needsAdvComp) {
                             if (i.count <= 300 && !i.phone) { // BP limit & Phone check
-                                base = "Business Premium"; 
-                                reason = "SMB High Security (BizPrem + Add-ons)."; 
+                                base = "Business Premium";
+                                reason = "SMB High Security (BizPrem + Add-ons).";
                                 alt = "M365 E5";
                             } else {
                                 // If > 300 or needs Phone (Ent Voice), jump to E5 logic
@@ -739,14 +1144,14 @@
                 else if (base.includes("M365 E3")) k = "Teams_ME3";
                 else if (base.includes("M365 E5")) k = "Teams_ME5";
                 tPrice = (PRICES[k] || 0) * mult; // Apply Mult
-                if (tPrice > 0) addons.push({name: "Teams EEA", price: tPrice});
+                if (tPrice > 0) addons.push({ name: "Teams EEA", price: tPrice });
             }
 
             // Intune Logic
             if (i.epm || i.rh) {
                 let indCost = ((i.epm ? PRICES["EPM Add-on"] : 0) + (i.rh ? PRICES["Remote Help Add-on"] : 0)) * mult;
                 let suiteCost = PRICES["Intune Suite Add-on"] * mult;
-                
+
                 if (indCost > suiteCost) {
                     addons.push("Intune Suite Add-on"); reason += " + Intune Suite.";
                 } else {
@@ -757,31 +1162,31 @@
 
             if (i.serverProt) addons.push("Defender for Business Servers");
             if (i.copilot) addons.push("M365 Copilot");
-            
+
             if (i.visio) addons.push("Visio Plan 2");
             if (i.project) addons.push("Project Plan 3");
             if (i.pauto) addons.push("Power Automate Premium");
             if (i.rooms) addons.push("Teams Rooms Pro");
 
-            
+
             // Security & Compliance Add-ons Logic
             if (!base.includes("E5")) {
                 if (base === "Business Premium") {
-                     // NEW SMB LOGIC
-                     if (needsAdvComp && needsAdvSec) {
-                         addons.push("BizPrem E5 Upgrade");
-                     } else if (needsAdvComp) {
-                         addons.push("Purview Suite for BizPrem");
-                     } else if (needsAdvSec) {
-                         addons.push("Defender Suite for BizPrem");
-                     }
+                    // NEW SMB LOGIC
+                    if (needsAdvComp && needsAdvSec) {
+                        addons.push("BizPrem E5 Upgrade");
+                    } else if (needsAdvComp) {
+                        addons.push("Purview Suite for BizPrem");
+                    } else if (needsAdvSec) {
+                        addons.push("Defender Suite for BizPrem");
+                    }
                 } else if (base.includes("F")) {
                     if (needsAdvComp) addons.push("M365 F5 Compliance Add-on");
                     if (needsAdvSec) addons.push("M365 F5 Security Add-on"); // F3 can use F5 Security
                 } else {
                     // Enterprise (E3)
                     if (needsAdvComp) addons.push("M365 E5 Compliance Add-on");
-                    if (needsAdvSec) addons.push("M365 E5 Security Add-on"); 
+                    if (needsAdvSec) addons.push("M365 E5 Security Add-on");
                 }
             }
 
@@ -793,7 +1198,7 @@
             });
 
             // Auto Upsell
-            if (i.style !== 'standalone' && base !== "M365 E5" && !base.includes("F")) { 
+            if (i.style !== 'standalone' && base !== "M365 E5" && !base.includes("F")) {
                 // Calc E5 Price with Multiplier
                 let e5P = (PRICES["M365 E5"] * mult) + (tPrice > 0 ? (PRICES["Teams_ME5"] * mult) : 0);
                 let keep = [];
@@ -801,17 +1206,17 @@
                 flatAddons.forEach(fa => {
                     // Addons NOT in E5 (Keep paying for them)
                     if (fa.includes("Copilot") || fa.includes("Visio") || fa.includes("Project") || fa.includes("Power") || fa.includes("Rooms") || fa.includes("Server") || fa.includes("Intune") || fa.includes("EPM") || fa.includes("Remote")) {
-                        e5P += (PRICES[fa] || 0) * mult; 
+                        e5P += (PRICES[fa] || 0) * mult;
                         keep.push(fa);
                     }
                 });
-                
+
                 if (price > e5P) {
                     base = "M365 E5";
                     price = e5P;
                     flatAddons = keep;
                     reason = "Auto-Upgrade to M365 E5 (Cheaper than Base + Add-ons).";
-                    tPrice = i.teams ? (PRICES["Teams_ME5"] * mult) : 0; 
+                    tPrice = i.teams ? (PRICES["Teams_ME5"] * mult) : 0;
                 }
             }
 
@@ -832,9 +1237,9 @@
             document.getElementById('recName').innerText = c.base;
             document.getElementById('recPrice').innerText = "€" + c.price.toFixed(2);
             document.getElementById('recReason').innerText = c.reason;
-            
+
             // Delta
-            const currentPrice = (PRICES[c.currentLic] || 0) * mult; 
+            const currentPrice = (PRICES[c.currentLic] || 0) * mult;
             const delta = c.price - currentPrice;
             let deltaHtml = "";
             if (c.currentLic !== "None") {
@@ -844,16 +1249,16 @@
             document.getElementById('recPrice').innerHTML = `€${c.price.toFixed(2)} ${deltaHtml}`;
 
             let subHtml = c.addons.filter(a => !a.includes("Teams")).join(" + ");
-            if(c.teamsPrice > 0) {
+            if (c.teamsPrice > 0) {
                 subHtml = `<span class="text-blue-500 font-bold">Teams (+€${c.teamsPrice.toFixed(2)})</span>` + (subHtml ? " + " + subHtml : "");
             }
             document.getElementById('recAddon').innerHTML = subHtml || "";
-            
+
             // Runner Up Fix
             document.getElementById('altName').innerText = c.alt;
             const altPrice = (PRICES[c.alt] || 0) * mult;
             document.getElementById('altPrice').innerText = "€" + altPrice.toFixed(2);
-            
+
             const altDiff = c.price - altPrice;
             const altEl = document.getElementById('altDiff');
             if (altDiff > 0) {
@@ -876,12 +1281,12 @@
             const inputState = {};
             FORM_IDS.forEach(id => {
                 const el = document.getElementById(id);
-                if(el) {
+                if (el) {
                     inputState[id] = (el.type === 'checkbox') ? el.checked : el.value;
                 }
             });
 
-            const item = {...currentCalc, persona: document.getElementById('personaName').value || "Persona " + (quoteItems.length+1), inputs: inputState};
+            const item = { ...currentCalc, persona: document.getElementById('personaName').value || "Persona " + (quoteItems.length + 1), inputs: inputState };
 
             if (editingIndex > -1) {
                 // UPDATE EXISTING
@@ -892,7 +1297,7 @@
                 // ADD NEW
                 quoteItems.push(item);
             }
-            
+
             resetForm(); // Clear form after adding/updating
             renderTable();
         }
@@ -901,7 +1306,7 @@
             const tb = document.getElementById('quoteBody');
             tb.innerHTML = "";
             let grand = 0;
-            
+
             // VARIABLES FOR DASHBOARD
             let totalBaseCost = 0;
             let totalAddonCost = 0;
@@ -910,20 +1315,20 @@
             quoteItems.forEach((item, idx) => {
                 const total = item.price * item.count;
                 grand += total;
-                
+
                 // CALC SPLIT FOR DASHBOARD
                 const baseUnit = (PRICES[item.base] || 0) * mult;
                 const lineBase = baseUnit * item.count;
                 const lineAddon = total - lineBase;
-                
+
                 totalBaseCost += lineBase;
                 totalAddonCost += lineAddon;
 
-                let addonHtml = item.addons.length > 0 
+                let addonHtml = item.addons.length > 0
                     ? item.addons.map(a => {
                         let color = a.includes("Teams") ? "badge-blue" : a.includes("Security") ? "badge-red" : a.includes("Copilot") ? "badge-purple" : "badge-yellow";
                         return `<span class="badge ${color} mr-1 mb-1">${a}</span>`;
-                    }).join("") 
+                    }).join("")
                     : "<span class='text-slate-400 italic text-xs'>-</span>";
 
                 // Edit Button Styling: Highlight if currently editing this row
@@ -949,7 +1354,7 @@
             // UPDATE DASHBOARD
             if (quoteItems.length > 0) {
                 document.getElementById('costDashboard').style.display = "grid";
-                
+
                 const basePct = grand > 0 ? Math.round((totalBaseCost / grand) * 100) : 0;
                 const addonPct = grand > 0 ? Math.round((totalAddonCost / grand) * 100) : 0;
 
@@ -958,7 +1363,7 @@
 
                 document.getElementById('dashBaseVal').innerText = "€" + totalBaseCost.toFixed(2);
                 document.getElementById('dashBasePct').innerText = basePct + "% of Total";
-                
+
                 document.getElementById('dashAddonVal').innerText = "€" + totalAddonCost.toFixed(2);
                 document.getElementById('dashAddonPct').innerText = addonPct + "% of Total";
             } else {
@@ -970,51 +1375,51 @@
             const item = quoteItems[idx];
             const curF = FEATURES_MAP[item.currentLic] || [];
             const recF = item.features || [];
-            
+
             const rawGained = recF.filter(newFeature => {
-                if (curF.includes(newFeature)) return false; 
+                if (curF.includes(newFeature)) return false;
                 let groupName = null;
                 for (const [grp, members] of Object.entries(HIERARCHY)) { if (members.includes(newFeature)) { groupName = grp; break; } }
                 if (groupName) {
                     const members = HIERARCHY[groupName];
                     const newRank = members.indexOf(newFeature);
                     const hasSuperior = curF.some(oldF => { const oldRank = members.indexOf(oldF); return oldRank > -1 && oldRank >= newRank; });
-                    if (hasSuperior) return false; 
+                    if (hasSuperior) return false;
                 }
                 return true;
             });
 
             const smartLost = curF.filter(lostFeature => {
-                if (recF.includes(lostFeature)) return false; 
+                if (recF.includes(lostFeature)) return false;
                 let groupName = null;
                 for (const [grp, members] of Object.entries(HIERARCHY)) { if (members.includes(lostFeature)) { groupName = grp; break; } }
                 if (groupName) {
                     const members = HIERARCHY[groupName];
                     const lostRank = members.indexOf(lostFeature);
                     const hasSuperiorOrEqual = recF.some(f => { const r = members.indexOf(f); return r > -1 && r >= lostRank; });
-                    if (hasSuperiorOrEqual) return false; 
+                    if (hasSuperiorOrEqual) return false;
                 }
                 return true;
             });
 
             document.getElementById('modCurrentName').innerText = item.currentLic;
             document.getElementById('modRecName').innerText = item.base;
-            
+
             const gList = document.getElementById('listGained');
-            gList.innerHTML = rawGained.length 
-                ? rawGained.map(f => `<li class="flex items-start gap-2"><i class="fas fa-check text-green-500 mt-1"></i><span>${f}</span></li>`).join('') 
+            gList.innerHTML = rawGained.length
+                ? rawGained.map(f => `<li class="flex items-start gap-2"><i class="fas fa-check text-green-500 mt-1"></i><span>${f}</span></li>`).join('')
                 : '<li class="italic text-slate-400">No new features</li>';
 
             const lList = document.getElementById('listLost');
-            lList.innerHTML = smartLost.length 
-                ? smartLost.map(f => `<li class="flex items-start gap-2"><i class="fas fa-times text-red-500 mt-1"></i><span>${f}</span></li>`).join('') 
+            lList.innerHTML = smartLost.length
+                ? smartLost.map(f => `<li class="flex items-start gap-2"><i class="fas fa-times text-red-500 mt-1"></i><span>${f}</span></li>`).join('')
                 : '<li class="italic text-slate-400">No features lost</li>';
-                
+
             document.getElementById('compModal').classList.remove('hidden');
         }
 
         function closeModal() { document.getElementById('compModal').classList.add('hidden'); }
-        
+
         // ---------------------------------------------------------
         // DATA MANAGEMENT (EXPORT & IMPORT)
         // ---------------------------------------------------------
@@ -1030,17 +1435,17 @@
 
         function exportCSV() {
             if (!quoteItems.length) return alert("Die Liste ist leer. Bitte füge erst Personas hinzu.");
-            
+
             // Header
             let csv = "Persona,Count,Base,Addons,Price,Total,CurrentLic\n";
-            
+
             csv += quoteItems.map(i => {
                 // Sanitized Output
                 const pName = escapeCSV(i.persona);
                 const pBase = escapeCSV(i.base);
                 const pAddons = escapeCSV(i.addons.join('|'));
                 const pCur = escapeCSV(i.currentLic);
-                
+
                 return `"${pName}",${i.count},"${pBase}","${pAddons}",${i.price},${(i.price * i.count).toFixed(2)},"${pCur}"`;
             }).join("\n");
 
@@ -1055,12 +1460,12 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const text = e.target.result;
                 const lines = text.split('\n');
 
                 let importedCount = 0;
-                
+
                 for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (!line) continue;
@@ -1068,7 +1473,7 @@
                     // CSV Parser
                     const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 
-                    if (cols.length < 5) continue; 
+                    if (cols.length < 5) continue;
 
                     const clean = (str) => str ? str.replace(/^"|"$/g, '').trim() : '';
 
@@ -1078,14 +1483,14 @@
                         base: clean(cols[2]),
                         addons: clean(cols[3]) ? clean(cols[3]).split('|') : [],
                         price: parseFloat(cols[4]) || 0,
-                        currentLic: cols[6] ? clean(cols[6]) : "None" 
+                        currentLic: cols[6] ? clean(cols[6]) : "None"
                     };
 
                     // Reconstruct Features
                     newItem.features = [...(FEATURES_MAP[newItem.base] || [])];
-                    if(newItem.addons.some(a => a.includes("Teams"))) {
+                    if (newItem.addons.some(a => a.includes("Teams"))) {
                         newItem.features = newItem.features.filter(f => f !== "No Teams");
-                        if(!newItem.features.includes("Teams Collaboration")) newItem.features.push("Teams Collaboration");
+                        if (!newItem.features.includes("Teams Collaboration")) newItem.features.push("Teams Collaboration");
                     }
 
                     // Note: Imported items do NOT have 'inputs' state, so they are not fully editable yet.
@@ -1096,10 +1501,11 @@
 
                 renderTable();
                 alert(`${importedCount} Personas erfolgreich importiert!`);
-                input.value = ''; 
+                input.value = '';
             };
             reader.readAsText(file);
         }
     </script>
 </body>
+
 </html>
