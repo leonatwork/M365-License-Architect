@@ -166,13 +166,40 @@ body {
 .term-btn:last-child { border-right: 0; }
 .term-btn.active { background: var(--ink); color: var(--paper); }
 
-.req-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px 18px;
+.req-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   max-height: 340px;
   overflow: auto;
   padding-right: 4px;
+}
+.req-cat {
+  border: 1px solid var(--rule);
+  background: #fffaf3;
+}
+.req-cat-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--rule);
+  background: #efe9e0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.req-cat-head .num {
+  color: var(--mute);
+  letter-spacing: 0.08em;
+}
+.req-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 14px;
+  padding: 6px 8px 8px;
 }
 .req-item {
   display: flex;
@@ -519,9 +546,11 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   .compare-foot .hold-btn { display: none; } /* CTA lives in sticky mobile bar */
 
   .req-panel { order: 5; }
+  .req-stack {
+    max-height: none;
+  }
   .req-grid {
     grid-template-columns: 1fr 1fr;
-    max-height: none;
     gap: 0 12px;
   }
   .req-item {
@@ -593,6 +622,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
     grid-template-columns: 1fr;
   }
   .req-grid { grid-template-columns: 1fr; }
+  .req-cat-head { font-size: 11px; padding: 8px; }
   .compare-cols { grid-template-columns: 1fr; }
   .top-actions {
     grid-template-columns: repeat(2, 1fr);
@@ -675,7 +705,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
     left: 0; top: 20%; width: 100%; height: 48%;
     overflow: hidden;
   }
-  .req-grid { max-height: none; height: calc(100% - 28px); }
+  .req-stack { max-height: none; height: calc(100% - 28px); }
   .quote-wrap {
     position: absolute;
     left: 0; top: 68%; width: 100%; height: 32%;
@@ -773,132 +803,167 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
 
       <div class="panel panel-pad req-panel">
         <h2 class="sec-label">Requirements</h2>
-        <div class="req-grid" id="reqList">
-          <label class="req-item">
-            <input type="checkbox" id="needMailbox" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Mailbox > 0GB</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="largeMailbox" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Large Mailbox (50GB+)</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="desktopApps" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Desktop Apps</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="webEdit" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Web Editing</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="teamsCollab" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Teams Collaboration</span>
-          </label>
-          <label class="req-item" data-tooltip="VoIP-Telefonie über Microsoft Teams">
-            <input type="checkbox" id="teamsPhone" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Teams Phone</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="mdmMobile" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Mobile MDM</span>
-          </label>
-          <label class="req-item" data-tooltip="Mobile Device Management für Windows/Mac Geräte">
-            <input type="checkbox" id="mdmDesktop" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Desktop MDM (Intune)</span>
-          </label>
-          <label class="req-item" data-tooltip="Windows Enterprise Lizenz mit erweiterten Features">
-            <input type="checkbox" id="winOS" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Windows OS (E3/E5)</span>
-          </label>
-          <label class="req-item" data-tooltip="Basis Antivirus und Endpoint Protection">
-            <input type="checkbox" id="sec_def_p1" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Defender P1 (AV)</span>
-          </label>
-          <label class="req-item" data-tooltip="Extended Detection & Response">
-            <input type="checkbox" id="sec_def_p2" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Defender P2 (XDR)</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="sec_ca" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Conditional Access</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="sec_risk_ca" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Risk-Based CA</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="sec_casb" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>CASB / Defender for Cloud Apps</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="comp_dlp" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>DLP</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="comp_labeling" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Sensitivity Labels</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="comp_ediscovery" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>eDiscovery</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="adv_epm" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Endpoint Privilege Management</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="adv_remotehelp" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Remote Help</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="adv_copilot" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Microsoft 365 Copilot (€30)</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="add_visio" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Visio Plan 2</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="add_project" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Project Plan 3</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="add_powerauto" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Power Automate (€14)</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="add_rooms" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Teams Rooms Pro (€33.70)</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="serverProt" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Defender Server (€2.80)</span>
-          </label>
+        <div class="req-stack" id="reqList">
+          <section class="req-cat" aria-labelledby="cat-prod">
+            <div class="req-cat-head"><span id="cat-prod">Productivity</span><span class="num">01</span></div>
+            <div class="req-grid">
+              <label class="req-item">
+                <input type="checkbox" id="needMailbox" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Mailbox > 0GB</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="largeMailbox" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Large Mailbox (50GB+)</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="desktopApps" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Desktop Apps</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="webEdit" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Web Editing</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="teamsCollab" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Teams Collaboration</span>
+              </label>
+              <label class="req-item" data-tooltip="VoIP-Telefonie über Microsoft Teams">
+                <input type="checkbox" id="teamsPhone" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Teams Phone</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="req-cat" aria-labelledby="cat-endpoint">
+            <div class="req-cat-head"><span id="cat-endpoint">Endpoint &amp; OS</span><span class="num">02</span></div>
+            <div class="req-grid">
+              <label class="req-item">
+                <input type="checkbox" id="mdmMobile" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Mobile MDM</span>
+              </label>
+              <label class="req-item" data-tooltip="Mobile Device Management für Windows/Mac Geräte">
+                <input type="checkbox" id="mdmDesktop" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Desktop MDM (Intune)</span>
+              </label>
+              <label class="req-item" data-tooltip="Windows Enterprise Lizenz mit erweiterten Features">
+                <input type="checkbox" id="winOS" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Windows OS (E3/E5)</span>
+              </label>
+              <label class="req-item" data-tooltip="Basis Antivirus und Endpoint Protection">
+                <input type="checkbox" id="sec_def_p1" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Defender P1 (AV)</span>
+              </label>
+              <label class="req-item" data-tooltip="Extended Detection & Response">
+                <input type="checkbox" id="sec_def_p2" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Defender P2 (XDR)</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="req-cat" aria-labelledby="cat-sec">
+            <div class="req-cat-head"><span id="cat-sec">Security</span><span class="num">03</span></div>
+            <div class="req-grid">
+              <label class="req-item">
+                <input type="checkbox" id="sec_ca" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Conditional Access</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="sec_risk_ca" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Risk-Based CA</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="sec_casb" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>CASB / Defender for Cloud Apps</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="req-cat" aria-labelledby="cat-comp">
+            <div class="req-cat-head"><span id="cat-comp">Compliance</span><span class="num">04</span></div>
+            <div class="req-grid">
+              <label class="req-item">
+                <input type="checkbox" id="comp_dlp" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>DLP</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="comp_labeling" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Sensitivity Labels</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="comp_ediscovery" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>eDiscovery</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="req-cat" aria-labelledby="cat-adv">
+            <div class="req-cat-head"><span id="cat-adv">Advanced Cloud &amp; AI</span><span class="num">05</span></div>
+            <div class="req-grid">
+              <label class="req-item">
+                <input type="checkbox" id="adv_epm" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Endpoint Privilege Management</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="adv_remotehelp" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Remote Help</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="adv_copilot" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Microsoft 365 Copilot (€30)</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="req-cat" aria-labelledby="cat-add">
+            <div class="req-cat-head"><span id="cat-add">Additional Products</span><span class="num">06</span></div>
+            <div class="req-grid">
+              <label class="req-item">
+                <input type="checkbox" id="add_visio" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Visio Plan 2</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="add_project" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Project Plan 3</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="add_powerauto" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Power Automate (€14)</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="add_rooms" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Teams Rooms Pro (€33.70)</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="serverProt" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Defender Server (€2.80)</span>
+              </label>
+            </div>
+          </section>
         </div>
       </div>
 
