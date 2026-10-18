@@ -5,12 +5,13 @@
     root.LicenseEngine = factory();
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
-  function getPrice(prices, key) {
+  function getPrice(prices, key, teamsVariant) {
     const entry = prices[key];
     if (typeof entry === 'number') {
       return entry;
     }
     if (entry && typeof entry === 'object') {
+      if (teamsVariant === 'no_teams' && typeof entry.price_no_teams === 'number') return entry.price_no_teams;
       return typeof entry.price === 'number' ? entry.price : 0;
     }
     return 0;
@@ -45,6 +46,7 @@
       web: toBoolean(i.web),
       teams: toBoolean(i.teams),
       phone: toBoolean(i.phone),
+      teamsVariant: i.teamsVariant === 'no_teams' ? 'no_teams' : 'included',
       mdm: Object.hasOwn(i, 'mdm') ? toBoolean(i.mdm) : (mdmMobile || mdmDesktop),
       win: toBoolean(i.win),
       ca: toBoolean(i.ca),
@@ -57,6 +59,11 @@
       edisc: toBoolean(i.edisc),
       epm: toBoolean(i.epm),
       rh: toBoolean(i.rh),
+      aa: toBoolean(i.aa),
+      intune2: toBoolean(i.intune2),
+      eam: toBoolean(i.eam),
+      pki: toBoolean(i.pki),
+      defO365: toBoolean(i.defO365),
       copilot: toBoolean(i.copilot),
       visio: toBoolean(i.visio),
       project: toBoolean(i.project),
@@ -66,13 +73,12 @@
     };
 
     let base = 'None';
-    let addons = [];
     let reason = '';
     let alt = '';
 
-    const needsAdvSec = state.risk || state.def2 || state.casb || state.phone;
+    const needsAdvSec = state.risk || state.def2 || state.casb;
     const needsAdvComp = state.lbl || state.edisc;
-    const needsIntuneAdv = state.epm || state.rh;
+    const needsIntuneAdv = state.epm || state.rh || state.aa || state.intune2 || state.eam || state.pki;
 
     if (state.style === 'standalone') {
       base = 'None';
@@ -93,9 +99,9 @@
       reason = 'Intune Suite Add-ons need M365 E3 base.';
       alt = 'Business Premium';
     } else if (state.style === 'frontline') {
-      if (state.phone || state.win || needsIntuneAdv) {
+      if (state.win || needsIntuneAdv) {
         base = 'M365 E5';
-        reason = 'Frontline needs Ent. features (Voice/Win/Intune Suite).';
+        reason = 'Frontline benötigt Enterprise-Funktionen (Windows/Intune).';
         alt = 'M365 F3';
       } else if (state.desktop) {
         base = 'M365 E3';
@@ -105,19 +111,16 @@
         base = state.web ? 'M365 F3' : 'M365 F1';
         reason = state.web ? 'F3 for Web Edit.' : 'F1 for Read-only.';
         alt = state.web ? 'M365 F1' : 'M365 F3';
-        if (needsAdvSec) {
-          addons.push('M365 F5 Security Add-on');
-        }
       }
+    } else if (state.defO365) {
+      base = 'M365 E3';
+      reason = 'Defender for Office 365 Plan 1 ist in E3 enthalten.';
+      alt = 'M365 E5';
     } else if (state.mdm || state.win || state.ca || state.def1 || needsIntuneAdv || needsAdvSec || needsAdvComp) {
-      if (state.count <= 300 && !state.phone) {
+      if (state.count <= 300) {
         base = 'Business Premium';
         reason = 'SMB High Security (BizPrem + Add-ons).';
         alt = 'M365 E5';
-      } else if (needsAdvSec || needsAdvComp || state.phone) {
-        base = 'M365 E5';
-        reason = 'E5 required (Security/Comp/Voice or >300 users).';
-        alt = 'M365 E3';
       } else {
         base = 'M365 E3';
         reason = 'Enterprise Standard (Intune/Sec).';
@@ -133,151 +136,93 @@
       alt = 'Business Standard';
     }
 
-    let teamsPrice = 0;
-    if (state.teams) {
-      let teamsKey = '';
-      if (base.includes('F1') || base.includes('F3')) {
-        teamsKey = 'Teams_F';
-      } else if (base.includes('Basic')) {
-        teamsKey = 'Teams_BizBasic';
-      } else if (base.includes('Standard')) {
-        teamsKey = 'Teams_BizStd';
-      } else if (base.includes('Premium')) {
-        teamsKey = 'Teams_BizPrem';
-      } else if (base.includes('O365 E1')) {
-        teamsKey = 'Teams_E1';
-      } else if (base.includes('O365 E3')) {
-        teamsKey = 'Teams_OE3';
-      } else if (base.includes('M365 E3')) {
-        teamsKey = 'Teams_ME3';
-      } else if (base.includes('M365 E5')) {
-        teamsKey = 'Teams_ME5';
+    const intuneRequirements = { epm: 'EPM', rh: 'Remote Help', aa: 'Advanced Analytics', intune2: 'Intune Plan 2', eam: 'EAM', pki: 'Cloud PKI' };
+    // Teams Phone setzt Teams voraus.
+    const needsTeams = state.teams || state.phone;
+    function combination(candidate) {
+      let features = (FEATURES_MAP[candidate] || []).slice();
+      const extra = [];
+      if (state.teamsVariant === 'no_teams' && features.includes('Teams Collaboration')) {
+        // EWR-Variante: Suite ohne Teams; benötigtes Teams kommt genau einmal als Add-on Teams EWR hinzu.
+        if (needsTeams) {
+          extra.push('Teams EWR');
+        } else {
+          features = features.filter(feature => feature !== 'Teams Collaboration');
+          features.push('No Teams');
+        }
       }
-
-      teamsPrice = getPrice(PRICES, teamsKey) * mult;
-      if (teamsPrice > 0) {
-        addons.push({ name: 'Teams EEA', price: teamsPrice });
-      }
-    }
-
-    if (state.epm || state.rh) {
-      const individualCost = ((state.epm ? getPrice(PRICES, 'EPM Add-on') : 0) + (state.rh ? getPrice(PRICES, 'Remote Help Add-on') : 0)) * mult;
-      const suiteCost = getPrice(PRICES, 'Intune Suite Add-on') * mult;
-
-      if (individualCost > suiteCost) {
-        addons.push('Intune Suite Add-on');
-        reason += ' + Intune Suite.';
+      const missing = Object.keys(intuneRequirements).filter(key => state[key] && !features.includes(intuneRequirements[key]));
+      // Für neue Einzelprodukte fehlt ein belegter EUR-Preis; die vorhandene Suite deckt sie ab.
+      const individualCost = missing.reduce((sum, key) => sum + getPrice(PRICES, key === 'epm' ? 'EPM Add-on' : 'Remote Help Add-on'), 0);
+      if (missing.length && (missing.some(key => key !== 'epm' && key !== 'rh') || individualCost > getPrice(PRICES, 'Intune Suite Add-on'))) {
+        extra.push('Intune Suite Add-on');
+        features.push(...Object.values(intuneRequirements).filter(feature => !features.includes(feature)));
       } else {
-        if (state.epm) {
-          addons.push('EPM Add-on');
-        }
-        if (state.rh) {
-          addons.push('Remote Help Add-on');
+        for (const key of missing) {
+          extra.push(key === 'epm' ? 'EPM Add-on' : 'Remote Help Add-on');
+          features.push(intuneRequirements[key]);
         }
       }
-    }
-
-    if (state.serverProt) {
-      addons.push('Defender for Business Servers');
-    }
-    if (state.copilot) {
-      addons.push('M365 Copilot');
-    }
-    if (state.visio) {
-      addons.push('Visio Plan 2');
-    }
-    if (state.project) {
-      addons.push('Project Plan 3');
-    }
-    if (state.pauto) {
-      addons.push('Power Automate Premium');
-    }
-    if (state.rooms) {
-      addons.push('Teams Rooms Pro');
-    }
-
-    if (!base.includes('E5')) {
-      if (base === 'Business Premium') {
-        if (needsAdvComp && needsAdvSec) {
-          addons.push('BizPrem E5 Upgrade');
-        } else if (needsAdvComp) {
-          addons.push('Purview Suite for BizPrem');
-        } else if (needsAdvSec) {
-          addons.push('Defender Suite for BizPrem');
-        }
-      } else if (base.includes('F')) {
-        if (needsAdvComp) {
-          addons.push('M365 F5 Compliance Add-on');
-        }
-        if (needsAdvSec) {
-          addons.push('M365 F5 Security Add-on');
-        }
-      } else {
-        if (needsAdvComp) {
-          addons.push('M365 E5 Compliance Add-on');
-        }
-        if (needsAdvSec) {
-          addons.push('M365 E5 Security Add-on');
-        }
+      if (needsAdvSec && !features.includes('Entra P2')) {
+        extra.push(candidate === 'Business Premium' ? (needsAdvComp ? 'BizPrem E5 Upgrade' : 'Defender Suite for BizPrem') : candidate.includes('F') ? 'M365 F5 Security Add-on' : 'M365 E5 Security Add-on');
       }
+      if (needsAdvComp && !features.includes('Comp E5')) {
+        if (!extra.includes('BizPrem E5 Upgrade')) extra.push(candidate === 'Business Premium' ? 'Purview Suite for BizPrem' : candidate.includes('F') ? 'M365 F5 Compliance Add-on' : 'M365 E5 Compliance Add-on');
+      }
+      if (state.phone && !features.includes('Teams Phone')) {
+        extra.push('Teams Phone Add-on');
+        features.push('Teams Phone');
+      }
+      for (const [flag, key] of Object.entries({ serverProt: 'Defender for Business Servers', copilot: 'M365 Copilot', visio: 'Visio Plan 2', project: 'Project Plan 3', pauto: 'Power Automate Premium', rooms: 'Teams Rooms Pro' })) {
+        if (state[flag]) extra.push(key);
+      }
+      const unitPrice = getPrice(PRICES, candidate, state.teamsVariant) + extra.reduce((sum, key) => sum + getPrice(PRICES, key), 0);
+      return { base: candidate, addons: extra, unitPrice, features };
     }
-
-    let price = getPrice(PRICES, base) * mult;
-    let flatAddons = [];
-
-    addons.forEach(function (addon) {
-      if (addon && typeof addon === 'object') {
-        price += addon.price;
-        flatAddons.push(addon.name);
-      } else {
-        price += getPrice(PRICES, addon) * mult;
-        flatAddons.push(addon);
+    // Zulässigkeit einer Basis gemäß den Regeln des Hauptpfads oben.
+    const isEnterprise = key => key.startsWith('M365 E');
+    const isFrontlineSku = key => key.startsWith('M365 F');
+    function isEligibleBase(candidate) {
+      if (candidate === 'None' || !PRICES[candidate]) return false;
+      if (candidate.includes('Business') && state.count > 300) return false;
+      if (isFrontlineSku(candidate) && state.style !== 'frontline') return false;
+      // Frontline erhält nur F-SKUs oder M365 Enterprise, nie Business-/Office-365-Pläne.
+      if (state.style === 'frontline' && !isFrontlineSku(candidate) && !isEnterprise(candidate)) return false;
+      if (state.copilot && !isEnterprise(candidate)) return false;
+      // Intune Suite Add-ons need M365 E3 base.
+      if (needsIntuneAdv && !isEnterprise(candidate)) return false;
+      if ((needsAdvSec || needsAdvComp) && !candidate.startsWith('M365') && candidate !== 'Business Premium') return false;
+      return true;
+    }
+    let selected = combination(base);
+    if (state.phone && state.style !== 'standalone') {
+      // Nur zulässige Basen mit allen nötigen Add-ons vergleichen.
+      const required = { desktop: 'Desktop Apps', web: 'Web Apps (Edit)', mdm: 'Intune', win: 'Win OS', ca: 'Entra P1', def1: 'Def P1', dlp: 'Comp Basic', defO365: 'Def O365 P1' };
+      const hierarchy = sourceData.HIERARCHY || {};
+      const covers = (features, feature) => features.includes(feature)
+        || (feature === 'Win OS' && features.includes('Win OS (VDA)'))
+        || Object.values(hierarchy).some(group => group.includes(feature) && features.some(f => group.indexOf(f) >= group.indexOf(feature)));
+      const candidates = Object.keys(FEATURES_MAP).filter(isEligibleBase);
+      let cheapest = null;
+      for (const candidate of candidates) {
+        const combo = combination(candidate);
+        if (!Object.entries(required).every(([flag, feature]) => !state[flag] || covers(combo.features, feature))) continue;
+        if (!cheapest || combo.unitPrice < cheapest.unitPrice - 1e-9) cheapest = combo;
       }
-    });
-
-    if (state.style !== 'standalone' && base !== 'M365 E5' && !base.includes('F')) {
-      let e5Price = (getPrice(PRICES, 'M365 E5') * mult) + (teamsPrice > 0 ? (getPrice(PRICES, 'Teams_ME5') * mult) : 0);
-      let keep = [];
-
-      if (state.teams && teamsPrice > 0) {
-        keep.push('Teams EEA');
-      }
-
-      flatAddons.forEach(function (flatAddon) {
-        if (
-          flatAddon.includes('Copilot')
-          || flatAddon.includes('Visio')
-          || flatAddon.includes('Project')
-          || flatAddon.includes('Power')
-          || flatAddon.includes('Rooms')
-          || flatAddon.includes('Server')
-          || flatAddon.includes('Intune')
-          || flatAddon.includes('EPM')
-          || flatAddon.includes('Remote')
-        ) {
-          e5Price += getPrice(PRICES, flatAddon) * mult;
-          keep.push(flatAddon);
-        }
-      });
-
-      if (price > e5Price) {
-        base = 'M365 E5';
-        price = e5Price;
-        flatAddons = keep;
+      if (cheapest) selected = cheapest;
+      reason = selected.base === 'M365 E5' ? 'M365 E5 ist inklusive aller Anforderungen günstiger als die Kombination mit Teams Phone.' : 'Günstigste passende Kombination mit Teams Phone.';
+    } else if (state.style !== 'standalone' && base !== 'M365 E5' && !base.includes('F')) {
+      const e5 = combination('M365 E5');
+      if (e5.unitPrice < selected.unitPrice - 1e-9) {
+        selected = e5;
         reason = 'Auto-Upgrade to M365 E5 (Cheaper than Base + Add-ons).';
-        teamsPrice = state.teams ? (getPrice(PRICES, 'Teams_ME5') * mult) : 0;
       }
     }
-
-    let features = (FEATURES_MAP[base] || []).slice();
-    if (state.teams) {
-      features = features.filter(function (feature) {
-        return feature !== 'No Teams';
-      });
-      if (!features.includes('Teams Phone') && !features.includes('Teams Collaboration')) {
-        features.push('Teams Collaboration');
-      }
-    }
+    base = selected.base;
+    const price = selected.unitPrice * mult;
+    const flatAddons = selected.addons;
+    // Teams EWR steht in addons; ein separater teamsPrice würde es doppelt anzeigen.
+    const teamsPrice = 0;
 
     return {
       base: base,
@@ -285,10 +230,11 @@
       price: price,
       reason: reason,
       count: state.count,
-      features: features,
+      features: selected.features,
       alt: alt,
       currentLic: state.current,
       teamsPrice: teamsPrice,
+      teamsVariant: state.teamsVariant,
     };
   }
 
@@ -302,15 +248,16 @@
     const rec = result || {};
     const mult = getMultiplier(term || 'annual');
 
-    const currentPrice = getPrice(PRICES, currentLicense) * mult;
+    const currentPrice = getPrice(PRICES, currentLicense, rec.teamsVariant) * mult;
     const recommendedPrice = typeof rec.price === 'number' ? rec.price : 0;
     const delta = recommendedPrice - currentPrice;
 
     const altLicense = rec.alt || 'None';
-    const altPrice = getPrice(PRICES, altLicense) * mult;
+    const altPrice = getPrice(PRICES, altLicense, rec.teamsVariant) * mult;
     const altDiff = recommendedPrice - altPrice;
 
-    const currentFeatures = FEATURES_MAP[currentLicense] || [];
+    const currentFeatures = (FEATURES_MAP[currentLicense] || []).filter(feature => rec.teamsVariant !== 'no_teams' || feature !== 'Teams Collaboration');
+    if (rec.teamsVariant === 'no_teams') currentFeatures.push('No Teams');
     const recommendedFeatures = rec.features || [];
 
     const gained = recommendedFeatures.filter(function (newFeature) {

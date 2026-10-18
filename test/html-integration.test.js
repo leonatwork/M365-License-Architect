@@ -36,3 +36,7 @@ test('index.html uses LICENSE_DATA and LicenseEngine instead of inline logic con
   assert.ok(html.includes('LicenseEngine.recommend('), 'recalc must use LicenseEngine.recommend');
   assert.ok(html.includes('LicenseEngine.compare('), 'render/showComparison must use LicenseEngine.compare');
 });
+
+test('recommendation does not hide the separately priced Teams Phone add-on', () => {
+  assert.equal(html.includes('c.addons.filter(a => !a.includes("Teams"))'), false);
+});
