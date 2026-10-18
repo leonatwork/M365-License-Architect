@@ -64,7 +64,7 @@ test('E5 break-even auto-upsell is preserved', () => {
   });
 
   assert.equal(result.base, 'M365 E5');
-  assert.match(result.reason, /günstiger/);
+  assert.match(result.reason, /günstigste/);
   assert.ok(result.addons.includes('M365 Copilot'));
 });
 

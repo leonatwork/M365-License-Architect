@@ -32,7 +32,7 @@ test('every changed price and mapping has a source and effective date', () => {
 test('handover lists every unconfirmed price', () => {
   const fs = require('node:fs');
   const path = require('node:path');
-  const handover = fs.readFileSync(path.join(__dirname, '..', 'ISSUE-8-HANDOVER.md'), 'utf8');
+  const handover = fs.readFileSync(path.join(__dirname, '..', 'ISSUE-15-HANDOVER.md'), 'utf8');
   for (const [key, entry] of Object.entries(data.PRICES)) {
     if (entry.todo_source) assert.ok(handover.includes(`| ${key} |`), key);
   }

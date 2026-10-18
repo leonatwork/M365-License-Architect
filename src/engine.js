@@ -34,6 +34,7 @@
     const sourceData = data || {};
     const PRICES = sourceData.PRICES || {};
     const FEATURES_MAP = sourceData.FEATURES_MAP || {};
+    const ADDON_FEATURES = sourceData.ADDON_FEATURES || {};
 
     const mdmMobile = toBoolean(i.mdmMobile);
     const mdmDesktop = toBoolean(i.mdmDesktop);
@@ -163,18 +164,41 @@
           features.push(intuneRequirements[key]);
         }
       }
-      if (needsAdvSec && !features.includes('Entra P2')) {
-        extra.push(candidate === 'Business Premium' ? (needsAdvComp ? 'BizPrem E5 Upgrade' : 'Defender Suite for BizPrem') : candidate.includes('F') ? 'M365 F5 Security Add-on' : 'M365 E5 Security Add-on');
-      }
-      if (needsAdvComp && !features.includes('Comp E5')) {
-        if (!extra.includes('BizPrem E5 Upgrade')) extra.push(candidate === 'Business Premium' ? 'Purview Suite for BizPrem' : candidate.includes('F') ? 'M365 F5 Compliance Add-on' : 'M365 E5 Compliance Add-on');
+      const missingSecurity = (state.risk && !features.includes('Entra P2'))
+        || ((state.def2 || state.casb) && !features.includes('Def XDR'));
+      const missingCompliance = needsAdvComp && !features.includes('Comp E5');
+      if (candidate === 'Business Premium') {
+        const security = 'Defender Suite for BizPrem';
+        const compliance = 'Purview Suite for BizPrem';
+        const bundle = 'BizPrem E5 Upgrade';
+        const chosen = missingSecurity && missingCompliance
+          && getPrice(PRICES, bundle) < getPrice(PRICES, security) + getPrice(PRICES, compliance)
+          ? [bundle] : [...(missingSecurity ? [security] : []), ...(missingCompliance ? [compliance] : [])];
+        for (const key of chosen) {
+          if (PRICES[key] && PRICES[key].requires === candidate) {
+            extra.push(key);
+            features.push(...(ADDON_FEATURES[key] || []).filter(feature => !features.includes(feature)));
+          }
+        }
+      } else {
+        if (missingSecurity) {
+          extra.push(candidate.includes('F') ? 'M365 F5 Security Add-on' : 'M365 E5 Security Add-on');
+          features.push('Entra P2', 'Def XDR');
+        }
+        if (missingCompliance) {
+          extra.push(candidate.includes('F') ? 'M365 F5 Compliance Add-on' : 'M365 E5 Compliance Add-on');
+          features.push('Comp E5');
+        }
       }
       if (state.phone && !features.includes('Teams Phone')) {
         extra.push('Teams Phone Add-on');
         features.push('Teams Phone');
       }
       for (const [flag, key] of Object.entries({ serverProt: 'Defender for Business Servers', copilot: 'M365 Copilot', visio: 'Visio Plan 2', project: 'Project Plan 3', pauto: 'Power Automate Premium', rooms: 'Teams Rooms Pro' })) {
-        if (state[flag]) extra.push(key);
+        if (state[flag] && !features.includes(key)) {
+          extra.push(key);
+          if (flag === 'copilot') features.push(key);
+        }
       }
       const unitPrice = getPrice(PRICES, candidate, state.teamsVariant) + extra.reduce((sum, key) => sum + getPrice(PRICES, key), 0);
       return { base: candidate, addons: extra, unitPrice, features };
@@ -184,6 +208,7 @@
     const isFrontlineSku = key => key.startsWith('M365 F');
     function isEligibleBase(candidate) {
       if (candidate === 'None' || !PRICES[candidate]) return false;
+      if (candidate === 'M365 E7' && !state.copilot) return false;
       if (candidate.includes('Business') && state.count > 300) return false;
       if (isFrontlineSku(candidate) && state.style !== 'frontline') return false;
       // Frontline erhält nur F-SKUs oder M365 Enterprise, nie Business-/Office-365-Pläne.
@@ -195,9 +220,9 @@
       return true;
     }
     let selected = combination(base);
-    if (state.phone && state.style !== 'standalone') {
+    if ((state.phone || needsAdvSec || needsAdvComp || state.copilot) && state.style !== 'standalone') {
       // Nur zulässige Basen mit allen nötigen Add-ons vergleichen.
-      const required = { desktop: 'Desktop Apps', web: 'Web Apps (Edit)', mdm: 'Intune', win: 'Win OS', ca: 'Entra P1', def1: 'Def P1', dlp: 'Comp Basic', defO365: 'Def O365 P1' };
+      const required = { desktop: 'Desktop Apps', web: 'Web Apps (Edit)', mdm: 'Intune', win: 'Win OS', ca: 'Entra P1', def1: 'Def P1', dlp: 'Comp Basic', defO365: 'Def O365 P1', risk: 'Entra P2', def2: 'Def XDR', casb: 'Def XDR', lbl: 'Comp E5', edisc: 'Comp E5', phone: 'Teams Phone', copilot: 'M365 Copilot', ...intuneRequirements };
       const hierarchy = sourceData.HIERARCHY || {};
       const covers = (features, feature) => features.includes(feature)
         || (feature === 'Win OS' && features.includes('Win OS (VDA)'))
@@ -210,7 +235,7 @@
         if (!cheapest || combo.unitPrice < cheapest.unitPrice - 1e-9) cheapest = combo;
       }
       if (cheapest) selected = cheapest;
-      reason = selected.base === 'M365 E5' ? 'M365 E5 ist inklusive aller Anforderungen günstiger als die Kombination mit Teams Phone.' : 'Günstigste passende Kombination mit Teams Phone.';
+      reason = `${selected.base}: günstigste zulässige Kombination inklusive aller Anforderungen${state.phone ? ' und Teams Phone' : ''}.`;
     } else if (state.style !== 'standalone' && base !== 'M365 E5' && !base.includes('F')) {
       const e5 = combination('M365 E5');
       if (e5.unitPrice < selected.unitPrice - 1e-9) {

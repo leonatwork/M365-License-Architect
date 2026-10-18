@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const julyReferenceResults = require('./fixtures/july-2026-reference-results.js');
+const referenceResults = require('./fixtures/upgrades-e7-reference-results.js');
 const legacyConstants = require('./fixtures/legacy-constants.js');
 const data = require('../data/licenses.js');
 
@@ -188,7 +188,7 @@ test('engine module can be required in node without browser globals', () => {
   });
 });
 
-test('recommend matches reviewed July prices and combinations for every preset', () => {
+test('recommend matches reviewed upgrade prices and combinations for every preset', () => {
   const engine = require('../src/engine.js');
   const presetNames = Object.keys(legacyConstants.PERSONA_PRESETS).filter((name) => name !== 'Benutzerdefiniert');
 
@@ -197,7 +197,7 @@ test('recommend matches reviewed July prices and combinations for every preset',
     const annual = engine.recommend(input, { term: 'annual' }, data);
     const monthly = engine.recommend(input, { term: 'monthly' }, data);
 
-    const expected = julyReferenceResults[presetName];
+    const expected = referenceResults[presetName];
     assert.equal(annual.base, expected.base, presetName);
     assert.deepEqual(annual.addons, expected.addons, presetName);
     assert.ok(Math.abs(annual.price - expected.price) < 1e-9, presetName);

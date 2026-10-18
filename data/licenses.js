@@ -10,8 +10,11 @@
   const BUSINESS = 'https://www.microsoft.com/de-de/microsoft-365/business/';
   const ENTERPRISE = 'https://www.microsoft.com/de-de/microsoft-365/enterprise/';
   const PACKAGING = 'https://www.microsoft.com/en-us/licensing/news/2026-m365-packaging-pricing-updates';
+  const SECURITY_UPGRADES = 'https://www.microsoft.com/de-de/security/pricing/small-medium-business/security-add-on-plans';
+  const SOURCE_CHECKED = '2026-10-18';
   const suite = (price, price_no_teams, source) => ({ price, price_no_teams, currency: 'EUR', source, valid_from: VALID_FROM });
   const addon = (price, source) => ({ price, currency: 'EUR', source, valid_from: VALID_FROM });
+  const upgrade = price => ({ ...addon(price, SECURITY_UPGRADES), requires: 'Business Premium', source_checked: SOURCE_CHECKED });
 
   const PRICES = {
     None: { price: 0, currency: 'EUR', source: SOURCE, valid_from: null },
@@ -26,6 +29,7 @@
     'O365 E5': suite(41.42, 34.01, ENTERPRISE + 'office-365-e3'),
     'M365 E3': suite(37.78, 30.36, ENTERPRISE + 'microsoft-365-plans-and-pricing'),
     'M365 E5': suite(58.13, 50.71, ENTERPRISE + 'microsoft-365-plans-and-pricing'),
+    'M365 E7': { ...suite(91.92, 84.51, ENTERPRISE + 'microsoft-365-plans-and-pricing'), source_checked: SOURCE_CHECKED },
     'Entra ID P2': { price: 8.40, currency: 'EUR', source: SOURCE, valid_from: null },
     'M365 E5 Security Add-on': { price: 11.20, currency: 'EUR', source: SOURCE, valid_from: null },
     'M365 E5 Compliance Add-on': { price: 11.20, currency: 'EUR', source: SOURCE, valid_from: null },
@@ -46,9 +50,11 @@
     'Project Plan 3': { price: 25.30, currency: 'EUR', source: SOURCE, valid_from: null },
     'Power Automate Premium': { price: 14.00, currency: 'EUR', source: SOURCE, valid_from: null },
     'Teams Rooms Pro': { price: 33.70, currency: 'EUR', source: SOURCE, valid_from: null },
-    'Defender Suite for BizPrem': { price: 10.00, currency: 'EUR', source: SOURCE, valid_from: null },
-    'Purview Suite for BizPrem': { price: 10.00, currency: 'EUR', source: SOURCE, valid_from: null },
-    'BizPrem E5 Upgrade': { price: 15.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Defender Suite for BizPrem': upgrade(8.70),
+    'Purview Suite for BizPrem': upgrade(8.70),
+    // Bestehender Schlüssel bleibt kompatibel; das Produkt ist das gemeinsame Paket,
+    // keine vollständige E5-Lizenz (insbesondere ohne Teams Phone / Intune Suite).
+    'BizPrem E5 Upgrade': upgrade(13.00),
   };
   // Unbelegte Bestandswerte sind kein bestätigter Preisstand Juli 2026.
   for (const [key, entry] of Object.entries(PRICES)) {
@@ -80,14 +86,25 @@
     'M365 E3': ['Win OS', 'Intune', 'Entra P1', 'Desktop Apps', 'Web Apps (Edit)', 'Exch 100GB', 'SharePoint', 'Def P1', 'Comp Basic', 'Teams Collaboration', 'Remote Help', 'Advanced Analytics', 'Intune Plan 2', 'Def O365 P1'],
     'M365 E5': ['Win OS', 'Intune', 'Entra P2', 'Desktop Apps', 'Web Apps (Edit)', 'Exch 100GB', 'SharePoint', 'Def XDR', 'Comp E5', 'PowerBI', 'Teams Phone', 'Teams Collaboration', 'Remote Help', 'Advanced Analytics', 'Intune Plan 2', 'Def O365 P2', 'EPM', 'EAM', 'Cloud PKI'],
   };
+  FEATURES_MAP['M365 E7'] = [...FEATURES_MAP['M365 E5'], 'M365 Copilot', 'Agent 365', 'Entra Suite'];
+  // Add-ons getrennt von Basislizenzen halten, damit sie nie als Basis gewählt werden.
+  const ADDON_FEATURES = {
+    'Defender Suite for BizPrem': ['Entra P2', 'Def XDR', 'Def O365 P2'],
+    'Purview Suite for BizPrem': ['Comp E5'],
+  };
+  ADDON_FEATURES['BizPrem E5 Upgrade'] = [...ADDON_FEATURES['Defender Suite for BizPrem'], ...ADDON_FEATURES['Purview Suite for BizPrem']];
   // Preisquelle und Paketquelle getrennt: Jede geänderte Zuordnung ist datiert.
   const FEATURE_SOURCES = {
     'O365 E3': { source: PACKAGING, valid_from: VALID_FROM },
     'O365 E5': { source: ENTERPRISE + 'office-365-e3', valid_from: VALID_FROM },
     'M365 E3': { source: PACKAGING, valid_from: VALID_FROM },
     'M365 E5': { source: PACKAGING, valid_from: VALID_FROM },
+    'M365 E7': { source: ENTERPRISE + 'microsoft-365-plans-and-pricing', valid_from: VALID_FROM, source_checked: SOURCE_CHECKED },
     'Intune Suite Add-on': { source: 'https://www.microsoft.com/en-us/security/business/microsoft-intune-pricing', valid_from: VALID_FROM },
   };
+  for (const key of Object.keys(ADDON_FEATURES)) {
+    FEATURE_SOURCES[key] = { source: SECURITY_UPGRADES, valid_from: VALID_FROM, source_checked: SOURCE_CHECKED };
+  }
 
   const PERSONA_PRESETS = {
     Benutzerdefiniert: {},
@@ -183,6 +200,7 @@
     PRICES,
     HIERARCHY,
     FEATURES_MAP,
+    ADDON_FEATURES,
     FEATURE_SOURCES,
     PERSONA_PRESETS,
   };
