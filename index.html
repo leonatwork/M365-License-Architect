@@ -804,6 +804,19 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
       <div class="panel panel-pad req-panel">
         <h2 class="sec-label">Requirements</h2>
         <div class="req-stack" id="reqList">
+          <section class="req-cat teams-options" role="group" aria-labelledby="cat-teams">
+            <div class="req-cat-head"><span id="cat-teams">Microsoft Teams</span></div>
+            <div class="req-grid">
+              <label class="req-item">
+                <input type="radio" id="teamsIncluded" name="teamsVariant" value="included" checked onchange="recalc()">
+                <i class="box" aria-hidden="true"></i><span>im Paket (Standard)</span>
+              </label>
+              <label class="req-item">
+                <input type="radio" id="teamsNoTeams" name="teamsVariant" value="no_teams" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i><span>ohne Teams (EWR-Variante)</span>
+              </label>
+            </div>
+          </section>
           <section class="req-cat" aria-labelledby="cat-prod">
             <div class="req-cat-head"><span id="cat-prod">Productivity</span><span class="num">01</span></div>
             <div class="req-grid">
@@ -972,6 +985,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
           <h2 class="sec-label" style="margin:0">Quote</h2>
           <div id="quoteCount">0 Personas</div>
         </div>
+        <p id="csvImportNotice" class="price-stand" role="status" hidden></p>
         <table class="data">
           <thead>
             <tr>
@@ -1041,6 +1055,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
           <div class="price-plate"><span></span><span id="recPrice">€ 0.00</span></div>
           <div class="delta-hatch" id="priceDelta">—</div>
         </div>
+        <div class="price-stand" id="recPriceStand"></div>
         <div class="reason" id="recReason">Select your requirements to begin...</div>
         <div class="tags" id="featureTags"></div>
         <div class="alt-row">
@@ -1081,6 +1096,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
 
 <script src="data/licenses.js"></script>
 <script src="src/engine.js"></script>
+<script src="src/csv.js"></script>
 <script>
         // CONFIG
 
@@ -1105,6 +1121,8 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
             });
 
             // Apply preset values
+            document.getElementById('teamsIncluded').checked = true;
+            document.getElementById('teamsNoTeams').checked = false;
             Object.keys(preset).forEach(key => {
                 const el = document.getElementById(key);
                 if (el) {
@@ -1120,7 +1138,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
         const FORM_IDS = [
             'personaName', 'userCount', 'workstyle', 'currentLicense',
             'needMailbox', 'largeMailbox', 'desktopApps', 'webEdit',
-            'teamsCollab', 'teamsPhone',
+            'teamsCollab', 'teamsPhone', 'teamsIncluded', 'teamsNoTeams',
             'mdmMobile', 'mdmDesktop', 'winOS',
             'sec_def_p1', 'sec_def_p2', 'sec_ca', 'sec_risk_ca', 'sec_casb',
             'comp_dlp', 'comp_labeling', 'comp_ediscovery',
@@ -1196,7 +1214,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
             FORM_IDS.forEach(id => {
                 const el = document.getElementById(id);
                 if (!el) return;
-                if (el.type === 'checkbox') el.checked = false;
+                if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
                 else if (el.tagName === 'SELECT') el.selectedIndex = 0;
                 else el.value = '';
             });
@@ -1204,6 +1222,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
             document.getElementById('userCount').value = 10;
             document.getElementById('workstyle').value = 'office';
             document.getElementById('currentLicense').value = 'None';
+            document.getElementById('teamsIncluded').checked = true;
 
             // Exit edit mode
             editingIndex = -1;
@@ -1221,7 +1240,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
                 const el = document.getElementById(id);
                 if (!el) return;
                 const savedVal = item.inputs[id];
-                if (el.type === 'checkbox') el.checked = savedVal;
+                if (el.type === 'checkbox' || el.type === 'radio') el.checked = savedVal;
                 else el.value = savedVal;
             });
 
@@ -1262,6 +1281,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
                 desktop: document.getElementById('desktopApps').checked,
                 web: document.getElementById('webEdit').checked,
                 teams: document.getElementById('teamsCollab').checked,
+                teamsVariant: document.getElementById('teamsNoTeams').checked ? 'no_teams' : 'included',
                 phone: document.getElementById('teamsPhone').checked,
                 mdm: document.getElementById('mdmMobile').checked || document.getElementById('mdmDesktop').checked,
                 win: document.getElementById('winOS').checked,
@@ -1284,6 +1304,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
             };
             const term = isMonthly ? 'monthly' : 'annual';
             currentCalc = LicenseEngine.recommend(i, { term }, LICENSE_DATA);
+            Object.assign(currentCalc, LicenseCSV.priceInfo(currentCalc, LICENSE_DATA));
             render();
         }
 
@@ -1295,6 +1316,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
             document.getElementById('recName').innerText = c.base;
             document.getElementById('recPrice').innerText = "€ " + c.price.toFixed(2);
             document.getElementById('recReason').innerText = c.reason;
+            document.getElementById('recPriceStand').innerText = LicenseCSV.priceInfo(c, LICENSE_DATA).text;
 
             const delta = comparison.delta;
             const deltaEl = document.getElementById('priceDelta');
@@ -1342,7 +1364,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
             FORM_IDS.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    inputState[id] = (el.type === 'checkbox') ? el.checked : el.value;
+                    inputState[id] = (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value;
                 }
             });
 
@@ -1377,7 +1399,8 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
                 grand += total;
 
                 // CALC SPLIT FOR DASHBOARD
-                const baseUnit = (PRICES[item.base] || 0) * mult;
+                const entry = PRICE_ENTRIES[item.base];
+                const baseUnit = ((item.teamsVariant === 'no_teams' ? entry?.price_no_teams : entry?.price) ?? PRICES[item.base] ?? 0) * mult;
                 const lineBase = baseUnit * item.count;
                 const lineAddon = total - lineBase;
 
@@ -1387,7 +1410,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
                 let addonHtml = item.addons.length > 0
                     ? item.addons.map(a => {
                         let color = a.includes("Teams") ? "tag-blue" : a.includes("Security") ? "tag-red" : a.includes("Copilot") ? "tag-purple" : "tag-ink";
-                        return `<span class="tag ${color} mr-1 mb-1">${a}</span>`;
+                        return `<span class="tag ${color} mr-1 mb-1">${escapeHTML(a)}</span>`;
                     }).join("")
                     : "<span class='text-slate-400 italic text-xs'>-</span>";
 
@@ -1396,8 +1419,8 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
 
                 tb.innerHTML += `
                 <tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition ${idx === editingIndex ? 'bg-indigo-50/50' : ''}">
-                    <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">${item.persona} <span class="text-xs text-slate-500 dark:text-slate-400 block">${item.count} Users</span></td>
-                    <td class="px-6 py-4 text-indigo-900 dark:text-indigo-300 font-bold whitespace-nowrap">${item.base}</td>
+                    <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">${escapeHTML(item.persona)} <span class="text-xs text-slate-500 dark:text-slate-400 block">${item.count} Users</span></td>
+                    <td class="px-6 py-4 text-indigo-900 dark:text-indigo-300 font-bold">${escapeHTML(item.base)}<div class="price-stand">${item.teamsVariant === 'no_teams' ? 'ohne Teams (EWR-Variante)' : 'Teams im Paket'}</div><div class="price-stand">${escapeHTML(LicenseCSV.priceInfo(item, LICENSE_DATA).text)}</div></td>
                     <td class="px-6 py-4 leading-relaxed">${addonHtml}</td>
                     <td class="px-6 py-4 text-right whitespace-nowrap font-mono text-slate-600 dark:text-slate-300">€${item.price.toFixed(2)}</td>
                     <td class="px-6 py-4 text-right whitespace-nowrap font-bold font-mono text-primary-600 dark:text-primary-400">€${total.toFixed(2)}</td>
@@ -1460,30 +1483,14 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
         // DATA MANAGEMENT (EXPORT & IMPORT)
         // ---------------------------------------------------------
 
-        function escapeCSV(str) {
-            if (!str) return "";
-            // Prevent Injection: if starts with = + - @
-            if (/^[=+\-@]/.test(str)) {
-                return "'" + str;
-            }
-            return str.replace(/"/g, '""'); // Escape quotes
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
         }
 
         function exportCSV() {
             if (!quoteItems.length) return alert("Die Liste ist leer. Bitte füge erst Personas hinzu.");
 
-            // Header
-            let csv = "Persona,Count,Base,Addons,Price,Total,CurrentLic\n";
-
-            csv += quoteItems.map(i => {
-                // Sanitized Output
-                const pName = escapeCSV(i.persona);
-                const pBase = escapeCSV(i.base);
-                const pAddons = escapeCSV(i.addons.join('|'));
-                const pCur = escapeCSV(i.currentLic);
-
-                return `"${pName}",${i.count},"${pBase}","${pAddons}",${i.price},${(i.price * i.count).toFixed(2)},"${pCur}"`;
-            }).join("\n");
+            const csv = LicenseCSV.buildCsv(quoteItems, LICENSE_DATA);
 
             const a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
@@ -1497,46 +1504,14 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
 
             const reader = new FileReader();
             reader.onload = function (e) {
-                const text = e.target.result;
-                const lines = text.split('\n');
-
-                let importedCount = 0;
-
-                for (let i = 1; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (!line) continue;
-
-                    // CSV Parser
-                    const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-
-                    if (cols.length < 5) continue;
-
-                    const clean = (str) => str ? str.replace(/^"|"$/g, '').trim() : '';
-
-                    const newItem = {
-                        persona: clean(cols[0]),
-                        count: parseInt(cols[1]) || 1,
-                        base: clean(cols[2]),
-                        addons: clean(cols[3]) ? clean(cols[3]).split('|') : [],
-                        price: parseFloat(cols[4]) || 0,
-                        currentLic: cols[6] ? clean(cols[6]) : "None"
-                    };
-
-                    // Reconstruct Features
-                    newItem.features = [...(FEATURES_MAP[newItem.base] || [])];
-                    if (newItem.addons.some(a => a.includes("Teams"))) {
-                        newItem.features = newItem.features.filter(f => f !== "No Teams");
-                        if (!newItem.features.includes("Teams Collaboration")) newItem.features.push("Teams Collaboration");
-                    }
-
-                    // Note: Imported items do NOT have 'inputs' state, so they are not fully editable yet.
-                    // Future improvement: Reverse-engineer inputs from base/addons.
-                    quoteItems.push(newItem);
-                    importedCount++;
-                }
+                const parsed = LicenseCSV.parseCsv(e.target.result, LICENSE_DATA);
+                quoteItems.push(...parsed.items);
+                const notice = document.getElementById('csvImportNotice');
+                notice.hidden = !parsed.legacyTeams;
+                notice.innerText = parsed.legacyTeams ? 'Alte CSV ohne Teams-Angabe: Alle importierten Personas wurden als „Teams im Paket“ übernommen.' : '';
 
                 renderTable();
-                alert(`${importedCount} Personas erfolgreich importiert!`);
+                alert(`${parsed.items.length} Personas erfolgreich importiert!`);
                 input.value = '';
             };
             reader.readAsText(file);

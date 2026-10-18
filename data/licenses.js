@@ -7,6 +7,11 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   const SOURCE = 'm365maps.com + Microsoft-Preisseite';
   const VALID_FROM = '2026-07-01';
+  const PRICE_TEXT = {
+    notice: 'Listenpreis in EUR, zzgl. MwSt., jährliche Abrechnung',
+    unconfirmed: 'Enthält unbestätigte Bestandswerte (Quelle/Preisstand offen)',
+    undated: 'Preisstand nicht belegt'
+  };
   const BUSINESS = 'https://www.microsoft.com/de-de/microsoft-365/business/';
   const ENTERPRISE = 'https://www.microsoft.com/de-de/microsoft-365/enterprise/';
   const PACKAGING = 'https://www.microsoft.com/en-us/licensing/news/2026-m365-packaging-pricing-updates';
@@ -197,6 +202,7 @@
   };
 
   return {
+    PRICE_TEXT,
     PRICES,
     HIERARCHY,
     FEATURES_MAP,
