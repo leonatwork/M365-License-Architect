@@ -1,0 +1,139 @@
+{
+  "title": "Choose the visual world (re-roll 1)",
+  "question": "Pin: whole tool on one page (profile + requirements + recommendation + quote visible together). The roll assigned Official Application Form. Keep it, take an alternate, or re-roll again.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Official Application Form",
+      "kicker": "THE ROLL",
+      "lineage": "single-sheet government and enterprise application forms",
+      "thesis": "One ruled form sheet: every field and checkbox stays visible; the € recommendation is the official approval block.",
+      "palette": ["#F7F5F0", "#1A1A1A", "#1E3A8A", "#B91C1C"],
+      "materials": ["bond paper", "ruled field boxes", "carbon-black ink", "official stamp block"],
+      "viewport": "ONE PAGE: top bar; left profile+all requirement checkboxes in ruled sections; right sticky approval block with mono €57.20; quote table full width below—nothing hidden behind tabs.",
+      "risk": "Can feel bureaucratic if the stamp outranks the live calculator feel.",
+      "raised": [
+        {
+          "from": "challenger-console",
+          "raise": "Panels persist: toggling never replaces the layout; the whole sheet stays on screen."
+        },
+        {
+          "from": "challenger-ticket",
+          "raise": "Filled money figures strike in carbon-purple mono so prices read as entered facts."
+        }
+      ],
+      "comp": ".impeccable/mocks/decision-r2/assigned.webp"
+    },
+    {
+      "id": "model-pick",
+      "label": "Pink Markets Page",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "Financial Times–style pink markets pages",
+      "thesis": "Licensing as a markets page: dense columns, prices everywhere, one sheet you scan.",
+      "palette": ["#F6D5C8", "#111111", "#C45C26", "#1F4B7A"],
+      "materials": ["pink newsprint", "hairline column rules", "tabular market figures"],
+      "viewport": "ONE PAGE: pink ground; requirements as dense market columns; recommendation as lead quote €57.20; quote table as the listings strip—all visible together.",
+      "risk": "Familiar category landing: serious finance paper most runs reach for.",
+      "comp": ".impeccable/mocks/decision-r2/model-pick.webp"
+    },
+    {
+      "id": "challenger-centre-rail",
+      "label": "Centre-Rail Reference",
+      "verdict": "wins",
+      "lineage": "reference-setting pages with centre key rail and wide annotation margin",
+      "thesis": "Two requirement columns flank a fixed centre rail of keys and the live € decision—whole page stays open.",
+      "palette": ["#EFE8DC", "#1A1A1A", "#C1121F"],
+      "materials": ["unbleached bone paper", "one-pixel ruling engine", "vermilion key rail"],
+      "viewport": "ONE PAGE: left/right requirement columns; centre rail with SKU keys and €57.20; quote apparatus in the margin/below—never a single-panel takeover.",
+      "case": "Beats the roll on clarity for your one-page pin and holds consultant identification via reference reading.",
+      "risk": "Costume if the ruling engine becomes decoration instead of structure.",
+      "comp": ".impeccable/mocks/decision-r2/challenger-centre-rail.webp",
+      "hero": "https://impeccable.style/worlds/cards/rw-centre-rail-reference-setting-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/rw-centre-rail-reference-setting.webp"
+    },
+    {
+      "id": "challenger-exposure",
+      "label": "Exposure Record Sheets",
+      "verdict": "competitive",
+      "lineage": "darkroom printer exposure records with translucent overlays",
+      "thesis": "Requirements as the base sheet; As-Is/To-Be as translucent overlays with stop-deltas on price.",
+      "palette": ["#D7D2C8", "#2A2A2A", "#C41E6A", "#F2EFE8"],
+      "materials": ["backlit neutrals", "tracing overlays", "zone-ramp hatches"],
+      "viewport": "ONE PAGE: base form always visible; overlay slides for Compare without replacing the field; €57.20 with stop-delta.",
+      "case": "Holds clarity for layered compare; weaker everyday audience ID than forms.",
+      "risk": "Darkroom metaphor can obscure if overlays hide the base sheet.",
+      "comp": ".impeccable/mocks/decision-r2/challenger-exposure.webp",
+      "hero": "https://impeccable.style/worlds/cards/operate-b-exposure-record-zone-sheets-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/operate-b-exposure-record-zone-sheets.webp"
+    },
+    {
+      "id": "challenger-wayfinding",
+      "label": "Terminal Yellow Wayfinding",
+      "verdict": "competitive",
+      "lineage": "Schiphol-style airport yellow wayfinding bands",
+      "thesis": "Scan bands for decisions; gate-number scale for the € price; paths stay signed on one concourse page.",
+      "palette": ["#F5C400", "#111111", "#FFFFFF", "#1A1A1A"],
+      "materials": ["saturated yellow panels", "black humanist sans", "pictogram insets"],
+      "viewport": "ONE PAGE: yellow decision bands over a full work field of requirements; monumental €57.20; quote as next-gate strip—all still on one surface.",
+      "case": "Holds scan clarity; loses on price-culture identification and risks ‘playful’ yellow.",
+      "risk": "Yellow can feel playful against your brief if not strictly reserved for wayfinding jobs.",
+      "comp": ".impeccable/mocks/decision-r2/challenger-wayfinding.webp",
+      "hero": "https://impeccable.style/worlds/cards/wayfinding-cartography-signage-terminal-yellow-wayfinding-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/wayfinding-cartography-signage-terminal-yellow-wayfinding.webp"
+    },
+    {
+      "id": "challenger-ticket",
+      "label": "Jet-Age Ticket Wallet",
+      "verdict": "declined",
+      "lineage": "airline ticket wallets with carbon-copy coupons",
+      "palette": ["#0B1F3A", "#C1121F", "#FFFFFF", "#6B3FA0"],
+      "materials": ["coupon stock", "carbon purple numerals", "VOID stamps"],
+      "case": "Loses both: coupon tear-flow fights one-page overview; travel ephemera reads playful.",
+      "kept": "Carbon-struck numerals for filled money figures.",
+      "hero": "https://impeccable.style/worlds/cards/vernacular-ephemera-jet-age-ticket-wallet-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/vernacular-ephemera-jet-age-ticket-wallet.webp"
+    },
+    {
+      "id": "challenger-saville",
+      "label": "Factory Catalog Sleeve",
+      "verdict": "declined",
+      "lineage": "Peter Saville Factory Records catalog identity",
+      "palette": ["#0A0A0A", "#FFFFFF", "#E10600", "#FFD200"],
+      "materials": ["matte black", "pulsar hairlines", "coded colour strips"],
+      "case": "Loses both: coded labels hide meaning; fights price-first clarity.",
+      "kept": "Ruthless reduction—one decoded focal line for the live SKU.",
+      "hero": "https://impeccable.style/worlds/cards/brand-identity-canon-saville-catalog-sleeve-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/brand-identity-canon-saville-catalog-sleeve.webp"
+    },
+    {
+      "id": "challenger-console",
+      "label": "Dark-First Console",
+      "verdict": "declined",
+      "lineage": "dark-first developer working surfaces",
+      "palette": ["#1B1F24", "#D1D5DB", "#22C55E", "#F59E0B"],
+      "materials": ["graphite panels", "hairline seams", "syntax accents"],
+      "case": "Loses both as tool-costume on an Operate screen; not consultant paper culture.",
+      "kept": "Tiled panels persist—navigation never replaces the whole layout.",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-dark-first-developer-console-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/digital-design-canon-dark-first-developer-console.webp"
+    }
+  ],
+  "reroll": {
+    "registers": ["safer", "bolder"]
+  },
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "The category standard",
+    "thesis": "Incumbent one-page SaaS calculator executed at full craft: left requirements, right recommendation, quote below.",
+    "palette": ["#FFFFFF", "#0F172A", "#254A9A", "#CB9D2A"],
+    "materials": ["clean elevated panels", "aligned grid", "tabular UI sans"],
+    "viewport": "ONE PAGE exactly like today’s topology, polished—not glass costume, not a wizard.",
+    "risk": "Closest to current; change is craft, not structure.",
+    "comp": ".impeccable/mocks/decision-r2/canon.webp"
+  },
+  "steer": true
+}

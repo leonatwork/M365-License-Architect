@@ -22,7 +22,7 @@ It is not a static price list. The differentiator is an opinionated recommendati
 
 ## Operating Context
 
-Used both live in client workshops (often projected) and alone at the desk preparing quotes. Typical flow: define persona and quantity → toggle requirements across productivity, endpoint, security, compliance, and add-ons → review live recommendation and decision reason → optionally compare to current license → add personas to a quote → import/export CSV. Pricing follows NCE annual vs monthly (+20%). Feature knowledge draws heavily from m365maps.com (Aaron Dinnage). Numbers and prices must stay the visual focus; playful or gamified treatment is explicitly wrong.
+Used both live in client workshops (often projected) and alone at the desk preparing quotes. Typical flow: define persona and quantity → toggle requirements across productivity, endpoint, security, compliance, and add-ons → review live recommendation and decision reason → optionally compare to current license → add personas to a quote → import/export CSV. Pricing follows NCE annual vs monthly (+20%). Feature knowledge draws heavily from m365maps.com (Aaron Dinnage). Numbers and prices must stay the visual focus; playful or gamified treatment is explicitly wrong. The whole workflow must stay on one scrollable page: profile, requirements, live recommendation, and quote are visible together (as in the incumbent), so the consultant can click through without losing the overview.
 
 ## Capabilities and Constraints
 
