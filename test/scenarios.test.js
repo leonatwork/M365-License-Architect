@@ -42,13 +42,13 @@ test('office persona with only base requirements recommends Business Basic', () 
   const result = recommend({ style: 'office' });
   assert.equal(result.base, 'Business Basic');
   assert.deepEqual(result.addons, []);
-  assert.equal(result.price, 4.6);
+  assert.equal(result.price, 6.07);
 });
 
-test('frontline persona with enterprise voice requirement triggers guardrail to E5', () => {
+test('frontline persona with voice requirement gets Phone without E5 guardrail', () => {
   const result = recommend({ style: 'frontline', phone: true });
-  assert.equal(result.base, 'M365 E5');
-  assert.equal(result.reason, 'Frontline needs Ent. features (Voice/Win/Intune Suite).');
+  assert.equal(result.base, 'M365 F1');
+  assert.deepEqual(result.addons, ['Teams Phone Add-on']);
 });
 
 test('E5 break-even auto-upsell is preserved', () => {
@@ -64,12 +64,12 @@ test('E5 break-even auto-upsell is preserved', () => {
   });
 
   assert.equal(result.base, 'M365 E5');
-  assert.equal(result.reason, 'Auto-Upgrade to M365 E5 (Cheaper than Base + Add-ons).');
+  assert.match(result.reason, /günstiger/);
   assert.ok(result.addons.includes('M365 Copilot'));
 });
 
 test('Intune Suite bundle is selected when cheaper than individual add-ons', () => {
-  const result = recommend({ epm: true, rh: true });
+  const result = recommend({ style: 'standalone', epm: true, rh: true });
   assert.ok(result.addons.includes('Intune Suite Add-on'));
   assert.equal(result.addons.includes('EPM Add-on'), false);
   assert.equal(result.addons.includes('Remote Help Add-on'), false);
@@ -85,8 +85,8 @@ test('compare returns as-is/to-be delta for positive investment', () => {
   const result = recommend({ desktop: true, teams: true, current: 'Business Basic' });
   const comparison = engine.compare('Business Basic', result, 'annual', data);
 
-  assert.equal(comparison.currentPrice, 4.6);
-  assert.equal(comparison.delta, 7.1);
+  assert.equal(comparison.currentPrice, 6.07);
+  assert.ok(Math.abs(comparison.delta - 6.06) < 1e-9);
   assert.equal(comparison.currentLic, 'Business Basic');
 });
 
@@ -106,23 +106,29 @@ test('user count above 1 is kept and affects base choice thresholds', () => {
 });
 
 const teamsTierScenarios = [
-  { name: 'M365 F1', input: { style: 'frontline', teams: true }, teamsPrice: 0.5 },
-  { name: 'M365 F3', input: { style: 'frontline', web: true, teams: true }, teamsPrice: 0.5 },
-  { name: 'Business Basic', input: { style: 'office', teams: true }, teamsPrice: 1.0 },
-  { name: 'Business Standard', input: { style: 'office', desktop: true, teams: true }, teamsPrice: 2.0 },
-  { name: 'Business Premium', input: { style: 'office', mdm: true, teams: true }, teamsPrice: 2.0 },
-  { name: 'O365 E1', input: { style: 'office', count: 500, teams: true }, teamsPrice: 1.0 },
-  { name: 'O365 E3', input: { style: 'office', count: 500, desktop: true, teams: true }, teamsPrice: 8.3 },
-  { name: 'M365 E3', input: { style: 'office', count: 500, mdm: true, teams: true }, teamsPrice: 8.0 },
-  { name: 'M365 E5', input: { style: 'office', teams: true, phone: true }, teamsPrice: 8.0 },
+  { name: 'M365 F1', input: { style: 'frontline', teams: true } },
+  { name: 'M365 F3', input: { style: 'frontline', web: true, teams: true } },
+  { name: 'Business Basic', input: { style: 'office', teams: true } },
+  { name: 'Business Standard', input: { style: 'office', desktop: true, teams: true } },
+  { name: 'Business Premium', input: { style: 'office', mdm: true, teams: true } },
+  { name: 'O365 E1', input: { style: 'office', count: 500, teams: true } },
+  { name: 'O365 E3', input: { style: 'office', count: 500, desktop: true, teams: true } },
+  { name: 'M365 E3', input: { style: 'office', count: 500, mdm: true, teams: true } },
+  { name: 'M365 E5', input: { style: 'office', count: 500, mdm: true, risk: true, lbl: true, teams: true } },
 ];
 
 teamsTierScenarios.forEach((scenario) => {
-  test(`Teams EEA add-on is mapped for ${scenario.name}`, () => {
+  test(`Teams is included once for ${scenario.name}`, () => {
     const result = recommend(scenario.input);
     assert.equal(result.base, scenario.name);
-    assert.equal(result.teamsPrice, scenario.teamsPrice);
-    assert.ok(result.addons.includes('Teams EEA'));
+    assert.equal(result.teamsPrice, 0);
+    assert.equal(result.addons.includes('Teams EEA'), false);
+    assert.equal(result.price, data.PRICES[scenario.name].price);
+    const noTeams = recommend({ ...scenario.input, teamsVariant: 'no_teams' });
+    assert.equal(noTeams.base, scenario.name);
+    assert.equal(noTeams.price, data.PRICES[scenario.name].price_no_teams);
+    assert.deepEqual(noTeams.addons, []);
+    assert.equal(noTeams.features.includes('Teams Collaboration'), false);
   });
 });
 

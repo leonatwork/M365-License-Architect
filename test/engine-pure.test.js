@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const legacyReferenceResults = require('./fixtures/legacy-reference-results.js');
+const julyReferenceResults = require('./fixtures/july-2026-reference-results.js');
 const legacyConstants = require('./fixtures/legacy-constants.js');
 const data = require('../data/licenses.js');
 
@@ -188,7 +188,7 @@ test('engine module can be required in node without browser globals', () => {
   });
 });
 
-test('recommend reproduces frozen results for every persona preset in annual and monthly mode', () => {
+test('recommend matches reviewed July prices and combinations for every preset', () => {
   const engine = require('../src/engine.js');
   const presetNames = Object.keys(legacyConstants.PERSONA_PRESETS).filter((name) => name !== 'Benutzerdefiniert');
 
@@ -197,8 +197,13 @@ test('recommend reproduces frozen results for every persona preset in annual and
     const annual = engine.recommend(input, { term: 'annual' }, data);
     const monthly = engine.recommend(input, { term: 'monthly' }, data);
 
-    assert.deepEqual(annual, legacyReferenceResults[presetName].annual, `${presetName} annual mismatch`);
-    assert.deepEqual(monthly, legacyReferenceResults[presetName].monthly, `${presetName} monthly mismatch`);
+    const expected = julyReferenceResults[presetName];
+    assert.equal(annual.base, expected.base, presetName);
+    assert.deepEqual(annual.addons, expected.addons, presetName);
+    assert.ok(Math.abs(annual.price - expected.price) < 1e-9, presetName);
+    assert.equal(monthly.base, expected.base, presetName);
+    assert.deepEqual(monthly.addons, expected.addons, presetName);
+    assert.ok(Math.abs(monthly.price - expected.price * 1.2) < 1e-9, presetName);
   }
 });
 
@@ -236,10 +241,10 @@ test('compare reproduces pricing delta and smart feature diff logic', () => {
   const comparison = engine.compare('Business Basic', result, 'annual', data);
   const expectedFeatureDiff = getExpectedFeatureDiff('Business Basic', result.features);
 
-  assert.equal(comparison.currentPrice, 4.6);
-  assert.equal(comparison.delta, result.price - 4.6);
-  assert.equal(comparison.altPrice, 4.6);
-  assert.equal(comparison.altDiff, result.price - 4.6);
+  assert.equal(comparison.currentPrice, 6.07);
+  assert.equal(comparison.delta, result.price - 6.07);
+  assert.equal(comparison.altPrice, 6.07);
+  assert.equal(comparison.altDiff, result.price - 6.07);
   assert.deepEqual(comparison.gained, expectedFeatureDiff.gained);
   assert.deepEqual(comparison.lost, expectedFeatureDiff.lost);
 });

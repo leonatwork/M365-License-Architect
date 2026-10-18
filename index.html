@@ -963,7 +963,7 @@
             }
             document.getElementById('recPrice').innerHTML = `€${c.price.toFixed(2)} ${deltaHtml}`;
 
-            let subHtml = c.addons.filter(a => !a.includes("Teams")).join(" + ");
+            let subHtml = c.addons.join(" + ");
             if (c.teamsPrice > 0) {
                 subHtml = `<span class="text-blue-500 font-bold">Teams (+€${c.teamsPrice.toFixed(2)})</span>` + (subHtml ? " + " + subHtml : "");
             }

@@ -6,18 +6,26 @@
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   const SOURCE = 'm365maps.com + Microsoft-Preisseite';
+  const VALID_FROM = '2026-07-01';
+  const BUSINESS = 'https://www.microsoft.com/de-de/microsoft-365/business/';
+  const ENTERPRISE = 'https://www.microsoft.com/de-de/microsoft-365/enterprise/';
+  const PACKAGING = 'https://www.microsoft.com/en-us/licensing/news/2026-m365-packaging-pricing-updates';
+  const suite = (price, price_no_teams, source) => ({ price, price_no_teams, currency: 'EUR', source, valid_from: VALID_FROM });
+  const addon = (price, source) => ({ price, currency: 'EUR', source, valid_from: VALID_FROM });
 
   const PRICES = {
     None: { price: 0, currency: 'EUR', source: SOURCE, valid_from: null },
-    'M365 F1': { price: 1.60, currency: 'EUR', source: SOURCE, valid_from: null },
-    'M365 F3': { price: 7.00, currency: 'EUR', source: SOURCE, valid_from: null },
-    'Business Basic': { price: 4.60, currency: 'EUR', source: SOURCE, valid_from: null },
-    'Business Standard': { price: 9.70, currency: 'EUR', source: SOURCE, valid_from: null },
-    'Business Premium': { price: 18.60, currency: 'EUR', source: SOURCE, valid_from: null },
-    'O365 E1': { price: 7.40, currency: 'EUR', source: SOURCE, valid_from: null },
-    'O365 E3': { price: 23.10, currency: 'EUR', source: SOURCE, valid_from: null },
-    'M365 E3': { price: 29.70, currency: 'EUR', source: SOURCE, valid_from: null },
-    'M365 E5': { price: 51.70, currency: 'EUR', source: SOURCE, valid_from: null },
+    'M365 F1': suite(2.60, 2.16, ENTERPRISE + 'frontline-plans-and-pricing'),
+    'M365 F3': suite(8.66, 7.73, ENTERPRISE + 'frontline-plans-and-pricing'),
+    'Business Basic': suite(6.07, 4.67, BUSINESS + 'microsoft-365-plans-and-pricing'),
+    'Business Standard': suite(12.13, 9.34, BUSINESS + 'microsoft-365-business-standard'),
+    'Business Premium': suite(19.06, 16.28, BUSINESS + 'microsoft-365-business-premium'),
+    'O365 E1': suite(8.66, 5.88, ENTERPRISE + 'office-365-e1'),
+    // Die Zuordnung der Vergleichsansicht ist laut Issue abgeleitet.
+    'O365 E3': { ...suite(26.27, 18.85, ENTERPRISE + 'office-365-e1'), todo_source: true },
+    'O365 E5': suite(41.42, 34.01, ENTERPRISE + 'office-365-e3'),
+    'M365 E3': suite(37.78, 30.36, ENTERPRISE + 'microsoft-365-plans-and-pricing'),
+    'M365 E5': suite(58.13, 50.71, ENTERPRISE + 'microsoft-365-plans-and-pricing'),
     'Entra ID P2': { price: 8.40, currency: 'EUR', source: SOURCE, valid_from: null },
     'M365 E5 Security Add-on': { price: 11.20, currency: 'EUR', source: SOURCE, valid_from: null },
     'M365 E5 Compliance Add-on': { price: 11.20, currency: 'EUR', source: SOURCE, valid_from: null },
@@ -27,7 +35,13 @@
     'Intune Suite Add-on': { price: 9.40, currency: 'EUR', source: SOURCE, valid_from: null },
     'EPM Add-on': { price: 5.50, currency: 'EUR', source: SOURCE, valid_from: null },
     'Remote Help Add-on': { price: 5.50, currency: 'EUR', source: SOURCE, valid_from: null },
-    'M365 Copilot': { price: 30.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    'M365 Copilot': addon(26.00, ENTERPRISE + 'microsoft-365-plans-and-pricing'),
+    // Aktion 15,60 EUR bis 31.12.2026; gerechnet wird nur der Listenpreis.
+    'Copilot Business': addon(18.20, BUSINESS + 'microsoft-365-plans-and-pricing'),
+    'Teams Phone Add-on': addon(8.70, BUSINESS + 'microsoft-365-plans-and-pricing'),
+    'Teams EWR': addon(7.41, ENTERPRISE + 'microsoft-365-plans-and-pricing'),
+    'Apps for Business': addon(11.00, BUSINESS + 'microsoft-365-plans-and-pricing'),
+    'Apps for Enterprise': addon(15.40, ENTERPRISE + 'frontline-plans-and-pricing'),
     'Visio Plan 2': { price: 12.70, currency: 'EUR', source: SOURCE, valid_from: null },
     'Project Plan 3': { price: 25.30, currency: 'EUR', source: SOURCE, valid_from: null },
     'Power Automate Premium': { price: 14.00, currency: 'EUR', source: SOURCE, valid_from: null },
@@ -35,15 +49,11 @@
     'Defender Suite for BizPrem': { price: 10.00, currency: 'EUR', source: SOURCE, valid_from: null },
     'Purview Suite for BizPrem': { price: 10.00, currency: 'EUR', source: SOURCE, valid_from: null },
     'BizPrem E5 Upgrade': { price: 15.00, currency: 'EUR', source: SOURCE, valid_from: null },
-    Teams_F: { price: 0.50, currency: 'EUR', source: SOURCE, valid_from: null },
-    Teams_BizBasic: { price: 1.00, currency: 'EUR', source: SOURCE, valid_from: null },
-    Teams_BizStd: { price: 2.00, currency: 'EUR', source: SOURCE, valid_from: null },
-    Teams_BizPrem: { price: 2.00, currency: 'EUR', source: SOURCE, valid_from: null },
-    Teams_E1: { price: 1.00, currency: 'EUR', source: SOURCE, valid_from: null },
-    Teams_OE3: { price: 8.30, currency: 'EUR', source: SOURCE, valid_from: null },
-    Teams_ME3: { price: 8.00, currency: 'EUR', source: SOURCE, valid_from: null },
-    Teams_ME5: { price: 8.00, currency: 'EUR', source: SOURCE, valid_from: null },
   };
+  // Unbelegte Bestandswerte sind kein bestätigter Preisstand Juli 2026.
+  for (const [key, entry] of Object.entries(PRICES)) {
+    if (key !== 'None' && entry.valid_from === null) entry.todo_source = true;
+  }
 
   const HIERARCHY = {
     Mail: ['2GB Mail', 'Exch 50GB', 'Exch 100GB'],
@@ -53,6 +63,8 @@
     Comp: ['Comp Basic', 'Comp E5'],
     Teams: ['No Teams', 'Teams Collaboration', 'Teams Phone'],
     MDM: ['Mobile MDM', 'Intune'],
+    IntunePlan: ['Intune Plan 1', 'Intune Plan 2'],
+    DefOffice: ['Def O365 P1', 'Def O365 P2'],
   };
 
   const FEATURES_MAP = {
@@ -63,9 +75,18 @@
     'Business Standard': ['Desktop Apps', 'Web Apps (Edit)', 'Exch 50GB', 'SharePoint', 'Teams Collaboration'],
     'Business Premium': ['Intune', 'Def Biz', 'Entra P1', 'Desktop Apps', 'Web Apps (Edit)', 'Exch 50GB', 'SharePoint', 'Teams Collaboration', 'Win OS (VDA)'],
     'O365 E1': ['Web Apps (Edit)', 'Exch 50GB', 'SharePoint', 'Teams Collaboration'],
-    'O365 E3': ['Desktop Apps', 'Web Apps (Edit)', 'Exch 100GB', 'SharePoint', 'Comp Basic', 'Teams Collaboration'],
-    'M365 E3': ['Win OS', 'Intune', 'Entra P1', 'Desktop Apps', 'Web Apps (Edit)', 'Exch 100GB', 'SharePoint', 'Def P1', 'Comp Basic', 'No Teams'],
-    'M365 E5': ['Win OS', 'Intune', 'Entra P2', 'Desktop Apps', 'Web Apps (Edit)', 'Exch 100GB', 'SharePoint', 'Def XDR', 'Comp E5', 'PowerBI', 'Teams Phone', 'No Teams'],
+    'O365 E3': ['Desktop Apps', 'Web Apps (Edit)', 'Exch 100GB', 'SharePoint', 'Comp Basic', 'Teams Collaboration', 'Def O365 P1'],
+    'O365 E5': ['Desktop Apps', 'Web Apps (Edit)', 'Exch 100GB', 'SharePoint', 'Comp E5', 'Teams Collaboration', 'Teams Phone', 'Def O365 P2'],
+    'M365 E3': ['Win OS', 'Intune', 'Entra P1', 'Desktop Apps', 'Web Apps (Edit)', 'Exch 100GB', 'SharePoint', 'Def P1', 'Comp Basic', 'Teams Collaboration', 'Remote Help', 'Advanced Analytics', 'Intune Plan 2', 'Def O365 P1'],
+    'M365 E5': ['Win OS', 'Intune', 'Entra P2', 'Desktop Apps', 'Web Apps (Edit)', 'Exch 100GB', 'SharePoint', 'Def XDR', 'Comp E5', 'PowerBI', 'Teams Phone', 'Teams Collaboration', 'Remote Help', 'Advanced Analytics', 'Intune Plan 2', 'Def O365 P2', 'EPM', 'EAM', 'Cloud PKI'],
+  };
+  // Preisquelle und Paketquelle getrennt: Jede geänderte Zuordnung ist datiert.
+  const FEATURE_SOURCES = {
+    'O365 E3': { source: PACKAGING, valid_from: VALID_FROM },
+    'O365 E5': { source: ENTERPRISE + 'office-365-e3', valid_from: VALID_FROM },
+    'M365 E3': { source: PACKAGING, valid_from: VALID_FROM },
+    'M365 E5': { source: PACKAGING, valid_from: VALID_FROM },
+    'Intune Suite Add-on': { source: 'https://www.microsoft.com/en-us/security/business/microsoft-intune-pricing', valid_from: VALID_FROM },
   };
 
   const PERSONA_PRESETS = {
@@ -162,6 +183,7 @@
     PRICES,
     HIERARCHY,
     FEATURES_MAP,
+    FEATURE_SOURCES,
     PERSONA_PRESETS,
   };
 });
