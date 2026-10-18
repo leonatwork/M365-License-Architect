@@ -1,0 +1,118 @@
+name: Agent-Auftrag
+description: Eine klar abgegrenzte Aufgabe für den autonomen Hermes-Agent-Stack.
+title: "[Agent] "
+labels:
+  - agent-task
+assignees:
+  - leonatwork
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Dieses Formular liefert Triage, Planer, Coding-Agent, Reviewer und QS den nötigen Kontext. Nach dem Erstellen startet noch keine Umsetzung: Erst `prüf m365 #N`, danach bei geklärten Fragen `go m365 #N`.
+
+        Keine Passwörter, API-Keys, Tokens, produktiven Verbindungsdaten oder vertraulichen Projektdaten eintragen.
+
+  - type: textarea
+    id: ziel
+    attributes:
+      label: Ziel und Nutzen
+      description: Was soll nach der Umsetzung für welche Nutzergruppe besser oder anders sein?
+      placeholder: |
+        Als … möchte ich …, damit …
+    validations:
+      required: true
+
+  - type: textarea
+    id: istzustand
+    attributes:
+      label: Ist-Zustand / Problem
+      description: Was passiert heute? Bei Fehlern bitte reproduzierbare Schritte sowie erwartetes und tatsächliches Verhalten nennen.
+      placeholder: |
+        Reproduktion:
+        1. …
+        2. …
+
+        Erwartet: …
+        Tatsächlich: …
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Umfang (In Scope)
+      description: Welche Dateien, Abläufe (index.html, Preis- und Featuredaten, Berechnungslogik, UI) sollen ausdrücklich geändert werden?
+      placeholder: |
+        - …
+        - …
+    validations:
+      required: true
+
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Nicht Teil dieses Issues (Out of Scope)
+      description: Was soll bewusst unverändert bleiben? Das verhindert unbeabsichtigte Zusatzarbeit.
+      placeholder: |
+        - Kein Redesign von …
+        - Keine Änderung am Dateiformat …
+    validations:
+      required: true
+
+  - type: textarea
+    id: entscheidungen
+    attributes:
+      label: Fachliche und UX-Entscheidungen
+      description: Gewünschtes Verhalten bei Fehlern, leeren Zuständen, Migrationen und Kompatibilität. Offene Entscheidungen bitte ausdrücklich als Frage markieren.
+      placeholder: |
+        - Fehlerfall: …
+        - Leerer Zustand: …
+        - Migration / Abwärtskompatibilität: …
+    validations:
+      required: true
+
+  - type: textarea
+    id: akzeptanz
+    attributes:
+      label: Prüfbare Akzeptanzkriterien
+      description: Kleine, beobachtbare Kriterien im Format AC-1, AC-2 …; möglichst Ergebnis statt Implementierungsweg beschreiben.
+      placeholder: |
+        AC-1: Wenn …, dann …
+        AC-2: Bei einem bestehenden Projekt …
+        AC-3: Der Fehlerfall …
+    validations:
+      required: true
+
+  - type: textarea
+    id: qs
+    attributes:
+      label: QS und Nachweis
+      description: Welche automatisierten und manuellen Prüfungen müssen erfolgreich sein? Testdaten, Fixtures und relevante Umgebungen nennen.
+      placeholder: |
+        - Automatisiert: Testbefehl des Repos (sobald vorhanden, z. B. npm test); sonst manuelle Prüfung im Browser mit konkretem Szenario
+        - Manuell: …
+        - Testdaten / Fixtures: …
+    validations:
+      required: true
+
+  - type: textarea
+    id: kontext
+    attributes:
+      label: Technischer Kontext und Referenzen
+      description: Relevante Dateien oder Module, Screenshots, Mockups, Logs, verwandte Issues oder PRs. Keine Geheimnisse oder vertraulichen Projektdaten.
+      placeholder: |
+        - Verwandt: #…
+        - Relevanter Bereich: …
+
+  - type: checkboxes
+    id: freigaben
+    attributes:
+      label: Sicherheits- und Liefergrenzen
+      options:
+        - label: Das Issue enthält keine Secrets, Tokens, Zugangsdaten oder vertraulichen Kundendaten.
+          required: true
+        - label: Der Agent darf Code und Tests ändern sowie einen Draft-PR öffnen, aber nicht selbst mergen, releasen oder deployen.
+          required: true
+        - label: Änderungen an produktiver Infrastruktur oder veröffentlichten Releases sind nicht Teil dieses Auftrags.
+          required: true
