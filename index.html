@@ -1,751 +1,842 @@
 <!DOCTYPE html>
-<html lang="de" class="h-full antialiased">
-
+<html lang="de" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>License Architect by Leon Machnik</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
-    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light.css" />
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                fontFamily: { sans: ['Inter', 'sans-serif'] },
-                extend: {
-                    colors: {
-                        curry: { DEFAULT: '#CB9D2A', 500: '#CB9D2A', 600: '#b88d22' },
-                        indigo: { DEFAULT: '#002B4F', 900: '#002B4F', 800: '#0b365a' },
-                        ultramarine: '#254A9A',
-                        slate: { 850: '#1e293b', 900: '#0f172a', 950: '#020617' }
-                    },
-                    backgroundImage: {
-                        'gradient-mesh': "radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%)",
-                        'gradient-light': "radial-gradient(at 0% 0%, hsla(210, 40%, 98%, 1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(42, 100%, 96%, 1) 0, transparent 50%)"
-                    }
-                }
-            }
-        }
-    </script>
+    <link rel="stylesheet" href=".impeccable/build/scaffold/layout.css">
     <style>
-        body {
-            transition: background-color 0.5s ease, color 0.3s ease;
-        }
+@font-face {
+  font-family: 'Nanum Gothic Coding';
+  src: url('fonts/NanumGothicCoding-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Nanum Gothic Coding';
+  src: url('fonts/NanumGothicCoding-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
+:root {
+  --paper: #f7f1e9;
+  --ink: #090909;
+  --mute: #73726e;
+  --rule: #0a0a0a;
+  --hatch: #b3b2ad;
+  --pink: #f48fc9;
+  --pink-deep: #e85aa8;
+  --sheet: #f6ede8;
+  --font: 'Nanum Gothic Coding', ui-monospace, monospace;
+}
 
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  font-family: var(--font);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.35;
+}
 
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
+.hatch {
+  background-image: repeating-linear-gradient(-45deg, var(--hatch) 0 1px, transparent 1px 5px);
+}
+.hatch-dense {
+  background-image: repeating-linear-gradient(-45deg, var(--ink) 0 1px, transparent 1px 3px);
+}
+.rule { border: 1px solid var(--rule); }
+.rule-b { border-bottom: 1px solid var(--rule); }
+.rule-t { border-top: 1px solid var(--rule); }
+.rule-r { border-right: 1px solid var(--rule); }
+.rule-l { border-left: 1px solid var(--rule); }
 
-        .dark ::-webkit-scrollbar-thumb {
-            background: #475569;
-        }
+.app {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 16px 20px 40px;
+}
 
-        /* Animation Utilities */
-        .chevron {
-            transition: transform 0.2s ease;
-        }
+.topbar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--rule);
+}
+.brand {
+  font-size: 39px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+  margin: 0;
+}
+.top-actions { display: flex; gap: 0; }
+.ghost-btn {
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.ghost-btn + .ghost-btn { border-left: 0; }
+.ghost-btn:hover { background: #fff; }
 
-        .open .chevron {
-            transform: rotate(180deg);
-        }
+.work {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 14px;
+  margin-top: 12px;
+  align-items: start;
+}
 
-        .fade-in-up {
-            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0;
-            transform: translateY(20px);
-        }
+.panel { border: 1px solid var(--rule); background: var(--paper); }
+.panel-pad { padding: 10px 12px; }
+.sec-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
 
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+.profile-strip {
+  display: grid;
+  grid-template-columns: 2fr 0.7fr 1fr 1.2fr;
+  gap: 0;
+  border: 1px solid var(--rule);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border-right: 1px solid var(--rule);
+  min-width: 0;
+}
+.field:last-child { border-right: 0; }
+.field label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.field input, .field select {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  width: 100%;
+  outline: none;
+}
+
+.term-row {
+  display: flex;
+  gap: 0;
+  margin-top: 8px;
+  border: 1px solid var(--rule);
+  width: fit-content;
+}
+.term-btn {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 0;
+  background: transparent;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-right: 1px solid var(--rule);
+}
+.term-btn:last-child { border-right: 0; }
+.term-btn.active { background: var(--ink); color: var(--paper); }
+
+.req-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 18px;
+  max-height: 340px;
+  overflow: auto;
+  padding-right: 4px;
+}
+.req-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  cursor: pointer;
+  user-select: none;
+}
+.req-item span { font-size: 12px; }
+.req-item input { position: absolute; opacity: 0; pointer-events: none; }
+.box {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--rule);
+  flex: 0 0 14px;
+  background: var(--paper);
+}
+.req-item input:checked + .box {
+  background-image: repeating-linear-gradient(-45deg, var(--ink) 0 1px, transparent 1px 3px);
+}
+
+.tools-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 8px 0;
+}
+.preset select {
+  font-family: inherit;
+  font-size: 12px;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  padding: 6px 8px;
+}
+
+.quote-wrap { margin-top: 8px; }
+.quote-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+table.data th, table.data td {
+  border: 1px solid var(--rule);
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+table.data th {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #efe9e0;
+}
+table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
+.icon-btn {
+  font-family: inherit;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ink);
+  padding: 2px 4px;
+}
+
+.right-col { display: flex; flex-direction: column; gap: 10px; }
+
+.compare-sheet {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.18);
+  padding: 12px 14px 10px;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+}
+.compare-sheet h2 {
+  margin: 0 0 10px;
+  font-size: 19px;
+  letter-spacing: 0.12em;
+}
+.compare-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+.compare-cols h3 {
+  margin: 0 0 6px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+.compare-cols .who {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  min-height: 1.2em;
+}
+.compare-cols ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 11px;
+  max-height: 260px;
+  overflow: auto;
+}
+.compare-cols li { padding: 2px 0; border-bottom: 1px dotted #c8c7c3; }
+.compare-cols .muted { color: var(--mute); font-style: italic; border: 0; }
+.compare-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+.hold-btn {
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid var(--rule);
+  background: var(--pink);
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.hold-btn:hover { background: var(--pink-deep); color: #fff; }
+
+.rec-block { border: 1px solid var(--rule); padding: 10px 12px; }
+.rec-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+}
+.rec-name { font-size: 18px; font-weight: 700; margin: 4px 0; }
+.rec-addon { font-size: 11px; color: var(--mute); min-height: 1em; }
+.price-row {
+  display: grid;
+  grid-template-columns: 1fr 0.45fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+.price-plate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--rule);
+  background: linear-gradient(90deg, var(--pink) 0 28%, var(--paper) 28%);
+  padding: 10px 12px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.delta-hatch {
+  border: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  background-image: repeating-linear-gradient(-45deg, var(--hatch) 0 1px, transparent 1px 4px);
+}
+.reason {
+  margin-top: 8px;
+  font-size: 12px;
+  border: 1px solid var(--rule);
+  padding: 8px;
+  background: #fffaf3;
+  min-height: 52px;
+}
+.tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.tag, .tag-ink, .tag-blue, .tag-red, .tag-purple {
+  display: inline-block;
+  border: 1px solid var(--rule);
+  padding: 2px 6px;
+  font-size: 10px;
+  background: #fff;
+}
+.tag-blue { background: #e8eef8; }
+.tag-red { background: #f8e8e8; }
+.tag-purple { background: #f0e8f8; }
+.meta-chip { font-size: 11px; font-weight: 700; }
+
+.alt-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  border: 1px dashed var(--rule);
+  padding: 8px;
+  font-size: 11px;
+}
+.btn-primary {
+  width: 100%;
+  margin-top: 10px;
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid var(--rule);
+  background: var(--pink);
+  padding: 12px;
+  cursor: pointer;
+}
+.btn-primary:hover { background: var(--pink-deep); color: #fff; }
+.btn-primary.editing { background: var(--ink); color: var(--paper); }
+
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+.dash-card { border: 1px solid var(--rule); padding: 10px; }
+.bar {
+  height: 8px;
+  background: #efe9e0;
+  border: 1px solid var(--rule);
+  margin-top: 6px;
+}
+.bar > span { display: block; height: 100%; background: var(--ink); }
+.bar.addon > span { background: var(--pink-deep); }
+
+.modal {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal.hidden { display: none; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(9,9,9,0.55); }
+.modal-card {
+  position: relative;
+  width: min(720px, 92vw);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  box-shadow: 8px 8px 0 rgba(0,0,0,0.2);
+  padding: 16px;
+}
+
+@media (max-width: 980px) {
+  .work { grid-template-columns: 1fr; }
+  .profile-strip { grid-template-columns: 1fr 1fr; }
+  .brand { font-size: 28px; }
+  .price-plate { font-size: 22px; }
+
+/* Hero / desktop first-viewport: lock to approved comp frame */
+@media (min-width: 1280px) {
+  body { overflow-x: hidden; }
+  .app {
+    position: relative;
+    width: 1280px;
+    height: 720px;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0;
+    overflow: hidden;
+  }
+  .topbar {
+    position: absolute;
+    left: 0; top: 0; width: 100%; height: 10%;
+    display: block;
+    border-bottom: 0;
+    padding: 0;
+  }
+  .brand {
+    position: absolute;
+    left: var(--r-title-x); top: var(--r-title-y);
+    width: var(--r-title-w); height: var(--r-title-h);
+    font-size: var(--r-title-font);
+    font-family: var(--r-title-family), monospace;
+    font-weight: var(--r-title-weight);
+    display: flex; align-items: center;
+    margin: 0; padding-left: 8px;
+  }
+  .top-actions {
+    position: absolute;
+    left: 80%; top: 0; width: 20%; height: 10%;
+    display: flex;
+  }
+  .top-actions .ghost-btn {
+    flex: 1;
+    height: 100%;
+    padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-top: 0; border-bottom: 1px solid var(--rule);
+  }
+  .top-actions .ghost-btn:nth-child(n+3) { display: none; } /* IMPORT EXPORT only in hero chrome */
+  .work {
+    position: absolute;
+    left: 0; top: 10%; width: 100%; height: 90%;
+    display: block;
+    margin: 0; gap: 0;
+  }
+  .left-col {
+    position: absolute;
+    left: 0; top: 0; width: 50%; height: 100%;
+  }
+  .right-col {
+    position: absolute;
+    left: 50%; top: 0; width: 50%; height: 100%;
+  }
+  .profile-strip {
+    position: absolute;
+    left: 0; top: 0; width: 100%; height: 11.11%;
+  }
+  .tools-row {
+    position: absolute;
+    left: 0; top: 11.11%; width: 100%; height: 8%;
+    margin: 0; padding: 4px 8px;
+  }
+  .left-col > .panel {
+    position: absolute;
+    left: 0; top: 20%; width: 100%; height: 48%;
+    overflow: hidden;
+  }
+  .req-grid { max-height: none; height: calc(100% - 28px); }
+  .quote-wrap {
+    position: absolute;
+    left: 0; top: 68%; width: 100%; height: 32%;
+    margin: 0; overflow: auto;
+  }
+  .compare-sheet {
+    position: absolute;
+    left: 0; top: 0; width: 100%; height: 77.77%;
+    min-height: 0; margin: 0;
+  }
+  .rec-block {
+    position: absolute;
+    left: 0; top: 77.77%; width: 100%; height: 22.23%;
+    padding: 6px 10px; overflow: hidden;
+  }
+  .price-row { grid-template-columns: 1.5fr 1fr; margin-top: 4px; }
+  .price-plate { font-size: 22px; padding: 6px 10px; }
+  .reason { display: none; } /* keep calm cells; reason below fold / hidden in hero */
+  .tags { display: none; }
+  .alt-row { display: none; }
+  .dashboard { display: none !important; }
+}
+
     </style>
 </head>
+<body onload="init()">
+<input type="file" id="csvInput" accept=".csv" class="hidden" style="display:none" onchange="handleFileSelect(this)">
 
-<body
-    class="bg-slate-50 dark:bg-[#020617] min-h-screen flex flex-col font-sans selection:bg-curry selection:text-white bg-gradient-light dark:bg-gradient-mesh bg-fixed bg-cover text-slate-900 dark:text-slate-100"
-    onload="init()">
-
-    <div class="sticky top-4 z-50 px-4">
-        <nav
-            class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/70 border-white/40 dark:bg-[#0f172a]/90 dark:border-white/10 rounded-2xl px-6 py-4 flex justify-between items-center max-w-[1600px] mx-auto">
-            <div class="flex items-center gap-4">
-                <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-900 to-ultramarine flex items-center justify-center text-white shadow-lg ring-1 ring-white/20">
-                    <i class="fas fa-cloud text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight leading-none">License
-                        Architect</h1>
-                    <div
-                        class="text-[11px] font-bold text-transparent bg-clip-text bg-gradient-to-r from-curry to-yellow-500 uppercase tracking-wider mt-0.5">
-                        by Leon Machnik</div>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-3">
-                <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="handleFileSelect(this)">
-
-                <div
-                    class="hidden md:flex items-center gap-1 bg-slate-100/50 dark:bg-slate-900/50 p-1 rounded-lg border border-slate-200/50 dark:border-white/5 backdrop-blur-sm">
-                    <button onclick="document.getElementById('csvInput').click()"
-                        class="px-3 py-1.5 text-xs font-semibold rounded-md hover:bg-white dark:hover:bg-slate-700 transition text-slate-600 dark:text-slate-200 flex items-center gap-2">
-                        <i class="fas fa-upload"></i> Import
-                    </button>
-                    <button onclick="exportCSV()"
-                        class="px-3 py-1.5 text-xs font-semibold rounded-md hover:bg-white dark:hover:bg-slate-700 transition text-slate-600 dark:text-slate-200 flex items-center gap-2">
-                        <i class="fas fa-download"></i> Export
-                    </button>
-                </div>
-                <button onclick="toggleTheme()"
-                    class="w-10 h-10 rounded-full backdrop-blur-md border shadow-sm flex items-center justify-center text-slate-600 dark:text-curry hover:scale-110 transition-transform duration-200 border-slate-200 dark:border-white/10 bg-white/50 dark:bg-slate-800/80">
-                    <i class="fas fa-sun hidden dark:block text-yellow-400"></i>
-                    <i class="fas fa-moon dark:hidden"></i>
-                </button>
-            </div>
-        </nav>
+<div class="app">
+  <header class="topbar">
+    <h1 class="brand">License Architect</h1>
+    <div class="top-actions">
+      <button type="button" class="ghost-btn" onclick="document.getElementById('csvInput').click()">Import</button>
+      <button type="button" class="ghost-btn" onclick="exportCSV()">Export</button>
+      <button type="button" class="ghost-btn" onclick="toggleTheme()" title="Theme" id="themeBtn">Theme</button>
+      <button type="button" class="ghost-btn" onclick="resetForm()">Clear</button>
     </div>
+  </header>
 
-    <main class="flex-grow container mx-auto px-4 py-8 max-w-[1600px]">
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-
-            <div class="xl:col-span-7 space-y-6 fade-in-up" style="animation-delay: 0.1s;">
-
-                <div
-                    class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-8 relative overflow-hidden group">
-                    <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-indigo-900 to-ultramarine">
-                    </div>
-
-                    <div class="flex justify-between items-center mb-6">
-                        <h2
-                            class="text-sm font-bold text-slate-900 dark:text-white uppercase flex items-center gap-3 tracking-wider">
-                            <span
-                                class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-300"><i
-                                    class="fas fa-id-badge"></i></span>
-                            1. Profile & Context
-                        </h2>
-                        <button onclick="resetForm()"
-                            class="text-[10px] uppercase font-bold tracking-wider text-slate-400 hover:text-red-500 transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-700">
-                            <i class="fas fa-eraser"></i> Clear Form
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-
-                        <div class="md:col-span-12 mb-2">
-                            <div
-                                class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-100 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
-                                <div class="flex flex-col mb-2 sm:mb-0">
-                                    <span
-                                        class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 tracking-widest">Commitment
-                                        Term</span>
-                                    <span class="text-xs text-slate-700 dark:text-slate-300 font-medium">NCE Pricing
-                                        Model</span>
-                                </div>
-                                <div
-                                    class="flex items-center bg-white dark:bg-slate-950 rounded-lg p-1 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                    <button onclick="setTerm('annual')" id="btnAnnual"
-                                        class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-xs font-bold transition-all bg-indigo-900 text-white shadow-md ring-1 ring-black/5">Annual</button>
-                                    <button onclick="setTerm('monthly')" id="btnMonthly"
-                                        class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-xs font-bold transition-all text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800">Monthly
-                                        (+20%)</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="md:col-span-12 mb-2">
-                            <label
-                                class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">
-                                Schnellauswahl (Preset)
-                            </label>
-                            <select id="presetSelector" onchange="applyPreset(this.value)"
-                                class="w-full rounded-lg border-0 px-3 py-2.5 shadow-inner ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-curry sm:text-sm sm:leading-6 transition-all bg-white/80 text-slate-900 ring-gray-300 placeholder:text-gray-400 dark:bg-slate-950 dark:text-white dark:ring-slate-700 dark:placeholder-slate-500">
-                                <option value="Benutzerdefiniert">-- Benutzerdefiniert --</option>
-                                <option value="Marketing Team">📊 Marketing Team</option>
-                                <option value="Development Team">💻 Development Team</option>
-                                <option value="Executive / C-Level">👔 Executive / C-Level</option>
-                                <option value="Frontline Worker">🏭 Frontline Worker</option>
-                                <option value="IT Administrator">🔧 IT Administrator</option>
-                                <option value="Sales Team">📈 Sales Team</option>
-                                <option value="Finance / Compliance">💰 Finance / Compliance</option>
-                                <option value="Project Manager">📋 Project Manager</option>
-                            </select>
-                        </div>
-
-                        <div class="md:col-span-6">
-                            <label
-                                class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">Persona
-                                Name</label>
-                            <input type="text" id="personaName" placeholder="e.g. Marketing Lead"
-                                class="w-full rounded-lg border-0 px-3 py-2.5 shadow-inner ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-curry sm:text-sm sm:leading-6 transition-all bg-white/80 text-slate-900 ring-gray-300 placeholder:text-gray-400 dark:bg-slate-950 dark:text-white dark:ring-slate-700 dark:placeholder-slate-500">
-                        </div>
-                        <div class="md:col-span-3">
-                            <label
-                                class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">Qty</label>
-                            <input type="number" id="userCount" value="10" min="1" oninput="recalc()"
-                                class="w-full rounded-lg border-0 px-3 py-2.5 shadow-inner ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-curry transition-all bg-white/80 text-slate-900 ring-gray-300 placeholder:text-gray-400 dark:bg-slate-950 dark:text-white dark:ring-slate-700 dark:placeholder-slate-500">
-                        </div>
-                        <div class="md:col-span-3">
-                            <label
-                                class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">Workstyle</label>
-                            <select id="workstyle" onchange="recalc()"
-                                class="w-full rounded-lg border-0 px-3 py-2.5 shadow-inner ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-curry transition-all bg-white/80 text-slate-900 ring-gray-300 placeholder:text-gray-400 dark:bg-slate-950 dark:text-white dark:ring-slate-700 dark:placeholder-slate-500">
-                                <option value="office">Office</option>
-                                <option value="frontline">Frontline</option>
-                                <option value="standalone">Standalone / Add-ons</option>
-                            </select>
-                        </div>
-                        <div class="md:col-span-12">
-                            <label
-                                class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-widest">Current
-                                License (For Comparison)</label>
-                            <select id="currentLicense" onchange="recalc()"
-                                class="w-full rounded-lg border-0 px-3 py-2.5 shadow-inner ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-curry transition-all bg-white/80 text-slate-900 ring-gray-300 placeholder:text-gray-400 dark:bg-slate-950 dark:text-white dark:ring-slate-700 dark:placeholder-slate-500">
-                                <option value="None">-- New Hire / No License --</option>
-                                <option value="M365 F1">Microsoft 365 F1</option>
-                                <option value="M365 F3">Microsoft 365 F3</option>
-                                <option value="Business Basic">Business Basic</option>
-                                <option value="Business Standard">Business Standard</option>
-                                <option value="Business Premium">Business Premium</option>
-                                <option value="O365 E1">Office 365 E1</option>
-                                <option value="O365 E3">Office 365 E3</option>
-                                <option value="M365 E3">Microsoft 365 E3</option>
-                                <option value="M365 E5">Microsoft 365 E5</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-6 fade-in-up border-l-4 border-l-curry"
-                        style="animation-delay: 0.2s;">
-                        <h3
-                            class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 flex items-center gap-2 tracking-wide">
-                            <i class="fas fa-rocket text-curry"></i> 2. Productivity
-                        </h3>
-                        <div class="space-y-4">
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span
-                                    class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Mailbox
-                                    > 0GB</span>
-                                <input type="checkbox" id="needMailbox"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span
-                                    class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Large
-                                    Mailbox (50GB+)</span>
-                                <input type="checkbox" id="largeMailbox"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span
-                                    class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Desktop
-                                    Apps</span>
-                                <input type="checkbox" id="desktopApps"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span
-                                    class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Web
-                                    Editing</span>
-                                <input type="checkbox" id="webEdit"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                            <div class="h-px bg-slate-200 dark:bg-white/10 my-2"></div>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-bold text-indigo-600 dark:text-indigo-300">Teams
-                                    Collaboration</span>
-                                <input type="checkbox" id="teamsCollab"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span
-                                    class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-curry transition">Teams
-                                    Phone <i class="fas fa-info-circle text-slate-400 ml-1"
-                                        data-tooltip="VoIP-Telefonie über Microsoft Teams"></i></span>
-                                <input type="checkbox" id="teamsPhone"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-6 fade-in-up border-l-4 border-l-curry"
-                        style="animation-delay: 0.3s;">
-                        <h3
-                            class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 flex items-center gap-2 tracking-wide">
-                            <i class="fas fa-laptop text-curry"></i> 3. Endpoint & OS
-                        </h3>
-                        <div class="space-y-4">
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Mobile MDM</span>
-                                <input type="checkbox" id="mdmMobile"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Desktop MDM
-                                    (Intune) <i class="fas fa-info-circle text-slate-400 ml-1"
-                                        data-tooltip="Mobile Device Management für Windows/Mac Geräte"></i></span>
-                                <input type="checkbox" id="mdmDesktop"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Windows OS (E3/E5)
-                                    <i class="fas fa-info-circle text-slate-400 ml-1"
-                                        data-tooltip="Windows Enterprise Lizenz mit erweiterten Features"></i></span>
-                                <input type="checkbox" id="winOS"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                            <div class="h-px bg-slate-200 dark:bg-white/10 my-2"></div>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Defender P1 (AV) <i
-                                        class="fas fa-info-circle text-slate-400 ml-1"
-                                        data-tooltip="Basis Antivirus und Endpoint Protection"></i></span>
-                                <input type="checkbox" id="sec_def_p1"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Defender P2 (XDR)
-                                    <i class="fas fa-info-circle text-slate-400 ml-1"
-                                        data-tooltip="Extended Detection & Response - Erweiterte Bedrohungserkennung"></i></span>
-                                <input type="checkbox" id="sec_def_p2"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-6 fade-in-up border-l-4 border-l-curry"
-                        style="animation-delay: 0.4s;">
-                        <h3
-                            class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 flex items-center gap-2 tracking-wide">
-                            <i class="fas fa-shield-alt text-curry"></i> 4. Security
-                        </h3>
-                        <div class="space-y-4">
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Cond. Access (P1)
-                                    <i class="fas fa-info-circle text-slate-400 ml-1"
-                                        data-tooltip="Bedingte Zugriffskontrolle ermöglicht Zugriff basierend auf Bedingungen wie Standort, Gerät oder Risiko"></i></span>
-                                <input type="checkbox" id="sec_ca"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Risk-Based CA (P2)
-                                    <i class="fas fa-info-circle text-slate-400 ml-1"
-                                        data-tooltip="Erweiterte bedingte Zugriffskontrolle mit KI-basierter Risikoerkennung"></i></span>
-                                <input type="checkbox" id="sec_risk_ca"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Cloud Apps (CASB)
-                                    <i class="fas fa-info-circle text-slate-400 ml-1"
-                                        data-tooltip="Cloud App Security Broker - Überwacht und schützt Cloud-Anwendungen"></i></span>
-                                <input type="checkbox" id="sec_casb"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-6 fade-in-up border-l-4 border-l-curry"
-                        style="animation-delay: 0.5s;">
-                        <h3
-                            class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 flex items-center gap-2 tracking-wide">
-                            <i class="fas fa-file-contract text-curry"></i> 5. Compliance
-                        </h3>
-                        <div class="space-y-4">
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">DLP (Basic/Full) <i
-                                        class="fas fa-info-circle text-slate-400 ml-1"
-                                        data-tooltip="Data Loss Prevention - Verhindert ungewollten Datenverlust"></i></span>
-                                <input type="checkbox" id="comp_dlp"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Auto Labeling <i
-                                        class="fas fa-info-circle text-slate-400 ml-1"
-                                        data-tooltip="Automatische Klassifizierung sensibler Daten"></i></span>
-                                <input type="checkbox" id="comp_labeling"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                            <label class="flex justify-between items-center cursor-pointer group">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Adv. eDiscovery <i
-                                        class="fas fa-info-circle text-slate-400 ml-1"
-                                        data-tooltip="Erweiterte elektronische Beweissicherung für Compliance"></i></span>
-                                <input type="checkbox" id="comp_ediscovery"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()">
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl overflow-hidden fade-in-up border-l-4 border-l-curry"
-                    style="animation-delay: 0.6s;">
-                    <div onclick="toggleCollapse('advancedAddons')"
-                        class="flex justify-between items-center p-5 cursor-pointer hover:bg-white/50 dark:hover:bg-slate-700/50 transition">
-                        <h3
-                            class="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase flex items-center gap-2 tracking-wide">
-                            <i class="fas fa-wand-magic-sparkles text-curry"></i> 6. Advanced Cloud & AI
-                        </h3>
-                        <i class="fas fa-chevron-down text-slate-400 chevron"></i>
-                    </div>
-                    <div id="advancedAddons"
-                        class="hidden p-6 border-t border-slate-200 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 dark:bg-slate-800/50">
-                        <div>
-                            <h4
-                                class="text-[10px] font-bold uppercase text-indigo-600 dark:text-indigo-300 mb-3 tracking-widest">
-                                Intune Suite</h4>
-                            <div class="space-y-3">
-                                <label class="flex justify-between items-center cursor-pointer"><span
-                                        class="text-sm text-slate-700 dark:text-slate-200">EPM (€5.50) <i
-                                            class="fas fa-info-circle text-slate-400 ml-1"
-                                            data-tooltip="Endpoint Privilege Management - Verwaltung von Admin-Rechten"></i></span><input
-                                        type="checkbox" id="adv_epm"
-                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                        onchange="recalc()"></label>
-                                <label class="flex justify-between items-center cursor-pointer"><span
-                                        class="text-sm text-slate-700 dark:text-slate-200">Remote Help (€5.50) <i
-                                            class="fas fa-info-circle text-slate-400 ml-1"
-                                            data-tooltip="Remote-Support-Tool für IT-Administratoren"></i></span><input
-                                        type="checkbox" id="adv_remotehelp"
-                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                        onchange="recalc()"></label>
-                            </div>
-                        </div>
-                        <div>
-                            <h4
-                                class="text-[10px] font-bold uppercase text-pink-500 dark:text-pink-400 mb-3 tracking-widest">
-                                AI / Copilot</h4>
-                            <label class="flex justify-between items-center cursor-pointer"><span
-                                    class="text-sm text-slate-700 dark:text-slate-200 font-semibold">M365 Copilot
-                                    (€30)</span><input type="checkbox" id="adv_copilot"
-                                    class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                    onchange="recalc()"></label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl overflow-hidden fade-in-up border-l-4 border-l-curry"
-                    style="animation-delay: 0.7s;">
-                    <div onclick="toggleCollapse('additionalProds')"
-                        class="flex justify-between items-center p-5 cursor-pointer hover:bg-white/50 dark:hover:bg-slate-700/50 transition">
-                        <h3
-                            class="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase flex items-center gap-2 tracking-wide">
-                            <i class="fas fa-cubes text-curry"></i> 7. Additional Products
-                        </h3>
-                        <i class="fas fa-chevron-down text-slate-400 chevron"></i>
-                    </div>
-                    <div id="additionalProds"
-                        class="hidden p-6 border-t border-slate-200 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 dark:bg-slate-800/50">
-                        <div>
-                            <h4
-                                class="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400 mb-3 tracking-widest">
-                                Visio & Project</h4>
-                            <div class="space-y-3">
-                                <label class="flex justify-between items-center cursor-pointer">
-                                    <span class="text-sm text-slate-700 dark:text-slate-200">Visio Plan 2
-                                        (€12.70)</span>
-                                    <input type="checkbox" id="add_visio"
-                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                        onchange="recalc()">
-                                </label>
-                                <label class="flex justify-between items-center cursor-pointer">
-                                    <span class="text-sm text-slate-700 dark:text-slate-200">Project Plan 3
-                                        (€25.30)</span>
-                                    <input type="checkbox" id="add_project"
-                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                        onchange="recalc()">
-                                </label>
-                            </div>
-                        </div>
-                        <div>
-                            <h4
-                                class="text-[10px] font-bold uppercase text-orange-500 dark:text-orange-400 mb-3 tracking-widest">
-                                Infra, Power & Rooms</h4>
-                            <div class="space-y-3">
-                                <label class="flex justify-between items-center cursor-pointer">
-                                    <span class="text-sm text-slate-700 dark:text-slate-200">Power Auto. Prem.
-                                        (€14)</span>
-                                    <input type="checkbox" id="add_powerauto"
-                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                        onchange="recalc()">
-                                </label>
-                                <label class="flex justify-between items-center cursor-pointer">
-                                    <span class="text-sm text-slate-700 dark:text-slate-200">Teams Rooms Pro
-                                        (€33.70)</span>
-                                    <input type="checkbox" id="add_rooms"
-                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                        onchange="recalc()">
-                                </label>
-                                <label class="flex justify-between items-center cursor-pointer">
-                                    <span class="text-sm text-slate-700 dark:text-slate-200">Defender Server
-                                        (€2.80)</span>
-                                    <input type="checkbox" id="serverProt"
-                                        class="h-5 w-5 rounded border-gray-300 text-curry focus:ring-curry dark:border-slate-600 dark:bg-slate-950 dark:checked:bg-curry accent-curry cursor-pointer"
-                                        onchange="recalc()">
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="xl:col-span-5">
-                <div class="sticky top-24 space-y-6 fade-in-up" style="animation-delay: 0.4s;">
-
-                    <div
-                        class="rounded-[2rem] shadow-2xl overflow-hidden bg-white dark:bg-[#0f172a] border border-white/20 dark:border-slate-700 relative transition-all group hover:shadow-curry/20 duration-500">
-                        <div
-                            class="bg-gradient-to-br from-indigo-900 to-indigo-800 p-10 text-white relative overflow-hidden">
-                            <div
-                                class="absolute -right-10 -top-10 w-48 h-48 bg-curry rounded-full blur-[90px] opacity-30 animate-pulse">
-                            </div>
-                            <div
-                                class="absolute -left-10 bottom-0 w-40 h-40 bg-blue-500 rounded-full blur-[70px] opacity-20">
-                            </div>
-
-                            <div class="relative z-10">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">
-                                        Recommended License</div>
-                                    <i class="fas fa-award text-curry text-xl"></i>
-                                </div>
-                                <h2 class="text-5xl font-extrabold leading-none tracking-tight mb-3" id="recName">--
-                                </h2>
-                                <div class="text-sm font-medium text-yellow-400" id="recAddon"></div>
-
-                                <div class="mt-8 pt-6 border-t border-white/10 flex justify-between items-end">
-                                    <div class="text-xs font-medium text-white/60 uppercase tracking-wider">Est. Monthly
-                                        / User</div>
-                                    <div class="text-right">
-                                        <div class="text-5xl font-bold text-white tracking-tight font-mono"
-                                            id="recPrice">€0.00</div>
-                                        <div class="text-xs font-bold mt-1" id="priceDelta">--</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div
-                            class="bg-slate-50/80 dark:bg-[#0f172a] px-10 py-5 border-b border-slate-200 dark:border-slate-700 backdrop-blur-sm">
-                            <div class="flex flex-wrap gap-2" id="featureTags"></div>
-                        </div>
-
-                        <div class="p-10 bg-white dark:bg-[#0f172a]">
-                            <h3
-                                class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-4 tracking-widest">
-                                Reasoning</h3>
-                            <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-200 mb-8 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-white/5"
-                                id="recReason">Select your requirements to begin...</p>
-
-                            <div
-                                class="rounded-xl bg-slate-100/80 dark:bg-slate-950 p-5 border border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                                <div>
-                                    <span
-                                        class="text-[10px] font-bold uppercase text-slate-400 block mb-0.5 tracking-wider">Runner
-                                        Up</span>
-                                    <span class="text-sm font-bold text-slate-700 dark:text-white"
-                                        id="altName">--</span>
-                                </div>
-                                <div class="text-right">
-                                    <span
-                                        class="text-[10px] font-bold px-2 py-1 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-                                        id="altDiff">--</span>
-                                    <div class="text-xs font-mono text-slate-400 mt-1" id="altPrice">--</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="p-6 bg-slate-50 dark:bg-[#0f172a] border-t border-slate-200 dark:border-slate-700">
-                            <button id="actionBtn" onclick="addToQuote()"
-                                class="bg-gradient-to-r from-curry via-yellow-500 to-curry text-white font-bold shadow-lg hover:shadow-curry/50 hover:scale-[1.02] transition-all duration-200 w-full py-4 rounded-xl text-sm uppercase tracking-[0.15em] flex justify-center items-center gap-3 group">
-                                <i
-                                    class="fas fa-plus-circle text-lg group-hover:rotate-90 transition-transform duration-300"></i>
-                                <span id="actionBtnText">Add to Quote</span>
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
+  <div class="work">
+    <section class="left-col">
+      <div class="profile-strip" id="profileStrip">
+        <div class="field">
+          <label>Profile</label>
+          <input type="text" id="personaName" placeholder="e.g. Marketing Lead">
         </div>
-
-        <div class="mt-12 backdrop-blur-xl border shadow-2xl transition-all duration-300 bg-white/65 border-white/40 dark:bg-[#0f172a]/95 dark:border-white/10 rounded-3xl p-10 fade-in-up"
-            style="animation-delay: 0.6s;">
-            <div class="flex justify-between items-center mb-8">
-                <h3 class="font-bold text-2xl text-slate-900 dark:text-white"><i
-                        class="fas fa-file-invoice text-curry mr-3"></i> Quote Summary</h3>
-                <div class="text-sm font-mono bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
-                    id="quoteCount">0 Personas</div>
-            </div>
-
-            <div class="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                <table class="w-full text-sm text-left">
-                    <thead
-                        class="bg-slate-50 dark:bg-[#020617] text-xs uppercase font-bold text-slate-500 dark:text-slate-400">
-                        <tr>
-                            <th class="px-6 py-5">Persona</th>
-                            <th class="px-6 py-5">Base</th>
-                            <th class="px-6 py-5 w-full">Add-ons</th>
-                            <th class="px-6 py-5 text-right">Price</th>
-                            <th class="px-6 py-5 text-right">Total</th>
-                            <th class="px-6 py-5 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="quoteBody"
-                        class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-[#0f172a] text-slate-700 dark:text-slate-200">
-                        <tr>
-                            <td colspan="6" class="px-6 py-16 text-center text-slate-400 italic">No personas added.
-                                Build your quote above.</td>
-                        </tr>
-                    </tbody>
-                    <tfoot
-                        class="bg-slate-50 dark:bg-[#020617] font-bold text-slate-900 dark:text-white border-t-2 border-slate-200 dark:border-slate-700">
-                        <tr>
-                            <td colspan="4" class="text-right px-6 py-5 uppercase text-xs tracking-wider">Monthly Total:
-                            </td>
-                            <td class="text-right text-curry text-2xl px-6 py-5 font-mono" id="grandTotal">€0.00</td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 fade-in-up" id="costDashboard"
-                style="display: none;">
-                <div
-                    class="bg-slate-100 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
-                    <div class="flex justify-between items-end mb-2">
-                        <div class="text-xs font-bold uppercase text-indigo-900 dark:text-indigo-300">Base Licenses
-                        </div>
-                        <div class="text-sm font-mono font-bold text-indigo-700 dark:text-indigo-400" id="dashBaseVal">
-                            €0.00</div>
-                    </div>
-                    <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
-                        <div class="bg-indigo-600 h-3 rounded-full transition-all duration-500" id="dashBaseBar"
-                            style="width: 0%"></div>
-                    </div>
-                    <div class="text-[10px] text-right mt-1 text-slate-500" id="dashBasePct">0%</div>
-                </div>
-
-                <div
-                    class="bg-slate-100 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
-                    <div class="flex justify-between items-end mb-2">
-                        <div class="text-xs font-bold uppercase text-curry-600 dark:text-yellow-500">Add-ons & Upgrades
-                        </div>
-                        <div class="text-sm font-mono font-bold text-curry-600 dark:text-yellow-500" id="dashAddonVal">
-                            €0.00</div>
-                    </div>
-                    <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
-                        <div class="bg-curry h-3 rounded-full transition-all duration-500" id="dashAddonBar"
-                            style="width: 0%"></div>
-                    </div>
-                    <div class="text-[10px] text-right mt-1 text-slate-500" id="dashAddonPct">0%</div>
-                </div>
-            </div>
-
+        <div class="field">
+          <label>Qty</label>
+          <input type="number" id="userCount" value="10" min="1" oninput="recalc()">
         </div>
-    </main>
-
-    <div id="compModal" class="fixed inset-0 z-[100] hidden" role="dialog" aria-modal="true"
-        aria-labelledby="modalTitle">
-        <div class="fixed inset-0 bg-slate-900/90 backdrop-blur-md transition-opacity" onclick="closeModal()"></div>
-        <div class="fixed inset-0 z-[101] overflow-y-auto">
-            <div class="flex min-h-full items-center justify-center p-4">
-                <div
-                    class="relative bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-3xl w-full border border-white/10 transition-all transform scale-100 overflow-hidden">
-                    <div
-                        class="bg-gradient-to-r from-indigo-900 to-indigo-800 px-10 py-8 flex justify-between items-center relative">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-curry to-yellow-500"></div>
-                        <h3 id="modalTitle" class="text-white font-bold text-2xl tracking-wide">License Comparison</h3>
-                        <button onclick="closeModal()"
-                            class="text-white/70 hover:text-white transition bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center"><i
-                                class="fas fa-times text-xl"></i></button>
-                    </div>
-                    <div class="p-10">
-                        <div class="grid grid-cols-2 gap-8 mb-10">
-                            <div
-                                class="text-center p-6 rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-[#020617] relative overflow-hidden">
-                                <div class="text-[10px] uppercase text-slate-500 font-bold tracking-widest mb-2">Current
-                                </div>
-                                <div class="font-bold text-xl text-slate-800 dark:text-white" id="modCurrentName">--
-                                </div>
-                            </div>
-                            <div
-                                class="text-center p-6 rounded-2xl border border-indigo-200 bg-indigo-50 dark:border-indigo-900 dark:bg-indigo-950 relative overflow-hidden ring-1 ring-indigo-500/30">
-                                <div class="absolute top-0 right-0 p-2 text-indigo-200 opacity-20 text-4xl"><i
-                                        class="fas fa-arrow-right"></i></div>
-                                <div
-                                    class="text-[10px] uppercase text-indigo-600 dark:text-indigo-300 font-bold tracking-widest mb-2">
-                                    Recommended</div>
-                                <div class="font-bold text-xl text-indigo-700 dark:text-white" id="modRecName">--</div>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                            <div
-                                class="bg-green-50/50 dark:bg-green-900/10 p-6 rounded-2xl border border-green-100 dark:border-green-900/30">
-                                <h4
-                                    class="text-xs font-bold text-green-700 dark:text-green-400 uppercase mb-4 border-b border-green-200 dark:border-green-800 pb-3 flex items-center gap-2">
-                                    <i class="fas fa-plus-circle"></i> Gained Features
-                                </h4>
-                                <ul id="listGained" class="text-sm space-y-3 text-slate-700 dark:text-slate-300"></ul>
-                            </div>
-                            <div
-                                class="bg-red-50/50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/30">
-                                <h4
-                                    class="text-xs font-bold text-red-700 dark:text-red-400 uppercase mb-4 border-b border-red-200 dark:border-red-800 pb-3 flex items-center gap-2">
-                                    <i class="fas fa-minus-circle"></i> Lost Features
-                                </h4>
-                                <ul id="listLost" class="text-sm space-y-3 text-slate-700 dark:text-slate-300"></ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        class="bg-slate-50 dark:bg-slate-900 px-10 py-6 flex justify-end border-t border-slate-200 dark:border-slate-700">
-                        <button onclick="closeModal()"
-                            class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3 rounded-xl font-bold text-sm hover:scale-105 transition transform shadow-lg">Done</button>
-                    </div>
-                </div>
-            </div>
+        <div class="field">
+          <label>Workstyle</label>
+          <select id="workstyle" onchange="recalc()">
+            <option value="office">Office</option>
+            <option value="frontline">Frontline</option>
+            <option value="standalone">Standalone / Add-ons</option>
+          </select>
         </div>
+        <div class="field">
+          <label>Current License</label>
+          <select id="currentLicense" onchange="recalc()">
+            <option value="None">-- New Hire / No License --</option>
+            <option value="M365 F1">Microsoft 365 F1</option>
+            <option value="M365 F3">Microsoft 365 F3</option>
+            <option value="Business Basic">Business Basic</option>
+            <option value="Business Standard">Business Standard</option>
+            <option value="Business Premium">Business Premium</option>
+            <option value="O365 E1">Office 365 E1</option>
+            <option value="O365 E3">Office 365 E3</option>
+            <option value="M365 E3">Microsoft 365 E3</option>
+            <option value="M365 E5">Microsoft 365 E5</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="tools-row">
+        <div class="term-row">
+          <button type="button" id="btnAnnual" class="term-btn active" onclick="setTerm('annual')">Annual</button>
+          <button type="button" id="btnMonthly" class="term-btn" onclick="setTerm('monthly')">Monthly (+20%)</button>
+        </div>
+        <div class="preset">
+          <select id="presetSelector" onchange="applyPreset(this.value)">
+            <option value="Benutzerdefiniert">-- Preset --</option>
+            <option value="Marketing Team">Marketing Team</option>
+            <option value="Development Team">Development Team</option>
+            <option value="Executive / C-Level">Executive / C-Level</option>
+            <option value="Frontline Worker">Frontline Worker</option>
+            <option value="IT Administrator">IT Administrator</option>
+            <option value="Sales Team">Sales Team</option>
+            <option value="Finance / Compliance">Finance / Compliance</option>
+            <option value="Project Manager">Project Manager</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="panel panel-pad">
+        <h2 class="sec-label">Requirements</h2>
+        <div class="req-grid" id="reqList">
+          <label class="req-item">
+            <input type="checkbox" id="needMailbox" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Mailbox > 0GB</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="largeMailbox" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Large Mailbox (50GB+)</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="desktopApps" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Desktop Apps</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="webEdit" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Web Editing</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="teamsCollab" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Teams Collaboration</span>
+          </label>
+          <label class="req-item" data-tooltip="VoIP-Telefonie über Microsoft Teams">
+            <input type="checkbox" id="teamsPhone" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Teams Phone</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="mdmMobile" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Mobile MDM</span>
+          </label>
+          <label class="req-item" data-tooltip="Mobile Device Management für Windows/Mac Geräte">
+            <input type="checkbox" id="mdmDesktop" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Desktop MDM (Intune)</span>
+          </label>
+          <label class="req-item" data-tooltip="Windows Enterprise Lizenz mit erweiterten Features">
+            <input type="checkbox" id="winOS" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Windows OS (E3/E5)</span>
+          </label>
+          <label class="req-item" data-tooltip="Basis Antivirus und Endpoint Protection">
+            <input type="checkbox" id="sec_def_p1" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Defender P1 (AV)</span>
+          </label>
+          <label class="req-item" data-tooltip="Extended Detection & Response">
+            <input type="checkbox" id="sec_def_p2" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Defender P2 (XDR)</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="sec_ca" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Conditional Access</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="sec_risk_ca" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Risk-Based CA</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="sec_casb" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>CASB / Defender for Cloud Apps</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="comp_dlp" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>DLP</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="comp_labeling" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Sensitivity Labels</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="comp_ediscovery" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>eDiscovery</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="adv_epm" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Endpoint Privilege Management</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="adv_remotehelp" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Remote Help</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="adv_copilot" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Microsoft 365 Copilot (€30)</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="add_visio" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Visio Plan 2</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="add_project" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Project Plan 3</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="add_powerauto" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Power Automate (€14)</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="add_rooms" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Teams Rooms Pro (€33.70)</span>
+          </label>
+          <label class="req-item">
+            <input type="checkbox" id="serverProt" onchange="recalc()">
+            <i class="box" aria-hidden="true"></i>
+            <span>Defender Server (€2.80)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="quote-wrap panel panel-pad">
+        <div class="quote-meta">
+          <h2 class="sec-label" style="margin:0">Quote</h2>
+          <div id="quoteCount">0 Personas</div>
+        </div>
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Plan</th>
+              <th>Add-ons</th>
+              <th class="num">Unit</th>
+              <th class="num">Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="quoteBody"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"><strong>Grand Total</strong></td>
+              <td class="num" id="grandTotal">€0.00</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="dashboard" id="costDashboard" style="display:none">
+          <div class="dash-card">
+            <div>Base licenses</div>
+            <div id="dashBaseVal">€0.00</div>
+            <div class="bar"><span id="dashBaseBar" style="width:0%"></span></div>
+            <div id="dashBasePct">0%</div>
+          </div>
+          <div class="dash-card">
+            <div>Add-ons</div>
+            <div id="dashAddonVal">€0.00</div>
+            <div class="bar addon"><span id="dashAddonBar" style="width:0%"></span></div>
+            <div id="dashAddonPct">0%</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="right-col">
+      <div class="compare-sheet" id="compareSheet">
+        <h2>Compare</h2>
+        <div class="compare-cols">
+          <div>
+            <h3>As-Is</h3>
+            <div class="who" id="liveCurrentName">—</div>
+            <ul id="liveLost"></ul>
+          </div>
+          <div>
+            <h3>To-Be</h3>
+            <div class="who" id="liveRecName">—</div>
+            <ul id="liveGained"></ul>
+          </div>
+        </div>
+        <div class="compare-foot">
+          <span class="meta-chip">Live feature delta</span>
+          <button type="button" class="hold-btn" id="actionBtn" onclick="addToQuote()"><span id="actionBtnText">ADD TO QUOTE</span></button>
+        </div>
+      </div>
+
+      <div class="rec-block">
+        <div class="rec-head">
+          <h2 class="sec-label" style="margin:0">Recommendation</h2>
+          <span class="meta-chip" id="altDiff">—</span>
+        </div>
+        <div class="rec-name" id="recName">--</div>
+        <div class="rec-addon" id="recAddon"></div>
+        <div class="price-row">
+          <div class="price-plate"><span></span><span id="recPrice">€ 0.00</span></div>
+          <div class="delta-hatch" id="priceDelta">—</div>
+        </div>
+        <div class="reason" id="recReason">Select your requirements to begin...</div>
+        <div class="tags" id="featureTags"></div>
+        <div class="alt-row">
+          <div><div class="sec-label" style="margin:0;font-size:10px">Runner up</div><div id="altName">--</div></div>
+          <div id="altPrice">--</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- Modal kept for quote-row compare -->
+<div id="compModal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" onclick="closeModal()"></div>
+  <div class="modal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="margin:0;letter-spacing:0.1em">LICENSE COMPARISON</h3>
+      <button type="button" class="ghost-btn" onclick="closeModal()">Close</button>
     </div>
+    <div class="compare-cols">
+      <div>
+        <h3>As-Is</h3>
+        <div class="who" id="modCurrentName">--</div>
+        <ul id="listLost"></ul>
+      </div>
+      <div>
+        <h3>To-Be</h3>
+        <div class="who" id="modRecName">--</div>
+        <ul id="listGained"></ul>
+      </div>
+    </div>
+  </div>
+</div>
 
-    <script src="data/licenses.js"></script>
-    <script src="src/engine.js"></script>
-    <script>
+<script src="data/licenses.js"></script>
+<script src="src/engine.js"></script>
+<script>
+        // CONFIG
+
         // CONFIG
         const { PRICES: PRICE_ENTRIES, HIERARCHY, FEATURES_MAP, PERSONA_PRESETS } = LICENSE_DATA;
         const PRICES = Object.fromEntries(
@@ -844,12 +935,12 @@
 
             if (term === 'annual') {
                 isMonthly = false;
-                btnA.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-md text-xs font-bold transition-all bg-indigo-900 text-white shadow-md ring-1 ring-black/5";
-                btnM.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-md text-xs font-bold transition-all text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800";
+                btnA.className = "term-btn active";
+                btnM.className = "term-btn";
             } else {
                 isMonthly = true;
-                btnM.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-md text-xs font-bold transition-all bg-indigo-900 text-white shadow-md ring-1 ring-black/5";
-                btnA.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-md text-xs font-bold transition-all text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800";
+                btnM.className = "term-btn active";
+                btnA.className = "term-btn";
             }
             recalc();
         }
@@ -903,11 +994,11 @@
             const txt = document.getElementById('actionBtnText');
 
             if (editingIndex > -1) {
-                txt.innerText = "Update Persona";
-                btn.className = "bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 text-white font-bold shadow-lg hover:shadow-indigo-500/50 hover:scale-[1.02] transition-all duration-200 w-full py-4 rounded-xl text-sm uppercase tracking-[0.15em] flex justify-center items-center gap-3 group";
+                txt.innerText = "UPDATE PERSONA";
+                btn.className = "btn-primary editing";
             } else {
-                txt.innerText = "Add to Quote";
-                btn.className = "bg-gradient-to-r from-curry via-yellow-500 to-curry text-white font-bold shadow-lg hover:shadow-curry/50 hover:scale-[1.02] transition-all duration-200 w-full py-4 rounded-xl text-sm uppercase tracking-[0.15em] flex justify-center items-center gap-3 group";
+                txt.innerText = "ADD TO QUOTE";
+                btn.className = "btn-primary";
             }
         }
 
@@ -951,43 +1042,47 @@
             const comparison = LicenseEngine.compare(c.currentLic, c, term, LICENSE_DATA);
 
             document.getElementById('recName').innerText = c.base;
-            document.getElementById('recPrice').innerText = "€" + c.price.toFixed(2);
+            document.getElementById('recPrice').innerText = "€ " + c.price.toFixed(2);
             document.getElementById('recReason').innerText = c.reason;
 
-            // Delta
             const delta = comparison.delta;
-            let deltaHtml = "";
-            if (c.currentLic !== "None") {
-                if (delta > 0) deltaHtml = `<span class="text-xs ml-2 text-red-300 font-semibold">+€${delta.toFixed(2)} Invest</span>`;
-                else if (delta < 0) deltaHtml = `<span class="text-xs ml-2 text-green-300 font-semibold">-€${Math.abs(delta).toFixed(2)} Save</span>`;
+            const deltaEl = document.getElementById('priceDelta');
+            if (c.currentLic !== "None" && delta !== 0) {
+                deltaEl.innerText = (delta > 0 ? "+" : "-") + "€" + Math.abs(delta).toFixed(2);
+            } else {
+                deltaEl.innerText = "—";
             }
-            document.getElementById('recPrice').innerHTML = `€${c.price.toFixed(2)} ${deltaHtml}`;
 
             let subHtml = c.addons.filter(a => !a.includes("Teams")).join(" + ");
             if (c.teamsPrice > 0) {
-                subHtml = `<span class="text-blue-500 font-bold">Teams (+€${c.teamsPrice.toFixed(2)})</span>` + (subHtml ? " + " + subHtml : "");
+                subHtml = `Teams (+€${c.teamsPrice.toFixed(2)})` + (subHtml ? " + " + subHtml : "");
             }
-            document.getElementById('recAddon').innerHTML = subHtml || "";
+            document.getElementById('recAddon').innerText = subHtml || "";
 
-            // Runner Up Fix
             document.getElementById('altName').innerText = c.alt;
             document.getElementById('altPrice').innerText = "€" + comparison.altPrice.toFixed(2);
-
             const altDiff = comparison.altDiff;
             const altEl = document.getElementById('altDiff');
-            if (altDiff > 0) {
-                altEl.innerText = `+€${altDiff.toFixed(2)} more`;
-                altEl.className = "text-[10px] font-bold px-2 py-1 rounded-full bg-red-100 text-red-600 dark:bg-red-900/50 dark:text-red-200";
-            } else {
-                altEl.innerText = `-€${Math.abs(altDiff).toFixed(2)} less`;
-                altEl.className = "text-[10px] font-bold px-2 py-1 rounded-full bg-green-100 text-green-600 dark:bg-green-900/50 dark:text-green-200";
-            }
+            altEl.innerText = (altDiff > 0 ? "+" : "-") + "€" + Math.abs(altDiff).toFixed(2);
+            altEl.className = "meta-chip";
 
             const tags = document.getElementById('featureTags');
             tags.innerHTML = "";
             c.features.forEach(f => {
-                tags.innerHTML += `<span class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10 dark:bg-indigo-900/30 dark:text-indigo-300 dark:ring-indigo-400/20">${f}</span>`;
+                tags.innerHTML += `<span class="tag">${f}</span>`;
             });
+
+            // Live Compare panel (As-Is / To-Be) — always on-page
+            document.getElementById('liveCurrentName').innerText = c.currentLic === 'None' ? 'New Hire / None' : c.currentLic;
+            document.getElementById('liveRecName').innerText = c.base;
+            const gList = document.getElementById('liveGained');
+            const lList = document.getElementById('liveLost');
+            gList.innerHTML = comparison.gained.length
+                ? comparison.gained.map(f => `<li>+ ${f}</li>`).join('')
+                : '<li class="muted">No new features</li>';
+            lList.innerHTML = comparison.lost.length
+                ? comparison.lost.map(f => `<li>− ${f}</li>`).join('')
+                : '<li class="muted">No features lost</li>';
         }
 
         function addToQuote() {
@@ -1040,8 +1135,8 @@
 
                 let addonHtml = item.addons.length > 0
                     ? item.addons.map(a => {
-                        let color = a.includes("Teams") ? "badge-blue" : a.includes("Security") ? "badge-red" : a.includes("Copilot") ? "badge-purple" : "badge-yellow";
-                        return `<span class="badge ${color} mr-1 mb-1">${a}</span>`;
+                        let color = a.includes("Teams") ? "tag-blue" : a.includes("Security") ? "tag-red" : a.includes("Copilot") ? "tag-purple" : "tag-ink";
+                        return `<span class="tag ${color} mr-1 mb-1">${a}</span>`;
                     }).join("")
                     : "<span class='text-slate-400 italic text-xs'>-</span>";
 
@@ -1195,7 +1290,7 @@
             };
             reader.readAsText(file);
         }
-    </script>
+    
+</script>
 </body>
-
 </html>

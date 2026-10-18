@@ -1,0 +1,99 @@
+{
+  "regions": [
+    {
+      "id": "title",
+      "kind": "text",
+      "grid": "A0:C0",
+      "note": "LICENSE ARCHITECT masthead in bold black caps"
+    },
+    {
+      "id": "btn-import",
+      "kind": "control",
+      "grid": "I0:I0",
+      "note": "IMPORT outlined button top right"
+    },
+    {
+      "id": "btn-export",
+      "kind": "control",
+      "grid": "J0:J0",
+      "note": "EXPORT outlined button top right"
+    },
+    {
+      "id": "profile-strip",
+      "kind": "control",
+      "grid": "A1:E1",
+      "note": "PROFILE and QTY ruled field strip"
+    },
+    {
+      "id": "req-label",
+      "kind": "text",
+      "grid": "A2:B2",
+      "note": "REQUIREMENTS section label"
+    },
+    {
+      "id": "req-list",
+      "kind": "control",
+      "grid": "A3:E6",
+      "note": "two-column requirement checklist with hatch-selected checkboxes",
+      "container": true
+    },
+    {
+      "id": "wad-swatches",
+      "kind": "control",
+      "grid": "A7:E7",
+      "note": "WAD pattern swatch row of hatch density samples"
+    },
+    {
+      "id": "quote-table",
+      "kind": "control",
+      "grid": "A8:E9",
+      "note": "quote data table with ITEM PLAN QTY UNIT PRICE TOTAL"
+    },
+    {
+      "id": "compare-sheet",
+      "kind": "chrome",
+      "grid": "F1:J7",
+      "note": "translucent Compare overlay sheet with soft shadow",
+      "container": true
+    },
+    {
+      "id": "compare-title",
+      "kind": "text",
+      "grid": "F1:G1",
+      "note": "COMPARE heading on overlay",
+      "parentId": "compare-sheet"
+    },
+    {
+      "id": "compare-cols",
+      "kind": "text",
+      "grid": "F2:J6",
+      "note": "AS-IS and TO-BE feature lists on overlay",
+      "parentId": "compare-sheet"
+    },
+    {
+      "id": "compare-actions",
+      "kind": "control",
+      "grid": "F7:J7",
+      "note": "filtration control and HOLD BACK pink action",
+      "parentId": "compare-sheet"
+    },
+    {
+      "id": "rec-label",
+      "kind": "text",
+      "grid": "F8:G8",
+      "note": "RECOMMENDATION label"
+    },
+    {
+      "id": "price-plate",
+      "kind": "control",
+      "grid": "F9:H9",
+      "note": "magenta filtration price plate showing € 57.20"
+    },
+    {
+      "id": "delta-hatch",
+      "kind": "control",
+      "grid": "I9:J9",
+      "note": "hatched delta box showing +€12.40"
+    }
+  ]
+}
