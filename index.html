@@ -420,14 +420,190 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   box-shadow: 8px 8px 0 rgba(0,0,0,0.2);
   padding: 16px;
 }
+.mobile-cta { display: none; }
+.hold-btn.editing { background: var(--ink); color: var(--paper); }
 
+/* Tablet + mobile: single column, prices early, touch-friendly */
 @media (max-width: 980px) {
-  .work { grid-template-columns: 1fr; }
-  .profile-strip { grid-template-columns: 1fr 1fr; }
-  .brand { font-size: 28px; }
-  .price-plate { font-size: 22px; }
+  body { font-size: 14px; }
+  .app {
+    padding: 12px 12px 88px;
+    max-width: 100%;
+    width: 100%;
+  }
+  .topbar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+    width: 100%;
+  }
+  .brand {
+    font-size: clamp(22px, 7vw, 28px);
+  }
+  .top-actions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+  }
+  .top-actions .ghost-btn {
+    padding: 12px 6px;
+    font-size: 10px;
+    text-align: center;
+    border-left: 1px solid var(--rule);
+  }
+  .top-actions .ghost-btn:first-child { border-left: 0; }
 
-/* Hero / desktop first-viewport: lock to approved comp frame */
+  .work {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+    width: 100%;
+  }
+  .left-col,
+  .right-col {
+    display: contents;
+  }
+  .work > * {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .profile-strip {
+    order: 1;
+    grid-template-columns: 1fr 1fr;
+  }
+  .profile-strip .field:nth-child(1) { grid-column: 1 / -1; }
+  .tools-row {
+    order: 2;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .term-row { width: 100%; display: flex; }
+  .term-btn { flex: 1; padding: 12px 8px; }
+  .preset { width: 100%; }
+  .preset select {
+    width: 100%;
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .rec-block {
+    order: 3;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--paper);
+    box-shadow: 0 2px 0 var(--rule);
+  }
+  .price-row { width: 100%; }
+  .price-plate { font-size: clamp(20px, 6vw, 26px); min-height: 48px; }
+  .delta-hatch { min-height: 48px; font-size: 13px; }
+  .btn-primary,
+  .hold-btn {
+    min-height: 48px;
+    font-size: 13px;
+  }
+
+  .compare-sheet {
+    order: 4;
+    min-height: 0;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.16);
+  }
+  .compare-cols {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .compare-cols ul { max-height: 140px; }
+  .compare-foot .hold-btn { display: none; } /* CTA lives in sticky mobile bar */
+
+  .req-panel { order: 5; }
+  .req-grid {
+    grid-template-columns: 1fr 1fr;
+    max-height: none;
+    gap: 0 12px;
+  }
+  .req-item {
+    min-height: 44px;
+    padding: 8px 2px;
+    border-bottom: 1px dotted #c8c7c3;
+  }
+  .box {
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
+  }
+  .field input,
+  .field select {
+    font-size: 16px; /* avoid iOS zoom */
+    min-height: 28px;
+  }
+
+  .quote-wrap {
+    order: 6;
+    margin-top: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  table.data {
+    min-width: 560px;
+    font-size: 12px;
+  }
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+  .compare-foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mobile-cta {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    background: var(--paper);
+    border-top: 2px solid var(--rule);
+  }
+  .mobile-cta .btn-primary {
+    margin: 0;
+    width: 100%;
+  }
+}
+
+@media (min-width: 981px) {
+  .mobile-cta { display: none; }
+}
+
+@media (max-width: 560px) {
+  .profile-strip {
+    grid-template-columns: 1fr;
+  }
+  .profile-strip .field:nth-child(1) { grid-column: auto; }
+  .field {
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .field:last-child { border-bottom: 0; }
+  .price-row {
+    grid-template-columns: 1fr;
+  }
+  .req-grid { grid-template-columns: 1fr; }
+  .compare-cols { grid-template-columns: 1fr; }
+  .top-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .top-actions .ghost-btn:nth-child(odd) { border-left: 0; }
+  .top-actions .ghost-btn:nth-child(n+3) {
+    border-top: 0;
+  }
+}
+
+/* Desktop wide: optional comp-frame lock (does not affect mobile) */
 @media (min-width: 1280px) {
   body { overflow-x: hidden; }
   .app {
@@ -468,7 +644,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
     display: flex; align-items: center; justify-content: center;
     border-top: 0; border-bottom: 1px solid var(--rule);
   }
-  .top-actions .ghost-btn:nth-child(n+3) { display: none; } /* IMPORT EXPORT only in hero chrome */
+  .top-actions .ghost-btn:nth-child(n+3) { display: none; }
   .work {
     position: absolute;
     left: 0; top: 10%; width: 100%; height: 90%;
@@ -478,10 +654,12 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   .left-col {
     position: absolute;
     left: 0; top: 0; width: 50%; height: 100%;
+    display: block;
   }
   .right-col {
     position: absolute;
     left: 50%; top: 0; width: 50%; height: 100%;
+    display: block;
   }
   .profile-strip {
     position: absolute;
@@ -515,7 +693,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   }
   .price-row { grid-template-columns: 1.5fr 1fr; margin-top: 4px; }
   .price-plate { font-size: 22px; padding: 6px 10px; }
-  .reason { display: none; } /* keep calm cells; reason below fold / hidden in hero */
+  .reason { display: none; }
   .tags { display: none; }
   .alt-row { display: none; }
   .dashboard { display: none !important; }
@@ -593,7 +771,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
         </div>
       </div>
 
-      <div class="panel panel-pad">
+      <div class="panel panel-pad req-panel">
         <h2 class="sec-label">Requirements</h2>
         <div class="req-grid" id="reqList">
           <label class="req-item">
@@ -809,6 +987,10 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   </div>
 </div>
 
+      <div class="mobile-cta" aria-hidden="false">
+        <button type="button" class="btn-primary" id="actionBtnMobile" onclick="addToQuote()"><span id="actionBtnTextMobile">ADD TO QUOTE</span></button>
+      </div>
+
 <!-- Modal kept for quote-row compare -->
 <div id="compModal" class="modal hidden" role="dialog" aria-modal="true">
   <div class="modal-backdrop" onclick="closeModal()"></div>
@@ -990,16 +1172,20 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
         }
 
         function updateActionButton() {
+            const editing = editingIndex > -1;
+            const label = editing ? "UPDATE PERSONA" : "ADD TO QUOTE";
+            const deskClass = editing ? "hold-btn editing" : "hold-btn";
+            const mobClass = editing ? "btn-primary editing" : "btn-primary";
+
             const btn = document.getElementById('actionBtn');
             const txt = document.getElementById('actionBtnText');
+            if (txt) txt.innerText = label;
+            if (btn) btn.className = deskClass;
 
-            if (editingIndex > -1) {
-                txt.innerText = "UPDATE PERSONA";
-                btn.className = "btn-primary editing";
-            } else {
-                txt.innerText = "ADD TO QUOTE";
-                btn.className = "btn-primary";
-            }
+            const btnM = document.getElementById('actionBtnMobile');
+            const txtM = document.getElementById('actionBtnTextMobile');
+            if (txtM) txtM.innerText = label;
+            if (btnM) btnM.className = mobClass;
         }
 
         function recalc() {
