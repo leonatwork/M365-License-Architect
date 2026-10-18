@@ -137,9 +137,20 @@
     }
 
     const intuneRequirements = { epm: 'EPM', rh: 'Remote Help', aa: 'Advanced Analytics', intune2: 'Intune Plan 2', eam: 'EAM', pki: 'Cloud PKI' };
+    // Teams Phone setzt Teams voraus.
+    const needsTeams = state.teams || state.phone;
     function combination(candidate) {
-      const features = (FEATURES_MAP[candidate] || []).slice();
+      let features = (FEATURES_MAP[candidate] || []).slice();
       const extra = [];
+      if (state.teamsVariant === 'no_teams' && features.includes('Teams Collaboration')) {
+        // EWR-Variante: Suite ohne Teams; benötigtes Teams kommt genau einmal als Add-on Teams EWR hinzu.
+        if (needsTeams) {
+          extra.push('Teams EWR');
+        } else {
+          features = features.filter(feature => feature !== 'Teams Collaboration');
+          features.push('No Teams');
+        }
+      }
       const missing = Object.keys(intuneRequirements).filter(key => state[key] && !features.includes(intuneRequirements[key]));
       // Für neue Einzelprodukte fehlt ein belegter EUR-Preis; die vorhandene Suite deckt sie ab.
       const individualCost = missing.reduce((sum, key) => sum + getPrice(PRICES, key === 'epm' ? 'EPM Add-on' : 'Remote Help Add-on'), 0);
@@ -168,20 +179,33 @@
       const unitPrice = getPrice(PRICES, candidate, state.teamsVariant) + extra.reduce((sum, key) => sum + getPrice(PRICES, key), 0);
       return { base: candidate, addons: extra, unitPrice, features };
     }
+    // Zulässigkeit einer Basis gemäß den Regeln des Hauptpfads oben.
+    const isEnterprise = key => key.startsWith('M365 E');
+    const isFrontlineSku = key => key.startsWith('M365 F');
+    function isEligibleBase(candidate) {
+      if (candidate === 'None' || !PRICES[candidate]) return false;
+      if (candidate.includes('Business') && state.count > 300) return false;
+      if (isFrontlineSku(candidate) && state.style !== 'frontline') return false;
+      // Frontline erhält nur F-SKUs oder M365 Enterprise, nie Business-/Office-365-Pläne.
+      if (state.style === 'frontline' && !isFrontlineSku(candidate) && !isEnterprise(candidate)) return false;
+      if (state.copilot && !isEnterprise(candidate)) return false;
+      // Intune Suite Add-ons need M365 E3 base.
+      if (needsIntuneAdv && !isEnterprise(candidate)) return false;
+      if ((needsAdvSec || needsAdvComp) && !candidate.startsWith('M365') && candidate !== 'Business Premium') return false;
+      return true;
+    }
     let selected = combination(base);
     if (state.phone && state.style !== 'standalone') {
-      // Nur zulässige Basen vergleichen; Business max. 300, F-SKUs nur Frontline.
+      // Nur zulässige Basen mit allen nötigen Add-ons vergleichen.
       const required = { desktop: 'Desktop Apps', web: 'Web Apps (Edit)', mdm: 'Intune', win: 'Win OS', ca: 'Entra P1', def1: 'Def P1', dlp: 'Comp Basic', defO365: 'Def O365 P1' };
       const hierarchy = sourceData.HIERARCHY || {};
       const covers = (features, feature) => features.includes(feature)
         || (feature === 'Win OS' && features.includes('Win OS (VDA)'))
         || Object.values(hierarchy).some(group => group.includes(feature) && features.some(f => group.indexOf(f) >= group.indexOf(feature)));
-      const candidates = Object.keys(FEATURES_MAP).filter(key => key !== 'None' && PRICES[key] && (!key.includes('Business') || state.count <= 300) && (!key.includes('F') || state.style === 'frontline'));
+      const candidates = Object.keys(FEATURES_MAP).filter(isEligibleBase);
       let cheapest = null;
       for (const candidate of candidates) {
         const combo = combination(candidate);
-        if (state.copilot && !candidate.startsWith('M365 E')) continue;
-        if ((needsAdvSec || needsAdvComp || needsIntuneAdv) && !candidate.startsWith('M365') && candidate !== 'Business Premium') continue;
         if (!Object.entries(required).every(([flag, feature]) => !state[flag] || covers(combo.features, feature))) continue;
         if (!cheapest || combo.unitPrice < cheapest.unitPrice - 1e-9) cheapest = combo;
       }
@@ -197,12 +221,8 @@
     base = selected.base;
     const price = selected.unitPrice * mult;
     const flatAddons = selected.addons;
+    // Teams EWR steht in addons; ein separater teamsPrice würde es doppelt anzeigen.
     const teamsPrice = 0;
-    let features = selected.features;
-    if (state.teamsVariant === 'no_teams') {
-      features = features.filter(feature => feature !== 'Teams Collaboration');
-      features.push('No Teams');
-    }
 
     return {
       base: base,
@@ -210,7 +230,7 @@
       price: price,
       reason: reason,
       count: state.count,
-      features: features,
+      features: selected.features,
       alt: alt,
       currentLic: state.current,
       teamsPrice: teamsPrice,

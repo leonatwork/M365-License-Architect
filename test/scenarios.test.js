@@ -124,11 +124,19 @@ teamsTierScenarios.forEach((scenario) => {
     assert.equal(result.teamsPrice, 0);
     assert.equal(result.addons.includes('Teams EEA'), false);
     assert.equal(result.price, data.PRICES[scenario.name].price);
-    const noTeams = recommend({ ...scenario.input, teamsVariant: 'no_teams' });
+    // EWR-Variante ohne Teams-Bedarf: nur price_no_teams, kein Teams-Add-on.
+    const noTeams = recommend({ ...scenario.input, teams: false, teamsVariant: 'no_teams' });
     assert.equal(noTeams.base, scenario.name);
     assert.equal(noTeams.price, data.PRICES[scenario.name].price_no_teams);
     assert.deepEqual(noTeams.addons, []);
     assert.equal(noTeams.features.includes('Teams Collaboration'), false);
+    // EWR-Variante mit Teams-Bedarf: Teams EWR genau einmal als Add-on.
+    const ewr = recommend({ ...scenario.input, teamsVariant: 'no_teams' });
+    assert.equal(ewr.base, scenario.name);
+    assert.deepEqual(ewr.addons, ['Teams EWR']);
+    assert.ok(Math.abs(ewr.price - (data.PRICES[scenario.name].price_no_teams + data.PRICES['Teams EWR'].price)) < 1e-9);
+    assert.ok(ewr.features.includes('Teams Collaboration'));
+    assert.equal(ewr.teamsPrice, 0);
   });
 });
 
