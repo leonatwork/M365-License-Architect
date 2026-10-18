@@ -1,0 +1,936 @@
+{
+  "tool": "comp-spec",
+  "version": 1,
+  "createdAt": "2026-10-18T20:19:50.466Z",
+  "comp": "/workspace/.impeccable/mocks/exposure-comp-a.jpg",
+  "warnings": [
+    "region req-list: \"container\": true set in the regions file (the region-size refusal is overridden: one undivided element)",
+    "region compare-sheet: \"container\": true set in the regions file (the region-size refusal is overridden: one undivided element)"
+  ],
+  "uncoveredInkCells": [
+    "C2",
+    "I8",
+    "J8"
+  ],
+  "compSize": {
+    "width": 1280,
+    "height": 720
+  },
+  "aspect": 1.7778,
+  "orientation": "landscape",
+  "palette": [
+    {
+      "hex": "#f7f1e9",
+      "coverage": 0.915
+    },
+    {
+      "hex": "#d2d0cb",
+      "coverage": 0.0258
+    },
+    {
+      "hex": "#73726e",
+      "coverage": 0.0252
+    },
+    {
+      "hex": "#abaaa6",
+      "coverage": 0.02
+    },
+    {
+      "hex": "#090909",
+      "coverage": 0.0141
+    }
+  ],
+  "bands": [
+    {
+      "y": 0.0139,
+      "strength": 0.6797
+    },
+    {
+      "y": 0.0972,
+      "strength": 0.3759
+    },
+    {
+      "y": 0.9861,
+      "strength": 0.7992
+    }
+  ],
+  "regions": [
+    {
+      "id": "title",
+      "kind": "text",
+      "note": "LICENSE ARCHITECT masthead in bold black caps",
+      "grid": "A0:C0",
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 0.3,
+        "h": 0.1
+      },
+      "px": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 72
+      },
+      "aspect": 5.3333,
+      "palette": [
+        {
+          "hex": "#f6f5ea",
+          "coverage": 0.8249
+        },
+        {
+          "hex": "#0a0a09",
+          "coverage": 0.1492
+        },
+        {
+          "hex": "#bbbab9",
+          "coverage": 0.0157
+        },
+        {
+          "hex": "#413f3f",
+          "coverage": 0.0059
+        },
+        {
+          "hex": "#5f5f5d",
+          "coverage": 0.0043
+        }
+      ],
+      "detail": {
+        "energy": 61.8136
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 16,
+          "capHeightPx": 28.2,
+          "inkIsDark": true,
+          "allCaps": true,
+          "advance": 0.4794,
+          "advTall": 0.4794,
+          "advX": null,
+          "gap": 0.2486,
+          "xRatio": null,
+          "stemW": 0.1604,
+          "contrast": 1.0685,
+          "serif": 1.0424,
+          "densTall": 0.5967,
+          "densX": null,
+          "weight": 0.5967
+        },
+        "widthClass": "condensed",
+        "weightClass": "bold",
+        "chosen": {
+          "family": "Nanum Gothic Coding",
+          "weight": 700,
+          "fontSizePx": 39,
+          "source": "index",
+          "fp": {
+            "lines": 1,
+            "glyphs": 17,
+            "capHeightPx": 28.5,
+            "inkIsDark": true,
+            "allCaps": true,
+            "advance": 0.4912,
+            "advTall": 0.4912,
+            "advX": null,
+            "gap": 0.1754,
+            "xRatio": null,
+            "stemW": 0.1584,
+            "contrast": 1.0608,
+            "serif": null,
+            "densTall": 0.5829,
+            "densX": null,
+            "weight": 0.5829
+          },
+          "stamp": "5501468a19b1"
+        }
+      }
+    },
+    {
+      "id": "btn-import",
+      "kind": "control",
+      "note": "IMPORT outlined button top right",
+      "grid": "I0:I0",
+      "box": {
+        "x": 0.8,
+        "y": 0,
+        "w": 0.1,
+        "h": 0.1
+      },
+      "px": {
+        "x": 1024,
+        "y": 0,
+        "w": 128,
+        "h": 72
+      },
+      "aspect": 1.7778,
+      "palette": [
+        {
+          "hex": "#f7f6ea",
+          "coverage": 0.9242
+        },
+        {
+          "hex": "#0b0a0a",
+          "coverage": 0.0544
+        },
+        {
+          "hex": "#72716c",
+          "coverage": 0.0107
+        },
+        {
+          "hex": "#c3c3c3",
+          "coverage": 0.0068
+        },
+        {
+          "hex": "#383830",
+          "coverage": 0.0039
+        }
+      ],
+      "detail": {
+        "energy": 15.8788
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      }
+    },
+    {
+      "id": "btn-export",
+      "kind": "control",
+      "note": "EXPORT outlined button top right",
+      "grid": "J0:J0",
+      "box": {
+        "x": 0.9,
+        "y": 0,
+        "w": 0.1,
+        "h": 0.1
+      },
+      "px": {
+        "x": 1152,
+        "y": 0,
+        "w": 128,
+        "h": 72
+      },
+      "aspect": 1.7778,
+      "palette": [
+        {
+          "hex": "#f7f4e9",
+          "coverage": 0.8814
+        },
+        {
+          "hex": "#0a0a0a",
+          "coverage": 0.0768
+        },
+        {
+          "hex": "#b5b5b3",
+          "coverage": 0.0292
+        },
+        {
+          "hex": "#6c6c6a",
+          "coverage": 0.0078
+        },
+        {
+          "hex": "#3e3b3b",
+          "coverage": 0.0049
+        }
+      ],
+      "detail": {
+        "energy": 17.9589
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      }
+    },
+    {
+      "id": "profile-strip",
+      "kind": "control",
+      "note": "PROFILE and QTY ruled field strip",
+      "grid": "A1:E1",
+      "box": {
+        "x": 0,
+        "y": 0.1,
+        "w": 0.5,
+        "h": 0.1
+      },
+      "px": {
+        "x": 0,
+        "y": 72,
+        "w": 640,
+        "h": 72
+      },
+      "aspect": 8.8889,
+      "palette": [
+        {
+          "hex": "#f7f6e8",
+          "coverage": 0.9163
+        },
+        {
+          "hex": "#454440",
+          "coverage": 0.0487
+        },
+        {
+          "hex": "#0b0b0b",
+          "coverage": 0.0186
+        },
+        {
+          "hex": "#71706d",
+          "coverage": 0.0096
+        },
+        {
+          "hex": "#b8b8b6",
+          "coverage": 0.0068
+        }
+      ],
+      "detail": {
+        "energy": 26.1202
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      }
+    },
+    {
+      "id": "req-label",
+      "kind": "text",
+      "note": "REQUIREMENTS section label",
+      "grid": "A2:B2",
+      "box": {
+        "x": 0,
+        "y": 0.2,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "px": {
+        "x": 0,
+        "y": 144,
+        "w": 256,
+        "h": 72
+      },
+      "aspect": 3.5556,
+      "palette": [
+        {
+          "hex": "#f7f2e9",
+          "coverage": 0.9428
+        },
+        {
+          "hex": "#131313",
+          "coverage": 0.0176
+        },
+        {
+          "hex": "#767672",
+          "coverage": 0.0147
+        },
+        {
+          "hex": "#bcbbb7",
+          "coverage": 0.0142
+        },
+        {
+          "hex": "#474744",
+          "coverage": 0.0108
+        }
+      ],
+      "detail": {
+        "energy": 23.2095
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "type": {
+        "comp": {
+          "lines": 2,
+          "glyphs": 17,
+          "capHeightPx": 12.9,
+          "inkIsDark": true,
+          "allCaps": false,
+          "advance": 0.3475,
+          "advTall": 0.1912,
+          "advX": 0.3823,
+          "gap": 0.1912,
+          "xRatio": 0.6181,
+          "stemW": 0.1335,
+          "contrast": 1.0658,
+          "serif": 1.0637,
+          "densTall": 0.8067,
+          "densX": 0.5834,
+          "weight": 0.8067
+        },
+        "widthClass": "compressed",
+        "weightClass": "black"
+      }
+    },
+    {
+      "id": "req-list",
+      "kind": "control",
+      "note": "two-column requirement checklist with hatch-selected checkboxes",
+      "grid": "A3:E6",
+      "container": true,
+      "box": {
+        "x": 0,
+        "y": 0.3,
+        "w": 0.5,
+        "h": 0.4
+      },
+      "px": {
+        "x": 0,
+        "y": 216,
+        "w": 640,
+        "h": 288
+      },
+      "aspect": 2.2222,
+      "palette": [
+        {
+          "hex": "#f7f1e9",
+          "coverage": 0.9556
+        },
+        {
+          "hex": "#52524f",
+          "coverage": 0.0173
+        },
+        {
+          "hex": "#b2b2ae",
+          "coverage": 0.0154
+        },
+        {
+          "hex": "#84847d",
+          "coverage": 0.0059
+        },
+        {
+          "hex": "#0e0e0e",
+          "coverage": 0.0059
+        }
+      ],
+      "detail": {
+        "energy": 17.278
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      }
+    },
+    {
+      "id": "wad-swatches",
+      "kind": "control",
+      "note": "WAD pattern swatch row of hatch density samples",
+      "grid": "A7:E7",
+      "box": {
+        "x": 0,
+        "y": 0.7,
+        "w": 0.5,
+        "h": 0.1
+      },
+      "px": {
+        "x": 0,
+        "y": 504,
+        "w": 640,
+        "h": 72
+      },
+      "aspect": 8.8889,
+      "palette": [
+        {
+          "hex": "#f6f4e8",
+          "coverage": 0.8421
+        },
+        {
+          "hex": "#b3b2ad",
+          "coverage": 0.0707
+        },
+        {
+          "hex": "#7a7a76",
+          "coverage": 0.0377
+        },
+        {
+          "hex": "#494844",
+          "coverage": 0.0355
+        },
+        {
+          "hex": "#151515",
+          "coverage": 0.0141
+        }
+      ],
+      "detail": {
+        "energy": 26.4165
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      }
+    },
+    {
+      "id": "quote-table",
+      "kind": "control",
+      "note": "quote data table with ITEM PLAN QTY UNIT PRICE TOTAL",
+      "grid": "A8:E9",
+      "box": {
+        "x": 0,
+        "y": 0.8,
+        "w": 0.5,
+        "h": 0.2
+      },
+      "px": {
+        "x": 0,
+        "y": 576,
+        "w": 640,
+        "h": 144
+      },
+      "aspect": 4.4444,
+      "palette": [
+        {
+          "hex": "#f7f6e8",
+          "coverage": 0.8578
+        },
+        {
+          "hex": "#787671",
+          "coverage": 0.0937
+        },
+        {
+          "hex": "#b1b0ac",
+          "coverage": 0.0396
+        },
+        {
+          "hex": "#080808",
+          "coverage": 0.0047
+        },
+        {
+          "hex": "#514d49",
+          "coverage": 0.0042
+        }
+      ],
+      "detail": {
+        "energy": 29.3827
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      }
+    },
+    {
+      "id": "compare-sheet",
+      "kind": "chrome",
+      "note": "translucent Compare overlay sheet with soft shadow",
+      "grid": "F1:J7",
+      "container": true,
+      "box": {
+        "x": 0.5,
+        "y": 0.1,
+        "w": 0.5,
+        "h": 0.7
+      },
+      "px": {
+        "x": 640,
+        "y": 72,
+        "w": 640,
+        "h": 504
+      },
+      "aspect": 1.2698,
+      "palette": [
+        {
+          "hex": "#f6ede8",
+          "coverage": 0.9317
+        },
+        {
+          "hex": "#c8c7c3",
+          "coverage": 0.041
+        },
+        {
+          "hex": "#6f6f6d",
+          "coverage": 0.0152
+        },
+        {
+          "hex": "#98988f",
+          "coverage": 0.0064
+        },
+        {
+          "hex": "#080808",
+          "coverage": 0.0058
+        }
+      ],
+      "detail": {
+        "energy": 14.9671
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      }
+    },
+    {
+      "id": "compare-title",
+      "kind": "text",
+      "note": "COMPARE heading on overlay",
+      "grid": "F1:G1",
+      "parentId": "compare-sheet",
+      "coverBox": {
+        "x": 0.5,
+        "y": 0.1,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.5609,
+        "y": 0.1417,
+        "w": 0.1391,
+        "h": 0.0583
+      },
+      "px": {
+        "x": 718,
+        "y": 102,
+        "w": 178,
+        "h": 42
+      },
+      "aspect": 4.2381,
+      "palette": [
+        {
+          "hex": "#f4eae9",
+          "coverage": 0.9083
+        },
+        {
+          "hex": "#5b5a54",
+          "coverage": 0.029
+        },
+        {
+          "hex": "#878581",
+          "coverage": 0.0265
+        },
+        {
+          "hex": "#0d0d0d",
+          "coverage": 0.0193
+        },
+        {
+          "hex": "#a9a8a7",
+          "coverage": 0.0169
+        }
+      ],
+      "detail": {
+        "energy": 23.5966
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 7,
+          "capHeightPx": 13.4,
+          "inkIsDark": true,
+          "allCaps": false,
+          "advance": 0.5205,
+          "advTall": 0.5205,
+          "advX": null,
+          "gap": 0.2231,
+          "xRatio": 0.8006,
+          "stemW": 0.1861,
+          "contrast": 0.9881,
+          "serif": null,
+          "densTall": 0.6838,
+          "densX": null,
+          "weight": 0.6838
+        },
+        "widthClass": "condensed",
+        "weightClass": "black"
+      }
+    },
+    {
+      "id": "compare-cols",
+      "kind": "text",
+      "note": "AS-IS and TO-BE feature lists on overlay",
+      "grid": "F2:J6",
+      "parentId": "compare-sheet",
+      "box": {
+        "x": 0.5,
+        "y": 0.2,
+        "w": 0.5,
+        "h": 0.5
+      },
+      "px": {
+        "x": 640,
+        "y": 144,
+        "w": 640,
+        "h": 360
+      },
+      "aspect": 1.7778,
+      "palette": [
+        {
+          "hex": "#f6ece8",
+          "coverage": 0.9278
+        },
+        {
+          "hex": "#c8c7c3",
+          "coverage": 0.0388
+        },
+        {
+          "hex": "#646460",
+          "coverage": 0.0176
+        },
+        {
+          "hex": "#93938d",
+          "coverage": 0.0107
+        },
+        {
+          "hex": "#080808",
+          "coverage": 0.0051
+        }
+      ],
+      "detail": {
+        "energy": 14.5071
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      }
+    },
+    {
+      "id": "compare-actions",
+      "kind": "control",
+      "note": "filtration control and HOLD BACK pink action",
+      "grid": "F7:J7",
+      "parentId": "compare-sheet",
+      "box": {
+        "x": 0.5,
+        "y": 0.7,
+        "w": 0.5,
+        "h": 0.1
+      },
+      "px": {
+        "x": 640,
+        "y": 504,
+        "w": 640,
+        "h": 72
+      },
+      "aspect": 8.8889,
+      "palette": [
+        {
+          "hex": "#f6efe9",
+          "coverage": 0.887
+        },
+        {
+          "hex": "#c7c6bf",
+          "coverage": 0.0672
+        },
+        {
+          "hex": "#f48fc9",
+          "coverage": 0.0228
+        },
+        {
+          "hex": "#73726d",
+          "coverage": 0.0136
+        },
+        {
+          "hex": "#0a0a0a",
+          "coverage": 0.0094
+        }
+      ],
+      "detail": {
+        "energy": 19.0271
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      }
+    },
+    {
+      "id": "rec-label",
+      "kind": "text",
+      "note": "RECOMMENDATION label",
+      "grid": "F8:G8",
+      "box": {
+        "x": 0.5,
+        "y": 0.8,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "px": {
+        "x": 640,
+        "y": 576,
+        "w": 256,
+        "h": 72
+      },
+      "aspect": 3.5556,
+      "palette": [
+        {
+          "hex": "#f7f4e8",
+          "coverage": 0.6723
+        },
+        {
+          "hex": "#f8dbeb",
+          "coverage": 0.1598
+        },
+        {
+          "hex": "#d4d0cc",
+          "coverage": 0.0987
+        },
+        {
+          "hex": "#f040a5",
+          "coverage": 0.0483
+        },
+        {
+          "hex": "#141112",
+          "coverage": 0.0209
+        }
+      ],
+      "detail": {
+        "energy": 23.8715
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "type": {
+        "comp": null,
+        "measuredAt": "2026-10-18T20:19:56.934Z",
+        "note": "no separable lettering in the crop; size by the region box"
+      }
+    },
+    {
+      "id": "price-plate",
+      "kind": "control",
+      "note": "magenta filtration price plate showing € 57.20",
+      "grid": "F9:H9",
+      "box": {
+        "x": 0.5,
+        "y": 0.9,
+        "w": 0.3,
+        "h": 0.1
+      },
+      "px": {
+        "x": 640,
+        "y": 648,
+        "w": 384,
+        "h": 72
+      },
+      "aspect": 5.3333,
+      "palette": [
+        {
+          "hex": "#f8f6e8",
+          "coverage": 0.7472
+        },
+        {
+          "hex": "#f7d6e5",
+          "coverage": 0.1343
+        },
+        {
+          "hex": "#9c9a98",
+          "coverage": 0.0824
+        },
+        {
+          "hex": "#f041a4",
+          "coverage": 0.0318
+        },
+        {
+          "hex": "#a84e7a",
+          "coverage": 0.0043
+        }
+      ],
+      "detail": {
+        "energy": 23.1436
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      }
+    },
+    {
+      "id": "delta-hatch",
+      "kind": "control",
+      "note": "hatched delta box showing +€12.40",
+      "grid": "I9:J9",
+      "box": {
+        "x": 0.8,
+        "y": 0.9,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "px": {
+        "x": 1024,
+        "y": 648,
+        "w": 256,
+        "h": 72
+      },
+      "aspect": 3.5556,
+      "palette": [
+        {
+          "hex": "#f7f5e8",
+          "coverage": 0.8745
+        },
+        {
+          "hex": "#b4b2ad",
+          "coverage": 0.0485
+        },
+        {
+          "hex": "#787776",
+          "coverage": 0.0422
+        },
+        {
+          "hex": "#141414",
+          "coverage": 0.0223
+        },
+        {
+          "hex": "#36332c",
+          "coverage": 0.0126
+        }
+      ],
+      "detail": {
+        "energy": 26.0266
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      }
+    }
+  ],
+  "compSha256": "0bbba9c090d94bdfd37adf669056a86036ad5a19673369b4a02a0d27fb254628",
+  "regionsSource": {
+    "path": "/workspace/.impeccable/build/regions.json",
+    "sha256": "8e70a04b1fa943816a669c0d199784d2d4acdce3fe10193815a6638ac76377a5"
+  }
+}
