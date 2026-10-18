@@ -1,0 +1,127 @@
+{
+  "title": "Choose the visual world",
+  "question": "The roll assigned War-Room Planning Board. Keep it, take an alternate, or re-roll.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "War-Room Planning Board",
+      "kicker": "THE ROLL",
+      "lineage": "consultant war-room magnetic planning boards",
+      "thesis": "Licensing work as a war-room board: prices snap on as magnetic plates while requirements cluster beside them.",
+      "palette": ["#2A2E33", "#F4F1EA", "#C4A35A", "#1F6F6B"],
+      "materials": ["matte magnetic board", "chalk-white card stock", "tabular metal price plates"],
+      "viewport": "Top bar with Import/Export and theme; left requirement clusters; right a dominant €57.20 recommendation plate with As-Is delta; quote strip pinned below.",
+      "risk": "Can tip playful if cards read as stickies instead of price plates.",
+      "raised": [
+        {
+          "from": "challenger-emigre",
+          "raise": "Recommendation price owns specimen-scale hierarchy: hero €, per-user, and delta as three deliberate size steps."
+        },
+        {
+          "from": "challenger-zoo",
+          "raise": "Shell commits a full charcoal board field; colour does jobs (selection teal, delta amber), never grey-plus-one-accent."
+        }
+      ],
+      "comp": ".impeccable/mocks/decision/assigned.webp"
+    },
+    {
+      "id": "model-pick",
+      "label": "Professional Rate Card",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "professional services rate cards and fee schedules",
+      "thesis": "The quote is a rate card: money columns lead, everything else supports the fee.",
+      "palette": ["#0F2744", "#F7F5F0", "#B08D57", "#1C1C1C"],
+      "materials": ["letterpress-weight paper", "ruled money columns", "navy service ink"],
+      "viewport": "Top utility bar; requirements as dense checklist columns; recommendation as a locked right money column with €57.20 and +€12.40 delta; quote table as the rate-card body.",
+      "risk": "Also the direction most runs in this category land on: familiar consulting paperwork.",
+      "comp": ".impeccable/mocks/decision/model-pick.webp"
+    },
+    {
+      "id": "challenger-acetate",
+      "label": "Acetate Reference Manual",
+      "verdict": "wins",
+      "lineage": "boxed-software reference manuals with coloured tab boards and punched acetate leaves",
+      "thesis": "Feature groups as coloured tab sections; As-Is vs To-Be as layered acetate; prices in machine mono.",
+      "palette": ["#F5E211", "#FF6A00", "#0B3A6E", "#F7F4EE", "#C1121F"],
+      "materials": ["milk acetate overlay", "chrome-yellow divider board", "punched leaf shadows"],
+      "viewport": "Stepped tab rail for Productivity/Endpoint/Security/Compliance; work area on acetate over section hue; recommendation €57.20 in mono with Compare as a second hinged leaf.",
+      "case": "Beats the roll on audience ID (consultants live in manuals) and clarity (tabs map to feature groups; acetate is literal As-Is/To-Be).",
+      "risk": "Costume risk if acetate becomes literal plastic UI instead of type/palette/density/signature only.",
+      "comp": ".impeccable/mocks/decision/challenger-acetate.webp",
+      "hero": "https://impeccable.style/worlds/cards/rw-manual-acetate-tab-board-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/rw-manual-acetate-tab-board.webp"
+    },
+    {
+      "id": "challenger-orienteering",
+      "label": "Orienteering Course Map",
+      "verdict": "competitive",
+      "lineage": "ISO orienteering maps with purple course overlay",
+      "thesis": "Requirements as fixed terrain colours; the recommendation rides as a purple course over them.",
+      "palette": ["#F4F1E8", "#8B5A2B", "#2F6B3A", "#6B4C9A", "#2B4C7E"],
+      "materials": ["isom map inks", "contour hairlines", "purple course overlay"],
+      "viewport": "Top bar; requirements tinted as terrain legend; recommendation as purple course controls ending at €57.20 control circle; quote as punched controls list.",
+      "case": "Holds product clarity (course = recommendation path) but loses audience identification for licensing consultants.",
+      "risk": "Reads outdoor-sport if purple course becomes decoration instead of the decision path.",
+      "comp": ".impeccable/mocks/decision/challenger-orienteering.webp",
+      "hero": "https://impeccable.style/worlds/cards/notation-diagram-systems-orienteering-map-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/notation-diagram-systems-orienteering-map.webp"
+    },
+    {
+      "id": "challenger-crouwel",
+      "label": "Crouwel Construction Grid",
+      "verdict": "competitive",
+      "lineage": "Wim Crouwel gridded type specimens",
+      "thesis": "Visible construction grid; the recommendation price builds cell by cell as the proof.",
+      "palette": ["#FFFFFF", "#0A0A0A", "#1E4DD8", "#D8DEE8"],
+      "materials": ["graph-paper hairlines", "cell-built display figures", "stark ink planes"],
+      "viewport": "Top bar on grid; requirements snapped to cells; €57.20 as monumental grid-built numerals; quote table on the same armature.",
+      "case": "Holds clarity through ruthless hierarchy; weaker audience identification than consulting paper culture.",
+      "risk": "Can freeze into poster specimen if the grid outranks the task.",
+      "comp": ".impeccable/mocks/decision/challenger-crouwel.webp",
+      "hero": "https://impeccable.style/worlds/cards/crouwel-grid-specimen-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/crouwel-grid-specimen.webp"
+    },
+    {
+      "id": "challenger-emigre",
+      "label": "Emigre Bitmap Specimen",
+      "verdict": "declined",
+      "lineage": "Emigre bitmap type specimens",
+      "palette": ["#F2EFE8", "#111111", "#E11D48"],
+      "materials": ["halftone dots", "pixel display type", "newsprint white"],
+      "case": "Loses both axes: pixel novelty fights consultant trust and price legibility.",
+      "kept": "Specimen-scale hierarchy of one figure at many sizes.",
+      "hero": "https://impeccable.style/worlds/cards/emigre-bitmap-specimen-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/emigre-bitmap-specimen.webp"
+    },
+    {
+      "id": "challenger-zoo",
+      "label": "Zoo Guide Map",
+      "verdict": "declined",
+      "lineage": "mid-century zoo and gardens guide maps",
+      "palette": ["#8ED462", "#F5F1E4", "#FF705D", "#F5E211"],
+      "materials": ["flat unmodulated colour lobes", "cream water ground"],
+      "case": "Loses both: playful lobe colours violate the prices-first, not-playful brief.",
+      "kept": "Committed coloured shell field instead of grey-plus-accent default.",
+      "hero": "https://impeccable.style/worlds/cards/aww2-zoo-gardens-guide-map-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/aww2-zoo-gardens-guide-map.webp"
+    }
+  ],
+  "reroll": {
+    "registers": ["safer", "bolder"]
+  },
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "The category standard",
+    "thesis": "Polished SaaS licensing calculator: clean grid, glass panels, indigo/gold accents, recommendation card beside requirements.",
+    "palette": ["#FFFFFF", "#0F172A", "#254A9A", "#CB9D2A"],
+    "materials": ["frosted glass panels", "soft elevation", "tabular UI sans"],
+    "viewport": "Sticky glass nav; requirements cards left; recommendation hero right with € price; quote table below.",
+    "risk": "Indistinguishable from the current glassmorphism incumbent by design.",
+    "comp": ".impeccable/mocks/decision/canon.webp"
+  },
+  "steer": true
+}
