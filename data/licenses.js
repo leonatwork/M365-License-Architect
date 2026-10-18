@@ -1,0 +1,167 @@
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory();
+  } else {
+    root.LICENSE_DATA = factory();
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  const SOURCE = 'm365maps.com + Microsoft-Preisseite';
+
+  const PRICES = {
+    None: { price: 0, currency: 'EUR', source: SOURCE, valid_from: null },
+    'M365 F1': { price: 1.60, currency: 'EUR', source: SOURCE, valid_from: null },
+    'M365 F3': { price: 7.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Business Basic': { price: 4.60, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Business Standard': { price: 9.70, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Business Premium': { price: 18.60, currency: 'EUR', source: SOURCE, valid_from: null },
+    'O365 E1': { price: 7.40, currency: 'EUR', source: SOURCE, valid_from: null },
+    'O365 E3': { price: 23.10, currency: 'EUR', source: SOURCE, valid_from: null },
+    'M365 E3': { price: 29.70, currency: 'EUR', source: SOURCE, valid_from: null },
+    'M365 E5': { price: 51.70, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Entra ID P2': { price: 8.40, currency: 'EUR', source: SOURCE, valid_from: null },
+    'M365 E5 Security Add-on': { price: 11.20, currency: 'EUR', source: SOURCE, valid_from: null },
+    'M365 E5 Compliance Add-on': { price: 11.20, currency: 'EUR', source: SOURCE, valid_from: null },
+    'M365 F5 Security Add-on': { price: 8.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    'M365 F5 Compliance Add-on': { price: 8.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Defender for Business Servers': { price: 2.80, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Intune Suite Add-on': { price: 9.40, currency: 'EUR', source: SOURCE, valid_from: null },
+    'EPM Add-on': { price: 5.50, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Remote Help Add-on': { price: 5.50, currency: 'EUR', source: SOURCE, valid_from: null },
+    'M365 Copilot': { price: 30.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Visio Plan 2': { price: 12.70, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Project Plan 3': { price: 25.30, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Power Automate Premium': { price: 14.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Teams Rooms Pro': { price: 33.70, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Defender Suite for BizPrem': { price: 10.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Purview Suite for BizPrem': { price: 10.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    'BizPrem E5 Upgrade': { price: 15.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    Teams_F: { price: 0.50, currency: 'EUR', source: SOURCE, valid_from: null },
+    Teams_BizBasic: { price: 1.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    Teams_BizStd: { price: 2.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    Teams_BizPrem: { price: 2.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    Teams_E1: { price: 1.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    Teams_OE3: { price: 8.30, currency: 'EUR', source: SOURCE, valid_from: null },
+    Teams_ME3: { price: 8.00, currency: 'EUR', source: SOURCE, valid_from: null },
+    Teams_ME5: { price: 8.00, currency: 'EUR', source: SOURCE, valid_from: null },
+  };
+
+  const HIERARCHY = {
+    Mail: ['2GB Mail', 'Exch 50GB', 'Exch 100GB'],
+    Apps: ['Web Apps (Read-Only)', 'Web Apps (Edit)', 'Desktop Apps'],
+    Entra: ['Entra P1', 'Entra P2'],
+    Def: ['Def Biz', 'Def P1', 'Def XDR'],
+    Comp: ['Comp Basic', 'Comp E5'],
+    Teams: ['No Teams', 'Teams Collaboration', 'Teams Phone'],
+    MDM: ['Mobile MDM', 'Intune'],
+  };
+
+  const FEATURES_MAP = {
+    None: [],
+    'M365 F1': ['Intune', 'Entra P1', 'Teams Collaboration', 'Web Apps (Read-Only)', '2GB Mail'],
+    'M365 F3': ['Intune', 'Entra P1', 'Teams Collaboration', 'Web Apps (Edit)', 'Win OS Kiosk', '2GB Mail'],
+    'Business Basic': ['Web Apps (Edit)', 'Exch 50GB', 'SharePoint', 'Teams Collaboration'],
+    'Business Standard': ['Desktop Apps', 'Web Apps (Edit)', 'Exch 50GB', 'SharePoint', 'Teams Collaboration'],
+    'Business Premium': ['Intune', 'Def Biz', 'Entra P1', 'Desktop Apps', 'Web Apps (Edit)', 'Exch 50GB', 'SharePoint', 'Teams Collaboration', 'Win OS (VDA)'],
+    'O365 E1': ['Web Apps (Edit)', 'Exch 50GB', 'SharePoint', 'Teams Collaboration'],
+    'O365 E3': ['Desktop Apps', 'Web Apps (Edit)', 'Exch 100GB', 'SharePoint', 'Comp Basic', 'Teams Collaboration'],
+    'M365 E3': ['Win OS', 'Intune', 'Entra P1', 'Desktop Apps', 'Web Apps (Edit)', 'Exch 100GB', 'SharePoint', 'Def P1', 'Comp Basic', 'No Teams'],
+    'M365 E5': ['Win OS', 'Intune', 'Entra P2', 'Desktop Apps', 'Web Apps (Edit)', 'Exch 100GB', 'SharePoint', 'Def XDR', 'Comp E5', 'PowerBI', 'Teams Phone', 'No Teams'],
+  };
+
+  const PERSONA_PRESETS = {
+    Benutzerdefiniert: {},
+    'Marketing Team': {
+      personaName: 'Marketing Team',
+      workstyle: 'office',
+      desktopApps: true,
+      webEdit: true,
+      teamsCollab: true,
+      mdmMobile: true,
+      sec_ca: true,
+      comp_dlp: true,
+    },
+    'Development Team': {
+      personaName: 'Development Team',
+      workstyle: 'office',
+      desktopApps: true,
+      webEdit: true,
+      teamsCollab: true,
+      mdmDesktop: true,
+      sec_ca: true,
+      sec_def_p1: true,
+      winOS: true,
+    },
+    'Executive / C-Level': {
+      personaName: 'Executive',
+      workstyle: 'office',
+      desktopApps: true,
+      largeMailbox: true,
+      teamsPhone: true,
+      teamsCollab: true,
+      mdmMobile: true,
+      mdmDesktop: true,
+      sec_risk_ca: true,
+      sec_def_p2: true,
+      comp_labeling: true,
+      adv_copilot: true,
+    },
+    'Frontline Worker': {
+      personaName: 'Frontline Worker',
+      workstyle: 'frontline',
+      webEdit: true,
+      teamsCollab: true,
+      mdmMobile: true,
+      needMailbox: false,
+    },
+    'IT Administrator': {
+      personaName: 'IT Admin',
+      workstyle: 'office',
+      desktopApps: true,
+      teamsCollab: true,
+      mdmDesktop: true,
+      winOS: true,
+      sec_ca: true,
+      sec_def_p2: true,
+      adv_remotehelp: true,
+    },
+    'Sales Team': {
+      personaName: 'Sales Team',
+      workstyle: 'office',
+      desktopApps: true,
+      largeMailbox: true,
+      teamsPhone: true,
+      teamsCollab: true,
+      mdmMobile: true,
+      sec_ca: true,
+      add_visio: true,
+    },
+    'Finance / Compliance': {
+      personaName: 'Finance Team',
+      workstyle: 'office',
+      desktopApps: true,
+      teamsCollab: true,
+      sec_risk_ca: true,
+      sec_def_p2: true,
+      comp_dlp: true,
+      comp_labeling: true,
+      comp_ediscovery: true,
+    },
+    'Project Manager': {
+      personaName: 'Project Manager',
+      workstyle: 'office',
+      desktopApps: true,
+      teamsCollab: true,
+      mdmMobile: true,
+      sec_ca: true,
+      add_project: true,
+      add_visio: true,
+    },
+  };
+
+  return {
+    PRICES,
+    HIERARCHY,
+    FEATURES_MAP,
+    PERSONA_PRESETS,
+  };
+});

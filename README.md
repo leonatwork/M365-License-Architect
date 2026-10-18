@@ -40,6 +40,25 @@ The **License Architect** is a single-page web application designed to simplify 
 
 ---
 
+## 🧱 Projektstruktur & Tests
+
+Das Projekt bleibt eine `index.html`-App ohne Build-Schritt, ist aber jetzt logisch getrennt:
+
+- `data/licenses.js`: UMD-Datenmodul mit Preisen, Feature-Mapping, Hierarchie und Persona-Presets
+- `src/engine.js`: UMD-Berechnungslogik (`recommend` und `compare`) ohne DOM-Zugriff
+- `index.html`: UI, Formular-Handling, Rendering und CSV-Logik
+- `test/`: node:test-Regressionstests inkl. Legacy-Referenzwerten und Integrationsprüfungen
+
+Tests lokal ausführen:
+
+```bash
+npm test
+```
+
+Die Tests laufen ohne zusätzliche Pakete und ohne Netzwerkzugriffe.
+
+---
+
 ## 📦 Installation
 
 No installation is required. This tool is designed to run client-side in any modern browser.
