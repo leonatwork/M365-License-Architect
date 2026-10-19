@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const referenceResults = require('./fixtures/upgrades-e7-reference-results.js');
+const referenceResults = require('./fixtures/intune-suites-reference-results.js');
 const legacyConstants = require('./fixtures/legacy-constants.js');
 const data = require('../data/licenses.js');
 

@@ -11,10 +11,15 @@
   const ENTERPRISE = 'https://www.microsoft.com/de-de/microsoft-365/enterprise/';
   const PACKAGING = 'https://www.microsoft.com/en-us/licensing/news/2026-m365-packaging-pricing-updates';
   const SECURITY_UPGRADES = 'https://www.microsoft.com/de-de/security/pricing/small-medium-business/security-add-on-plans';
+  const INTUNE = 'https://www.microsoft.com/de-de/security/business/microsoft-intune-pricing';
+  const SECURITY_SUITES = 'https://www.microsoft.com/de-de/security/pricing/enterprise/security-suites';
+  const FRONTLINE = ENTERPRISE + 'frontline-plans-and-pricing';
   const SOURCE_CHECKED = '2026-10-18';
   const suite = (price, price_no_teams, source) => ({ price, price_no_teams, currency: 'EUR', source, valid_from: VALID_FROM });
   const addon = (price, source) => ({ price, currency: 'EUR', source, valid_from: VALID_FROM });
   const upgrade = price => ({ ...addon(price, SECURITY_UPGRADES), requires: 'Business Premium', source_checked: SOURCE_CHECKED });
+  const intuneAddon = price => ({ ...addon(price, INTUNE), requires: 'Intune Plan 1', source_checked: '2026-10-19' });
+  const enterpriseAddon = price => ({ ...addon(price, SECURITY_SUITES), requires: ['M365 E3', 'M365 E5', 'M365 E7'], source_checked: '2026-10-19' });
 
   const PRICES = {
     None: { price: 0, currency: 'EUR', source: SOURCE, valid_from: null },
@@ -31,14 +36,23 @@
     'M365 E5': suite(58.13, 50.71, ENTERPRISE + 'microsoft-365-plans-and-pricing'),
     'M365 E7': { ...suite(91.92, 84.51, ENTERPRISE + 'microsoft-365-plans-and-pricing'), source_checked: SOURCE_CHECKED },
     'Entra ID P2': { price: 8.40, currency: 'EUR', source: SOURCE, valid_from: null },
-    'M365 E5 Security Add-on': { price: 11.20, currency: 'EUR', source: SOURCE, valid_from: null },
-    'M365 E5 Compliance Add-on': { price: 11.20, currency: 'EUR', source: SOURCE, valid_from: null },
+    // Offizielle Seite: Defender/Purview Suite, ehemals M365 E5 Security/Compliance.
+    'Defender Suite': enterpriseAddon(10.40),
+    'Purview Suite': enterpriseAddon(10.40),
     'M365 F5 Security Add-on': { price: 8.00, currency: 'EUR', source: SOURCE, valid_from: null },
     'M365 F5 Compliance Add-on': { price: 8.00, currency: 'EUR', source: SOURCE, valid_from: null },
     'Defender for Business Servers': { price: 2.80, currency: 'EUR', source: SOURCE, valid_from: null },
-    'Intune Suite Add-on': { price: 9.40, currency: 'EUR', source: SOURCE, valid_from: null },
-    'EPM Add-on': { price: 5.50, currency: 'EUR', source: SOURCE, valid_from: null },
-    'Remote Help Add-on': { price: 5.50, currency: 'EUR', source: SOURCE, valid_from: null },
+    // Kein belegter EUR-Bündelpreis: Bestandswert bleibt dokumentiert, nicht preisvergleichbar.
+    'Intune Suite Add-on': { price: 9.40, currency: 'EUR', source: INTUNE, valid_from: null, requires: 'Intune Plan 1', source_checked: '2026-10-19' },
+    'EPM Add-on': intuneAddon(2.60),
+    'Remote Help Add-on': intuneAddon(3.00),
+    'Advanced Analytics Add-on': intuneAddon(4.30),
+    'EAM Add-on': intuneAddon(1.73),
+    'Cloud PKI Add-on': intuneAddon(1.73),
+    // EUR-Nachweis des Maintainers vom 18.10.2026; beim Folgeabruf fehlt die Preiskachel.
+    'Intune Plan 2 Add-on': { ...intuneAddon(3.50), price_source_checked: '2026-10-18' },
+    // Noch keine eigene Anforderung/Funktionszuordnung: gemäß #23 als todo_source führen.
+    'Entra Suite': { ...addon(10.40, SECURITY_SUITES), requires: 'Entra P1', source_checked: '2026-10-19', todo_source: true },
     'M365 Copilot': addon(26.00, ENTERPRISE + 'microsoft-365-plans-and-pricing'),
     // Aktion 15,60 EUR bis 31.12.2026; gerechnet wird nur der Listenpreis.
     'Copilot Business': addon(18.20, BUSINESS + 'microsoft-365-plans-and-pricing'),
@@ -87,10 +101,23 @@
     'M365 E5': ['Win OS', 'Intune', 'Entra P2', 'Desktop Apps', 'Web Apps (Edit)', 'Exch 100GB', 'SharePoint', 'Def XDR', 'Comp E5', 'PowerBI', 'Teams Phone', 'Teams Collaboration', 'Remote Help', 'Advanced Analytics', 'Intune Plan 2', 'Def O365 P2', 'EPM', 'EAM', 'Cloud PKI'],
   };
   FEATURES_MAP['M365 E7'] = [...FEATURES_MAP['M365 E5'], 'M365 Copilot', 'Agent 365', 'Entra Suite'];
+  // Intune ist die bestehende MDM-Anzeige; Plan 1 ist die konkrete Add-on-Voraussetzung.
+  for (const key of ['M365 F1', 'M365 F3', 'Business Premium', 'M365 E3', 'M365 E5', 'M365 E7']) {
+    FEATURES_MAP[key].push('Intune Plan 1');
+  }
   // Add-ons getrennt von Basislizenzen halten, damit sie nie als Basis gewählt werden.
   const ADDON_FEATURES = {
     'Defender Suite for BizPrem': ['Entra P2', 'Def XDR', 'Def O365 P2'],
     'Purview Suite for BizPrem': ['Comp E5'],
+    'Defender Suite': ['Entra P2', 'Def XDR', 'Def O365 P2'],
+    'Purview Suite': ['Comp E5'],
+    'Remote Help Add-on': ['Remote Help'],
+    'EPM Add-on': ['EPM'],
+    'Advanced Analytics Add-on': ['Advanced Analytics'],
+    'EAM Add-on': ['EAM'],
+    'Cloud PKI Add-on': ['Cloud PKI'],
+    'Intune Plan 2 Add-on': ['Intune Plan 2'],
+    'Intune Suite Add-on': ['Remote Help', 'EPM', 'Advanced Analytics', 'EAM', 'Cloud PKI', 'Intune Plan 2'],
   };
   ADDON_FEATURES['BizPrem E5 Upgrade'] = [...ADDON_FEATURES['Defender Suite for BizPrem'], ...ADDON_FEATURES['Purview Suite for BizPrem']];
   // Preisquelle und Paketquelle getrennt: Jede geänderte Zuordnung ist datiert.
@@ -100,10 +127,12 @@
     'M365 E3': { source: PACKAGING, valid_from: VALID_FROM },
     'M365 E5': { source: PACKAGING, valid_from: VALID_FROM },
     'M365 E7': { source: ENTERPRISE + 'microsoft-365-plans-and-pricing', valid_from: VALID_FROM, source_checked: SOURCE_CHECKED },
-    'Intune Suite Add-on': { source: 'https://www.microsoft.com/en-us/security/business/microsoft-intune-pricing', valid_from: VALID_FROM },
+    'Business Premium': { source: BUSINESS + 'microsoft-365-business-premium', valid_from: VALID_FROM, source_checked: '2026-10-19' },
+    'M365 F1': { source: FRONTLINE, valid_from: VALID_FROM, source_checked: '2026-10-19' },
+    'M365 F3': { source: FRONTLINE, valid_from: VALID_FROM, source_checked: '2026-10-19' },
   };
   for (const key of Object.keys(ADDON_FEATURES)) {
-    FEATURE_SOURCES[key] = { source: SECURITY_UPGRADES, valid_from: VALID_FROM, source_checked: SOURCE_CHECKED };
+    FEATURE_SOURCES[key] = { source: PRICES[key].source, valid_from: VALID_FROM, source_checked: PRICES[key].source_checked };
   }
 
   const PERSONA_PRESETS = {

@@ -96,9 +96,25 @@ body {
 .work {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
+  grid-template-areas:
+    "profile compare"
+    "tools compare"
+    "req compare"
+    "quote rec";
   gap: 14px;
   margin-top: 12px;
   align-items: start;
+}
+.work > * { min-width: 0; }
+.profile-strip { grid-area: profile; }
+.tools-row { grid-area: tools; }
+.req-panel { grid-area: req; }
+.quote-wrap { grid-area: quote; }
+.compare-sheet { grid-area: compare; }
+.rec-block { grid-area: rec; }
+
+.mobile-nav {
+  display: none;
 }
 
 .panel { border: 1px solid var(--rule); background: var(--paper); }
@@ -166,13 +182,40 @@ body {
 .term-btn:last-child { border-right: 0; }
 .term-btn.active { background: var(--ink); color: var(--paper); }
 
-.req-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px 18px;
+.req-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   max-height: 340px;
   overflow: auto;
   padding-right: 4px;
+}
+.req-cat {
+  border: 1px solid var(--rule);
+  background: #fffaf3;
+}
+.req-cat-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--rule);
+  background: #efe9e0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.req-cat-head .num {
+  color: var(--mute);
+  letter-spacing: 0.08em;
+}
+.req-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 14px;
+  padding: 6px 8px 8px;
 }
 .req-item {
   display: flex;
@@ -244,7 +287,6 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   padding: 2px 4px;
 }
 
-.right-col { display: flex; flex-direction: column; gap: 10px; }
 
 .compare-sheet {
   background: var(--sheet);
@@ -425,11 +467,16 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
 
 /* Tablet + mobile: single column, prices early, touch-friendly */
 @media (max-width: 980px) {
+  html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
   body { font-size: 14px; }
   .app {
     padding: 12px 12px 88px;
     max-width: 100%;
     width: 100%;
+    overflow-x: hidden;
   }
   .topbar {
     display: flex;
@@ -454,20 +501,58 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   }
   .top-actions .ghost-btn:first-child { border-left: 0; }
 
+  .mobile-nav {
+    display: flex;
+    gap: 0;
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    margin: 10px -12px 0;
+    padding: 0 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    background: var(--paper);
+    border-bottom: 2px solid var(--rule);
+  }
+  .mobile-nav::-webkit-scrollbar { display: none; }
+  .mobile-nav a {
+    flex: 1 1 0;
+    min-width: 0;
+    text-align: center;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+    padding: 12px 6px;
+    border-right: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  .mobile-nav a:last-child { border-right: 0; }
+  .mobile-nav a:active,
+  .mobile-nav a:focus-visible {
+    background: var(--ink);
+    color: var(--paper);
+    outline: none;
+  }
+
   .work {
     display: flex;
     flex-direction: column;
     gap: 12px;
     margin-top: 10px;
     width: 100%;
-  }
-  .left-col,
-  .right-col {
-    display: contents;
+    max-width: 100%;
+    min-width: 0;
   }
   .work > * {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
+    grid-area: auto;
   }
 
   .profile-strip {
@@ -480,8 +565,8 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
     flex-wrap: wrap;
     gap: 8px;
   }
-  .term-row { width: 100%; display: flex; }
-  .term-btn { flex: 1; padding: 12px 8px; }
+  .term-row { width: 100%; display: flex; max-width: 100%; }
+  .term-btn { flex: 1; padding: 12px 8px; min-width: 0; }
   .preset { width: 100%; }
   .preset select {
     width: 100%;
@@ -492,14 +577,24 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   .rec-block {
     order: 3;
     position: sticky;
-    top: 0;
+    top: 44px; /* below mobile-nav */
     z-index: 5;
     background: var(--paper);
     box-shadow: 0 2px 0 var(--rule);
   }
   .price-row { width: 100%; }
-  .price-plate { font-size: clamp(20px, 6vw, 26px); min-height: 48px; }
+  .price-plate {
+    font-size: clamp(20px, 6vw, 26px);
+    min-height: 48px;
+    overflow-wrap: anywhere;
+  }
   .delta-hatch { min-height: 48px; font-size: 13px; }
+  .reason { overflow-wrap: anywhere; word-break: break-word; }
+  .tags { max-width: 100%; }
+  .tag, .tag-ink, .tag-blue, .tag-red, .tag-purple {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
   .btn-primary,
   .hold-btn {
     min-height: 48px;
@@ -516,12 +611,12 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
     gap: 10px;
   }
   .compare-cols ul { max-height: 140px; }
-  .compare-foot .hold-btn { display: none; } /* CTA lives in sticky mobile bar */
+  .compare-foot .hold-btn { display: none; }
 
   .req-panel { order: 5; }
+  .req-stack { max-height: none; }
   .req-grid {
     grid-template-columns: 1fr 1fr;
-    max-height: none;
     gap: 0 12px;
   }
   .req-item {
@@ -536,7 +631,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   }
   .field input,
   .field select {
-    font-size: 16px; /* avoid iOS zoom */
+    font-size: 16px;
     min-height: 28px;
   }
 
@@ -550,12 +645,18 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
     min-width: 560px;
     font-size: 12px;
   }
-  .dashboard {
-    grid-template-columns: 1fr;
-  }
+  .dashboard { grid-template-columns: 1fr; }
   .compare-foot {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  #profileStrip,
+  #recBlock,
+  #reqPanel,
+  #compareSheet,
+  #quotePanel {
+    scroll-margin-top: 56px;
   }
 
   .mobile-cta {
@@ -577,6 +678,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
 
 @media (min-width: 981px) {
   .mobile-cta { display: none; }
+  .mobile-nav { display: none; }
 }
 
 @media (max-width: 560px) {
@@ -593,6 +695,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
     grid-template-columns: 1fr;
   }
   .req-grid { grid-template-columns: 1fr; }
+  .req-cat-head { font-size: 11px; padding: 8px; }
   .compare-cols { grid-template-columns: 1fr; }
   .top-actions {
     grid-template-columns: repeat(2, 1fr);
@@ -600,6 +703,11 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   .top-actions .ghost-btn:nth-child(odd) { border-left: 0; }
   .top-actions .ghost-btn:nth-child(n+3) {
     border-top: 0;
+  }
+  .mobile-nav a {
+    padding: 12px 4px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
   }
 }
 
@@ -650,46 +758,43 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
     left: 0; top: 10%; width: 100%; height: 90%;
     display: block;
     margin: 0; gap: 0;
-  }
-  .left-col {
-    position: absolute;
-    left: 0; top: 0; width: 50%; height: 100%;
-    display: block;
-  }
-  .right-col {
-    position: absolute;
-    left: 50%; top: 0; width: 50%; height: 100%;
-    display: block;
+    grid-template-areas: none;
   }
   .profile-strip {
     position: absolute;
-    left: 0; top: 0; width: 100%; height: 11.11%;
+    left: 0; top: 0; width: 50%; height: 11.11%;
+    grid-area: auto;
   }
   .tools-row {
     position: absolute;
-    left: 0; top: 11.11%; width: 100%; height: 8%;
+    left: 0; top: 11.11%; width: 50%; height: 8%;
     margin: 0; padding: 4px 8px;
+    grid-area: auto;
   }
-  .left-col > .req-panel {
+  .req-panel {
     position: absolute;
-    left: 0; top: 20%; width: 100%; height: 48%;
+    left: 0; top: 20%; width: 50%; height: 48%;
     overflow: hidden;
+    grid-area: auto;
   }
-  .req-grid { max-height: none; height: calc(100% - 28px); }
-  .left-col > .quote-wrap {
+  .req-stack { max-height: none; height: calc(100% - 28px); }
+  .quote-wrap {
     position: absolute;
-    left: 0; top: 68%; width: 100%; height: 32%;
+    left: 0; top: 68%; width: 50%; height: 32%;
     margin: 0; overflow: auto;
+    grid-area: auto;
   }
   .compare-sheet {
     position: absolute;
-    left: 0; top: 0; width: 100%; height: 77.77%;
+    left: 50%; top: 0; width: 50%; height: 77.77%;
     min-height: 0; margin: 0;
+    grid-area: auto;
   }
   .rec-block {
     position: absolute;
-    left: 0; top: 77.77%; width: 100%; height: 22.23%;
+    left: 50%; top: 77.77%; width: 50%; height: 22.23%;
     padding: 6px 10px; overflow: hidden;
+    grid-area: auto;
   }
   .price-row { grid-template-columns: 1.5fr 1fr; margin-top: 4px; }
   .price-plate { font-size: 22px; padding: 6px 10px; }
@@ -715,8 +820,15 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
     </div>
   </header>
 
+  <nav class="mobile-nav" aria-label="Abschnitte">
+    <a href="#profileStrip">Profil</a>
+    <a href="#recBlock">Preis</a>
+    <a href="#reqPanel">Reqs</a>
+    <a href="#compareSheet">Compare</a>
+    <a href="#quotePanel">Quote</a>
+  </nav>
+
   <div class="work">
-    <section class="left-col">
       <div class="profile-strip" id="profileStrip">
         <div class="field">
           <label>Profile</label>
@@ -771,138 +883,173 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
         </div>
       </div>
 
-      <div class="panel panel-pad req-panel">
+      <div class="panel panel-pad req-panel" id="reqPanel">
         <h2 class="sec-label">Requirements</h2>
-        <div class="req-grid" id="reqList">
-          <label class="req-item">
-            <input type="checkbox" id="needMailbox" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Mailbox > 0GB</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="largeMailbox" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Large Mailbox (50GB+)</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="desktopApps" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Desktop Apps</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="webEdit" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Web Editing</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="teamsCollab" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Teams Collaboration</span>
-          </label>
-          <label class="req-item" data-tooltip="VoIP-Telefonie über Microsoft Teams">
-            <input type="checkbox" id="teamsPhone" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Teams Phone</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="mdmMobile" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Mobile MDM</span>
-          </label>
-          <label class="req-item" data-tooltip="Mobile Device Management für Windows/Mac Geräte">
-            <input type="checkbox" id="mdmDesktop" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Desktop MDM (Intune)</span>
-          </label>
-          <label class="req-item" data-tooltip="Windows Enterprise Lizenz mit erweiterten Features">
-            <input type="checkbox" id="winOS" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Windows OS (E3/E5)</span>
-          </label>
-          <label class="req-item" data-tooltip="Basis Antivirus und Endpoint Protection">
-            <input type="checkbox" id="sec_def_p1" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Defender P1 (AV)</span>
-          </label>
-          <label class="req-item" data-tooltip="Extended Detection & Response">
-            <input type="checkbox" id="sec_def_p2" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Defender P2 (XDR)</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="sec_ca" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Conditional Access</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="sec_risk_ca" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Risk-Based CA</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="sec_casb" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>CASB / Defender for Cloud Apps</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="comp_dlp" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>DLP</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="comp_labeling" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Sensitivity Labels</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="comp_ediscovery" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>eDiscovery</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="adv_epm" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Endpoint Privilege Management</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="adv_remotehelp" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Remote Help</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="adv_copilot" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Microsoft 365 Copilot (€30)</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="add_visio" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Visio Plan 2</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="add_project" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Project Plan 3</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="add_powerauto" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Power Automate (€14)</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="add_rooms" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Teams Rooms Pro (€33.70)</span>
-          </label>
-          <label class="req-item">
-            <input type="checkbox" id="serverProt" onchange="recalc()">
-            <i class="box" aria-hidden="true"></i>
-            <span>Defender Server (€2.80)</span>
-          </label>
+        <div class="req-stack" id="reqList">
+          <section class="req-cat" aria-labelledby="cat-prod">
+            <div class="req-cat-head"><span id="cat-prod">Productivity</span><span class="num">01</span></div>
+            <div class="req-grid">
+              <label class="req-item">
+                <input type="checkbox" id="needMailbox" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Mailbox > 0GB</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="largeMailbox" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Large Mailbox (50GB+)</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="desktopApps" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Desktop Apps</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="webEdit" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Web Editing</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="teamsCollab" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Teams Collaboration</span>
+              </label>
+              <label class="req-item" data-tooltip="VoIP-Telefonie über Microsoft Teams">
+                <input type="checkbox" id="teamsPhone" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Teams Phone</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="req-cat" aria-labelledby="cat-endpoint">
+            <div class="req-cat-head"><span id="cat-endpoint">Endpoint &amp; OS</span><span class="num">02</span></div>
+            <div class="req-grid">
+              <label class="req-item">
+                <input type="checkbox" id="mdmMobile" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Mobile MDM</span>
+              </label>
+              <label class="req-item" data-tooltip="Mobile Device Management für Windows/Mac Geräte">
+                <input type="checkbox" id="mdmDesktop" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Desktop MDM (Intune)</span>
+              </label>
+              <label class="req-item" data-tooltip="Windows Enterprise Lizenz mit erweiterten Features">
+                <input type="checkbox" id="winOS" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Windows OS (E3/E5)</span>
+              </label>
+              <label class="req-item" data-tooltip="Basis Antivirus und Endpoint Protection">
+                <input type="checkbox" id="sec_def_p1" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Defender P1 (AV)</span>
+              </label>
+              <label class="req-item" data-tooltip="Extended Detection & Response">
+                <input type="checkbox" id="sec_def_p2" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Defender P2 (XDR)</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="req-cat" aria-labelledby="cat-sec">
+            <div class="req-cat-head"><span id="cat-sec">Security</span><span class="num">03</span></div>
+            <div class="req-grid">
+              <label class="req-item">
+                <input type="checkbox" id="sec_ca" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Conditional Access</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="sec_risk_ca" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Risk-Based CA</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="sec_casb" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>CASB / Defender for Cloud Apps</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="req-cat" aria-labelledby="cat-comp">
+            <div class="req-cat-head"><span id="cat-comp">Compliance</span><span class="num">04</span></div>
+            <div class="req-grid">
+              <label class="req-item">
+                <input type="checkbox" id="comp_dlp" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>DLP</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="comp_labeling" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Sensitivity Labels</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="comp_ediscovery" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>eDiscovery</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="req-cat" aria-labelledby="cat-adv">
+            <div class="req-cat-head"><span id="cat-adv">Advanced Cloud &amp; AI</span><span class="num">05</span></div>
+            <div class="req-grid">
+              <label class="req-item">
+                <input type="checkbox" id="adv_epm" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Endpoint Privilege Management</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="adv_remotehelp" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Remote Help</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="adv_copilot" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Microsoft 365 Copilot (€30)</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="req-cat" aria-labelledby="cat-add">
+            <div class="req-cat-head"><span id="cat-add">Additional Products</span><span class="num">06</span></div>
+            <div class="req-grid">
+              <label class="req-item">
+                <input type="checkbox" id="add_visio" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Visio Plan 2</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="add_project" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Project Plan 3</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="add_powerauto" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Power Automate (€14)</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="add_rooms" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Teams Rooms Pro (€33.70)</span>
+              </label>
+              <label class="req-item">
+                <input type="checkbox" id="serverProt" onchange="recalc()">
+                <i class="box" aria-hidden="true"></i>
+                <span>Defender Server (€2.80)</span>
+              </label>
+            </div>
+          </section>
         </div>
       </div>
 
-      <div class="quote-wrap panel panel-pad">
+      <div class="quote-wrap panel panel-pad" id="quotePanel">
         <div class="quote-meta">
           <h2 class="sec-label" style="margin:0">Quote</h2>
           <div id="quoteCount">0 Personas</div>
@@ -942,9 +1089,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
           </div>
         </div>
       </div>
-    </section>
 
-    <aside class="right-col">
       <div class="compare-sheet" id="compareSheet">
         <h2>Compare</h2>
         <div class="compare-cols">
@@ -965,7 +1110,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
         </div>
       </div>
 
-      <div class="rec-block">
+      <div class="rec-block" id="recBlock">
         <div class="rec-head">
           <h2 class="sec-label" style="margin:0">Recommendation</h2>
           <span class="meta-chip" id="altDiff">—</span>
@@ -983,7 +1128,6 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
           <div id="altPrice">--</div>
         </div>
       </div>
-    </aside>
   </div>
 </div>
 

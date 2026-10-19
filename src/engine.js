@@ -83,24 +83,14 @@
 
     if (state.style === 'standalone') {
       base = 'None';
-      reason = 'Standalone Mode: Only selected Add-ons are calculated.';
+      reason = 'Standalone-Modus: Nur ausgewählte Add-ons werden berechnet.';
       alt = 'None';
     } else if (state.copilot) {
       base = 'M365 E3';
       reason = 'M365 Copilot selected: Requires E3/E5.';
       alt = 'M365 E5';
-    } else if (
-      needsIntuneAdv
-      && (state.current === 'None'
-        || state.current.includes('Business')
-        || state.current.includes('F')
-        || state.current.includes('O365'))
-    ) {
-      base = 'M365 E3';
-      reason = 'Intune Suite Add-ons need M365 E3 base.';
-      alt = 'Business Premium';
     } else if (state.style === 'frontline') {
-      if (state.win || needsIntuneAdv) {
+      if (state.win) {
         base = 'M365 E5';
         reason = 'Frontline benötigt Enterprise-Funktionen (Windows/Intune).';
         alt = 'M365 F3';
@@ -138,6 +128,7 @@
     }
 
     const intuneRequirements = { epm: 'EPM', rh: 'Remote Help', aa: 'Advanced Analytics', intune2: 'Intune Plan 2', eam: 'EAM', pki: 'Cloud PKI' };
+    const intuneProducts = { epm: 'EPM Add-on', rh: 'Remote Help Add-on', aa: 'Advanced Analytics Add-on', intune2: 'Intune Plan 2 Add-on', eam: 'EAM Add-on', pki: 'Cloud PKI Add-on' };
     // Teams Phone setzt Teams voraus.
     const needsTeams = state.teams || state.phone;
     function combination(candidate) {
@@ -153,15 +144,27 @@
         }
       }
       const missing = Object.keys(intuneRequirements).filter(key => state[key] && !features.includes(intuneRequirements[key]));
-      // Für neue Einzelprodukte fehlt ein belegter EUR-Preis; die vorhandene Suite deckt sie ab.
-      const individualCost = missing.reduce((sum, key) => sum + getPrice(PRICES, key === 'epm' ? 'EPM Add-on' : 'Remote Help Add-on'), 0);
-      if (missing.length && (missing.some(key => key !== 'epm' && key !== 'rh') || individualCost > getPrice(PRICES, 'Intune Suite Add-on'))) {
-        extra.push('Intune Suite Add-on');
-        features.push(...Object.values(intuneRequirements).filter(feature => !features.includes(feature)));
-      } else {
-        for (const key of missing) {
-          extra.push(key === 'epm' ? 'EPM Add-on' : 'Remote Help Add-on');
-          features.push(intuneRequirements[key]);
+      function addProduct(key) {
+        const entry = PRICES[key];
+        if (!entry) return;
+        const requires = entry.requires;
+        // Standalone kalkuliert Add-ons; die erforderliche Basis wird separat lizenziert.
+        if (state.style !== 'standalone' && (Array.isArray(requires) ? !requires.includes(candidate)
+          : requires && requires !== candidate && !features.includes(requires))) return;
+        extra.push(key);
+        features.push(...(ADDON_FEATURES[key] || []).filter(feature => !features.includes(feature)));
+      }
+      const individualCost = missing.reduce((sum, key) => sum + getPrice(PRICES, intuneProducts[key]), 0);
+      const bundle = PRICES['Intune Suite Add-on'];
+      const sourcedBundle = bundle && !bundle.todo_source && bundle.currency === 'EUR'
+        && /^https:\/\/www\.microsoft\.com\//.test(bundle.source || '') && bundle.valid_from
+        && typeof bundle.price === 'number'
+        && missing.every(key => (ADDON_FEATURES['Intune Suite Add-on'] || []).includes(intuneRequirements[key]));
+      if (missing.length && (state.style === 'standalone' || features.includes('Intune Plan 1'))) {
+        if (sourcedBundle && getPrice(PRICES, 'Intune Suite Add-on') <= individualCost + 1e-9) {
+          addProduct('Intune Suite Add-on');
+        } else {
+          for (const key of missing) addProduct(intuneProducts[key]);
         }
       }
       const missingSecurity = (state.risk && !features.includes('Entra P2'))
@@ -172,22 +175,25 @@
         const compliance = 'Purview Suite for BizPrem';
         const bundle = 'BizPrem E5 Upgrade';
         const chosen = missingSecurity && missingCompliance
-          && getPrice(PRICES, bundle) < getPrice(PRICES, security) + getPrice(PRICES, compliance)
+          && getPrice(PRICES, bundle) <= getPrice(PRICES, security) + getPrice(PRICES, compliance) + 1e-9
           ? [bundle] : [...(missingSecurity ? [security] : []), ...(missingCompliance ? [compliance] : [])];
         for (const key of chosen) {
           if (PRICES[key] && PRICES[key].requires === candidate) {
-            extra.push(key);
-            features.push(...(ADDON_FEATURES[key] || []).filter(feature => !features.includes(feature)));
+            addProduct(key);
           }
         }
       } else {
         if (missingSecurity) {
-          extra.push(candidate.includes('F') ? 'M365 F5 Security Add-on' : 'M365 E5 Security Add-on');
-          features.push('Entra P2', 'Def XDR');
+          if (candidate.startsWith('M365 F')) {
+            extra.push('M365 F5 Security Add-on');
+            features.push('Entra P2', 'Def XDR');
+          } else addProduct('Defender Suite');
         }
         if (missingCompliance) {
-          extra.push(candidate.includes('F') ? 'M365 F5 Compliance Add-on' : 'M365 E5 Compliance Add-on');
-          features.push('Comp E5');
+          if (candidate.startsWith('M365 F')) {
+            extra.push('M365 F5 Compliance Add-on');
+            features.push('Comp E5');
+          } else addProduct('Purview Suite');
         }
       }
       if (state.phone && !features.includes('Teams Phone')) {
@@ -214,15 +220,15 @@
       // Frontline erhält nur F-SKUs oder M365 Enterprise, nie Business-/Office-365-Pläne.
       if (state.style === 'frontline' && !isFrontlineSku(candidate) && !isEnterprise(candidate)) return false;
       if (state.copilot && !isEnterprise(candidate)) return false;
-      // Intune Suite Add-ons need M365 E3 base.
-      if (needsIntuneAdv && !isEnterprise(candidate)) return false;
+      // Erweiterte Intune-Funktionen benötigen Plan 1, unabhängig vom Suite-Namen.
+      if (needsIntuneAdv && !(FEATURES_MAP[candidate] || []).includes('Intune Plan 1')) return false;
       if ((needsAdvSec || needsAdvComp) && !candidate.startsWith('M365') && candidate !== 'Business Premium') return false;
       return true;
     }
     let selected = combination(base);
-    if ((state.phone || needsAdvSec || needsAdvComp || state.copilot) && state.style !== 'standalone') {
+    if ((state.phone || needsAdvSec || needsAdvComp || needsIntuneAdv || state.copilot) && state.style !== 'standalone') {
       // Nur zulässige Basen mit allen nötigen Add-ons vergleichen.
-      const required = { desktop: 'Desktop Apps', web: 'Web Apps (Edit)', mdm: 'Intune', win: 'Win OS', ca: 'Entra P1', def1: 'Def P1', dlp: 'Comp Basic', defO365: 'Def O365 P1', risk: 'Entra P2', def2: 'Def XDR', casb: 'Def XDR', lbl: 'Comp E5', edisc: 'Comp E5', phone: 'Teams Phone', copilot: 'M365 Copilot', ...intuneRequirements };
+      const required = { desktop: 'Desktop Apps', web: 'Web Apps (Edit)', teams: 'Teams Collaboration', mdm: 'Intune', win: 'Win OS', ca: 'Entra P1', def1: 'Def P1', dlp: 'Comp Basic', defO365: 'Def O365 P1', risk: 'Entra P2', def2: 'Def XDR', casb: 'Def XDR', lbl: 'Comp E5', edisc: 'Comp E5', phone: 'Teams Phone', copilot: 'M365 Copilot', ...intuneRequirements };
       const hierarchy = sourceData.HIERARCHY || {};
       const covers = (features, feature) => features.includes(feature)
         || (feature === 'Win OS' && features.includes('Win OS (VDA)'))
@@ -232,7 +238,8 @@
       for (const candidate of candidates) {
         const combo = combination(candidate);
         if (!Object.entries(required).every(([flag, feature]) => !state[flag] || covers(combo.features, feature))) continue;
-        if (!cheapest || combo.unitPrice < cheapest.unitPrice - 1e-9) cheapest = combo;
+        if (!cheapest || combo.unitPrice < cheapest.unitPrice - 1e-9
+          || (Math.abs(combo.unitPrice - cheapest.unitPrice) < 1e-9 && combo.addons.length < cheapest.addons.length)) cheapest = combo;
       }
       if (cheapest) selected = cheapest;
       reason = `${selected.base}: günstigste zulässige Kombination inklusive aller Anforderungen${state.phone ? ' und Teams Phone' : ''}.`;
@@ -246,6 +253,11 @@
     base = selected.base;
     const price = selected.unitPrice * mult;
     const flatAddons = selected.addons;
+    if (state.style === 'standalone') {
+      const prerequisites = [...new Set(flatAddons.map(key => PRICES[key]?.requires)
+        .filter(Boolean).map(requires => Array.isArray(requires) ? requires.join(' oder ') : requires))];
+      if (prerequisites.length) reason += ` Voraussetzungen: ${prerequisites.join('; ')} – separat erforderlich und nicht im Preis enthalten.`;
+    }
     // Teams EWR steht in addons; ein separater teamsPrice würde es doppelt anzeigen.
     const teamsPrice = 0;
 
