@@ -25,7 +25,7 @@
 :root {
   --paper: #f7f1e9;
   --ink: #090909;
-  --mute: #73726e;
+  --mute: #6a6965;
   --rule: #0a0a0a;
   --hatch: #b3b2ad;
   --pink: #f48fc9;
@@ -143,7 +143,7 @@ body {
 }
 .field:last-child { border-right: 0; }
 .field label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -202,7 +202,7 @@ body {
   padding: 6px 8px;
   border-bottom: 1px solid var(--rule);
   background: #efe9e0;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -272,7 +272,7 @@ table.data th, table.data td {
   vertical-align: top;
 }
 table.data th {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   background: #efe9e0;
@@ -417,7 +417,7 @@ table.data tbody tr.is-editing {
   display: inline-block;
   border: 1px solid var(--rule);
   padding: 2px 6px;
-  font-size: 10px;
+  font-size: 11px;
   background: #fff;
 }
 .tag-blue { background: #e8eef8; }
@@ -512,7 +512,7 @@ table.data tbody tr.is-editing {
   }
   .top-actions .ghost-btn {
     padding: 12px 6px;
-    font-size: 10px;
+    font-size: 11px;
     text-align: center;
     border-left: 1px solid var(--rule);
   }
@@ -691,7 +691,7 @@ table.data tbody tr.is-editing {
   table.data tbody td:last-child { border-bottom: 0; }
   table.data tbody td::before {
     content: attr(data-label);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -769,6 +769,162 @@ table.data tbody tr.is-editing {
 @media (min-width: 981px) {
   .mobile-cta { display: none; }
   .mobile-nav { display: none; }
+
+  /* One desktop page: fill the window, no document scroll. */
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+  body { font-size: 15px; }
+  .app {
+    width: min(1920px, 100%);
+    max-width: none;
+    height: 100dvh;
+    margin: 0 auto;
+    padding: 12px 16px 14px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .topbar {
+    flex: 0 0 auto;
+    padding-bottom: 8px;
+  }
+  .brand { font-size: clamp(34px, 2.6vw, 52px); }
+  .ghost-btn {
+    font-size: 13px;
+    padding: 12px 18px;
+  }
+  .work {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-top: 8px;
+    gap: 8px 12px;
+    align-items: stretch;
+    overflow: hidden;
+    grid-template-columns: minmax(0, 1.42fr) minmax(340px, 0.78fr);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+  }
+  .profile-strip {
+    align-self: start;
+    grid-template-columns: minmax(0, 1.7fr) 76px minmax(0, 1fr) minmax(190px, 1.45fr);
+  }
+  .field { padding: 8px 12px; }
+  .field label { font-size: 11px; }
+  .field input, .field select { font-size: 15px; }
+  .tools-row { margin: 0; align-self: center; }
+  .term-btn { font-size: 12px; padding: 9px 14px; }
+  .preset select { font-size: 13px; padding: 8px 10px; }
+  .req-panel {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 8px 10px 10px;
+  }
+  .sec-label { font-size: 12px; margin-bottom: 6px; }
+  .req-stack {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    align-content: start;
+    max-height: none;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    padding-right: 0;
+  }
+  .req-cat-head { padding: 3px 8px; font-size: 11px; }
+  .req-grid { padding: 2px 8px 3px; gap: 0 10px; }
+  .req-item { padding: 2px 0; gap: 8px; }
+  .req-item span { font-size: 13px; line-height: 1.25; }
+  .box { width: 15px; height: 15px; flex-basis: 15px; }
+  .quote-wrap {
+    margin: 0;
+    min-height: 0;
+    max-height: min(220px, 30vh);
+    overflow: auto;
+    padding: 8px 10px;
+    align-self: start;
+  }
+  table.data { font-size: 12px; }
+  table.data th, table.data td { padding: 5px 8px; }
+  .compare-sheet {
+    min-height: 0;
+    height: auto;
+    align-self: stretch;
+    overflow: hidden;
+    margin: 0 6px 6px 0;
+    padding: 12px 14px 10px;
+  }
+  .compare-sheet h2 { font-size: clamp(18px, 1.6vw, 24px); margin-bottom: 8px; }
+  .compare-cols { min-height: 0; }
+  .compare-cols > div {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .compare-cols ul {
+    max-height: none;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    font-size: 13px;
+  }
+  .rec-block {
+    min-height: 0;
+    max-height: min(240px, 32vh);
+    overflow: auto;
+    padding: 8px 10px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    column-gap: 10px;
+    row-gap: 4px;
+    align-items: start;
+  }
+  .rec-head { grid-column: 1 / -1; grid-row: 1; }
+  .rec-name { grid-column: 1 / -1; grid-row: 2; font-size: clamp(18px, 1.5vw, 24px); margin: 0; }
+  .rec-addon { grid-column: 1 / -1; grid-row: 3; }
+  .rec-addon:empty { display: none; }
+  .price-row { margin: 0; gap: 8px; grid-column: 1; grid-row: 4; }
+  .price-plate {
+    font-size: clamp(24px, 2vw, 34px);
+    padding: 8px 12px;
+  }
+  .delta-hatch { font-size: 15px; }
+  .rec-meta {
+    grid-column: 2;
+    grid-row: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .reason {
+    margin: 0;
+    min-height: 0;
+    max-height: 4.8em;
+    overflow: auto;
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+  .tags { margin: 0; }
+  .alt-row { margin: 0; padding: 6px 8px; grid-column: 1 / -1; grid-row: 5; }
+  .rec-block:not(:has(.rec-addon:not(:empty))) .price-row,
+  .rec-block:not(:has(.rec-addon:not(:empty))) .rec-meta { grid-row: 3; }
+  .rec-block:not(:has(.rec-addon:not(:empty))) .alt-row { grid-row: 4; }
+  .dashboard { margin-top: 6px; gap: 8px; }
+  .dash-card { padding: 6px 8px; }
+  .bar { margin-top: 4px; height: 6px; }
+  table.data th, table.data td { padding: 3px 6px; }
+  .req-stack,
+  .compare-cols ul,
+  .quote-wrap,
+  .rec-block {
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) var(--paper);
+  }
 }
 
 @media (max-width: 560px) {
@@ -796,103 +952,11 @@ table.data tbody tr.is-editing {
   }
   .mobile-nav a {
     padding: 12px 4px;
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 0.04em;
   }
 }
 
-/* Desktop wide: optional comp-frame lock (does not affect mobile) */
-@media (min-width: 1280px) {
-  body { overflow-x: hidden; }
-  .app {
-    position: relative;
-    width: 1280px;
-    height: 720px;
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0;
-    overflow: hidden;
-  }
-  .topbar {
-    position: absolute;
-    left: 0; top: 0; width: 100%; height: 10%;
-    display: block;
-    border-bottom: 0;
-    padding: 0;
-  }
-  .brand {
-    position: absolute;
-    left: var(--r-title-x); top: var(--r-title-y);
-    width: var(--r-title-w); height: var(--r-title-h);
-    font-size: var(--r-title-font);
-    font-family: var(--r-title-family), monospace;
-    font-weight: var(--r-title-weight);
-    display: flex; align-items: center;
-    margin: 0; padding-left: 8px;
-  }
-  .top-actions {
-    position: absolute;
-    left: 80%; top: 0; width: 20%; height: 10%;
-    display: flex;
-  }
-  .top-actions .ghost-btn {
-    flex: 1;
-    height: 100%;
-    padding: 0;
-    display: flex; align-items: center; justify-content: center;
-    border-top: 0; border-bottom: 1px solid var(--rule);
-  }
-  .top-actions .ghost-btn:nth-child(n+3) { display: none; }
-  .work {
-    position: absolute;
-    left: 0; top: 10%; width: 100%; height: 90%;
-    display: block;
-    margin: 0; gap: 0;
-    grid-template-areas: none;
-  }
-  .profile-strip {
-    position: absolute;
-    left: 0; top: 0; width: 50%; height: 11.11%;
-    grid-area: auto;
-  }
-  .tools-row {
-    position: absolute;
-    left: 0; top: 11.11%; width: 50%; height: 8%;
-    margin: 0; padding: 4px 8px;
-    grid-area: auto;
-  }
-  .req-panel {
-    position: absolute;
-    left: 0; top: 20%; width: 50%; height: 48%;
-    overflow: hidden;
-    grid-area: auto;
-  }
-  .req-stack { max-height: none; height: calc(100% - 28px); }
-  .quote-wrap {
-    position: absolute;
-    left: 0; top: 68%; width: 50%; height: 32%;
-    margin: 0; overflow: auto;
-    grid-area: auto;
-  }
-  .compare-sheet {
-    position: absolute;
-    left: 50%; top: 0; width: 50%; height: 77.77%;
-    min-height: 0; margin: 0;
-    grid-area: auto;
-  }
-  .rec-block {
-    position: absolute;
-    left: 50%; top: 77.77%; width: 50%; height: 22.23%;
-    padding: 6px 10px; overflow: hidden;
-    grid-area: auto;
-  }
-  .price-row { grid-template-columns: 1.5fr 1fr; margin-top: 4px; }
-  .price-plate { font-size: 22px; padding: 6px 10px; }
-  .reason { display: none; }
-  .tags { display: none; }
-  .alt-row { display: none; }
-  .dashboard { display: none !important; }
-}
 
     </style>
 </head>
@@ -1211,10 +1275,12 @@ table.data tbody tr.is-editing {
           <div class="price-plate"><span></span><span id="recPrice">€ 0.00</span></div>
           <div class="delta-hatch" id="priceDelta">—</div>
         </div>
-        <div class="reason" id="recReason">Select your requirements to begin...</div>
-        <div class="tags" id="featureTags"></div>
+        <div class="rec-meta">
+          <div class="reason" id="recReason">Select your requirements to begin...</div>
+          <div class="tags" id="featureTags"></div>
+        </div>
         <div class="alt-row">
-          <div><div class="sec-label" style="margin:0;font-size:10px">Runner up</div><div id="altName">--</div></div>
+          <div><div class="sec-label" style="margin:0;font-size:11px">Runner up</div><div id="altName">--</div></div>
           <div id="altPrice">--</div>
         </div>
       </div>
