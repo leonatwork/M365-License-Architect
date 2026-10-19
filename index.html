@@ -517,15 +517,17 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   }
   .mobile-nav::-webkit-scrollbar { display: none; }
   .mobile-nav a {
-    flex: 0 0 auto;
+    flex: 1 1 0;
+    min-width: 0;
+    text-align: center;
     font-family: inherit;
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     text-decoration: none;
     color: var(--ink);
-    padding: 12px 14px;
+    padding: 12px 6px;
     border-right: 1px solid var(--rule);
     white-space: nowrap;
   }
@@ -703,8 +705,9 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
     border-top: 0;
   }
   .mobile-nav a {
-    padding: 12px 12px;
+    padding: 12px 4px;
     font-size: 10px;
+    letter-spacing: 0.04em;
   }
 }
 
