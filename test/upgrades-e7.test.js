@@ -71,12 +71,13 @@ test('upgrade comparison considers E3/E5, user limits and all requested features
   catalog.PRICES[upgrades[0]].price = 40;
   const e3 = rec({ risk: true, desktop: true }, catalog);
   assert.equal(e3.base, 'M365 E3');
-  close(e3.price, 37.78 + 11.20);
+  close(e3.price, 37.78 + 10.40);
   assert.ok(e3.features.includes('Entra P2'));
   assert.equal(rec({ count: 301, risk: true, lbl: true }).base, 'M365 E5');
   assert.equal(rec({ count: 300, risk: true, lbl: true }).base, 'Business Premium');
   const intune = rec({ risk: true, rh: true });
-  assert.equal(intune.base, 'M365 E3');
+  assert.equal(intune.base, 'Business Premium');
+  close(intune.price, 30.76);
   assert.ok(intune.features.includes('Remote Help'));
   for (const input of [{ count: 301 }, { style: 'frontline' }, { style: 'standalone' }, { copilot: true }]) {
     const result = rec({ ...input, risk: true, lbl: true });
@@ -104,7 +105,7 @@ test('actual EUR prices never recommend E7 instead of cheaper E5 plus Copilot', 
   }
 });
 
-test('E7 wins only below every eligible combination; equality and no Copilot do not upsell', () => {
+test('E7 wins below every eligible combination or with fewer products at equality; requires Copilot', () => {
   for (const teamsVariant of ['included', 'no_teams']) {
     for (const term of ['annual', 'monthly']) {
       const catalog = structuredClone(data);
@@ -126,7 +127,7 @@ test('E7 wins only below every eligible combination; equality and no Copilot do 
       assert.deepEqual(withPhone.addons, withTeams.addons, 'E7 already includes Teams Phone');
       close(withPhone.price, withTeams.price);
       catalog.PRICES['M365 E7'][field] = catalog.PRICES['M365 E5'][field] + 40;
-      assert.equal(rec(input, catalog, term).base, 'M365 E5', 'equal price must not upsell');
+      assert.equal(rec(input, catalog, term).base, 'M365 E7', 'equal price prefers included Copilot');
       catalog.PRICES['M365 E7'][field] = 1;
       assert.notEqual(rec({ ...input, copilot: false }, catalog, term).base, 'M365 E7');
       assert.equal(rec({ copilot: true, teamsVariant }, catalog, term).base, 'M365 E7');

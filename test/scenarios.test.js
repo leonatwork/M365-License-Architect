@@ -68,11 +68,12 @@ test('E5 break-even auto-upsell is preserved', () => {
   assert.ok(result.addons.includes('M365 Copilot'));
 });
 
-test('Intune Suite bundle is selected when cheaper than individual add-ons', () => {
+test('standalone quotes Intune products with a separate Plan 1 prerequisite', () => {
   const result = recommend({ style: 'standalone', epm: true, rh: true });
-  assert.ok(result.addons.includes('Intune Suite Add-on'));
-  assert.equal(result.addons.includes('EPM Add-on'), false);
-  assert.equal(result.addons.includes('Remote Help Add-on'), false);
+  assert.equal(result.base, 'None');
+  assert.deepEqual(result.addons, ['EPM Add-on', 'Remote Help Add-on']);
+  assert.ok(Math.abs(result.price - 5.60) < 1e-9);
+  assert.match(result.reason, /Intune Plan 1.*separat erforderlich/);
 });
 
 test('single Intune add-on stays individual when bundle is not cheaper', () => {
