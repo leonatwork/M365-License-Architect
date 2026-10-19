@@ -21,6 +21,21 @@
   font-weight: 700;
   font-display: swap;
 }
+/* Nanum Gothic Coding has no umlauts; D2Coding (same metrics) fills in Latin-1/Extended-A and U+2212 */
+@font-face {
+  font-family: 'Nanum Gothic Coding';
+  src: url('fonts/D2CodingLatin-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+00A0-017F, U+2212;
+}
+@font-face {
+  font-family: 'Nanum Gothic Coding';
+  src: url('fonts/D2CodingLatin-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+00A0-017F, U+2212;
+}
 
 :root {
   --paper: #f7f1e9;
@@ -822,8 +837,9 @@ table.data tbody tr.is-editing {
   }
   .brand {
     position: absolute;
-    left: var(--r-title-x); top: var(--r-title-y);
-    width: var(--r-title-w); height: var(--r-title-h);
+    /* the --r-* vars are relative to the full frame; the title fills the 10% topbar */
+    left: var(--r-title-x); top: 0;
+    width: var(--r-title-w); height: 100%;
     font-size: var(--r-title-font);
     font-family: var(--r-title-family), monospace;
     font-weight: var(--r-title-weight);
@@ -832,7 +848,7 @@ table.data tbody tr.is-editing {
   }
   .top-actions {
     position: absolute;
-    left: 80%; top: 0; width: 20%; height: 10%;
+    left: 80%; top: 0; width: 20%; height: 100%;
     display: flex;
   }
   .top-actions .ghost-btn {
