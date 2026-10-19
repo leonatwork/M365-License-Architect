@@ -29,14 +29,15 @@ test('Phone compares the cheapest qualifying combination, including external add
   assert.ok(Math.abs(expensive.price - (58.13 + 12.70)) < 1e-9);
 });
 
-test('E5 phone upgrade uses strict less-than, including monthly and no-Teams pricing', () => {
+test('equal Phone totals prefer fewer add-ons, including monthly and no-Teams pricing', () => {
   for (const teamsVariant of ['included', 'no_teams']) {
     for (const term of ['annual', 'monthly']) {
       const catalog = structuredClone(data);
       const field = teamsVariant === 'included' ? 'price' : 'price_no_teams';
       catalog.PRICES['M365 E5'][field] = catalog.PRICES['M365 E3'][field] + 8.70;
       const result = rec({ count: 500, mdm: true, phone: true, teamsVariant }, catalog, term);
-      assert.equal(result.base, 'M365 E3', 'equal prices must not upgrade');
+      assert.equal(result.base, 'M365 E5', 'equal prices prefer the included Phone product');
+      assert.equal(result.addons.includes('Teams Phone Add-on'), false);
     }
   }
 });
@@ -115,13 +116,14 @@ test('no-Teams variant adds Teams EWR as add-on when Teams or Teams Phone is req
   assert.equal(standalone.price, 0);
 });
 
-test('Phone path keeps main-path eligibility: Intune add-ons need M365 E3/E5, Frontline stays F-SKU or Enterprise', () => {
-  // Hauptpfad: "Intune Suite Add-ons need M365 E3 base" – auch mit Phone kein Business Premium / F-SKU.
+test('Phone path allows Plan 1 Intune bases, Frontline stays F-SKU or Enterprise', () => {
+  // Plan 1 erlaubt Business Premium und F3 auch mit einzelnen Intune-Produkten.
   const intune = rec({ phone: true, mdm: true, epm: true });
-  assert.equal(intune.base, 'M365 E3');
+  assert.equal(intune.base, 'Business Premium');
   assert.deepEqual(intune.addons, ['EPM Add-on', 'Teams Phone Add-on']);
   const frontlineIntune = rec({ style: 'frontline', phone: true, web: true, epm: true });
-  assert.equal(frontlineIntune.base, 'M365 E3');
+  assert.equal(frontlineIntune.base, 'M365 F3');
+  assert.deepEqual(frontlineIntune.addons, ['EPM Add-on', 'Teams Phone Add-on']);
 
   // Hauptpfad: Frontline erhält nur F-SKUs oder M365 Enterprise, nie Business-/Office-365-Pläne.
   const frontlineDesktop = rec({ style: 'frontline', phone: true, desktop: true });
