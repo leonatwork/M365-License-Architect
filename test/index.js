@@ -6,3 +6,5 @@ require('./scenarios.test.js');
 require('./july-2026.test.js');
 require('./upgrades-e7.test.js');
 require('./intune-suites.test.js');
+require('./csv.test.js');
+require('./teams-ui.test.js');

@@ -392,6 +392,12 @@ table.data tbody tr.is-editing {
 }
 .rec-name { font-size: 18px; font-weight: 700; margin: 4px 0; }
 .rec-addon { font-size: 11px; color: var(--mute); min-height: 1em; }
+.price-stand, .quote-variant { display: block; font-size: 11px; color: var(--mute); overflow-wrap: anywhere; }
+.price-stand { margin-top: 4px; }
+.teams-field { border: 0; }
+.teams-field select { border: 1px solid var(--rule); padding: 8px; background: var(--paper); }
+.teams-field select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.csv-notice { margin: 6px 0; color: var(--ink); overflow-wrap: anywhere; }
 .price-row {
   display: grid;
   grid-template-columns: 1fr 0.45fr;
@@ -926,6 +932,7 @@ table.data tbody tr.is-editing {
   }
   .tags { margin: 0; }
   .alt-row { margin: 0; padding: 6px 8px; grid-column: 1 / -1; grid-row: 5; }
+  .rec-block > .price-stand { grid-column: 1 / -1; grid-row: 6; }
   .rec-block:not(:has(.rec-addon:not(:empty))) .price-row,
   .rec-block:not(:has(.rec-addon:not(:empty))) .rec-meta { grid-row: 3; }
   .rec-block:not(:has(.rec-addon:not(:empty))) .alt-row { grid-row: 4; }
@@ -1054,6 +1061,16 @@ table.data tbody tr.is-editing {
       <div class="panel panel-pad req-panel" id="reqPanel">
         <h2 class="sec-label">Requirements</h2>
         <div class="req-stack" id="reqList">
+          <section class="req-cat" aria-labelledby="cat-teams">
+            <div class="req-cat-head"><span id="cat-teams">Microsoft Teams</span></div>
+            <div class="field teams-field">
+              <label for="teamsVariant">Teams-Variante pro Persona</label>
+              <select id="teamsVariant" onchange="recalc()">
+                <option value="included">im Paket (Standard)</option>
+                <option value="no_teams">ohne Teams (EWR-Variante)</option>
+              </select>
+            </div>
+          </section>
           <section class="req-cat" aria-labelledby="cat-prod">
             <div class="req-cat-head"><span id="cat-prod">Productivity</span><span class="num">01</span></div>
             <div class="req-grid">
@@ -1222,6 +1239,7 @@ table.data tbody tr.is-editing {
           <h2 class="sec-label" style="margin:0">Quote</h2>
           <div id="quoteCount">0 Personas</div>
         </div>
+        <div id="csvNotice" class="csv-notice" role="status" hidden></div>
         <table class="data">
           <thead>
             <tr>
@@ -1297,6 +1315,7 @@ table.data tbody tr.is-editing {
           <div><div class="sec-label" style="margin:0;font-size:11px">Runner up</div><div id="altName">--</div></div>
           <div id="altPrice">--</div>
         </div>
+        <div class="price-stand" id="recPriceStand"></div>
       </div>
   </div>
 </div>
@@ -1330,6 +1349,7 @@ table.data tbody tr.is-editing {
 
 <script src="data/licenses.js"></script>
 <script src="src/engine.js"></script>
+<script src="src/csv.js"></script>
 <script>
         // CONFIG
 
@@ -1367,7 +1387,7 @@ table.data tbody tr.is-editing {
 
         // IDs for Form Persistence
         const FORM_IDS = [
-            'personaName', 'userCount', 'workstyle', 'currentLicense',
+            'personaName', 'userCount', 'workstyle', 'currentLicense', 'teamsVariant',
             'needMailbox', 'largeMailbox', 'desktopApps', 'webEdit',
             'teamsCollab', 'teamsPhone',
             'mdmMobile', 'mdmDesktop', 'winOS',
@@ -1453,6 +1473,7 @@ table.data tbody tr.is-editing {
             document.getElementById('userCount').value = 10;
             document.getElementById('workstyle').value = 'office';
             document.getElementById('currentLicense').value = 'None';
+            document.getElementById('teamsVariant').value = 'included';
 
             // Exit edit mode
             editingIndex = -1;
@@ -1469,7 +1490,7 @@ table.data tbody tr.is-editing {
             FORM_IDS.forEach(id => {
                 const el = document.getElementById(id);
                 if (!el) return;
-                const savedVal = item.inputs[id];
+                const savedVal = item.inputs[id] ?? (id === 'teamsVariant' ? 'included' : '');
                 if (el.type === 'checkbox') el.checked = savedVal;
                 else el.value = savedVal;
             });
@@ -1508,6 +1529,7 @@ table.data tbody tr.is-editing {
                 count: parseInt(document.getElementById('userCount').value) || 1,
                 style: document.getElementById('workstyle').value,
                 current: document.getElementById('currentLicense').value,
+                teamsVariant: document.getElementById('teamsVariant').value,
                 desktop: document.getElementById('desktopApps').checked,
                 web: document.getElementById('webEdit').checked,
                 teams: document.getElementById('teamsCollab').checked,
@@ -1533,7 +1555,17 @@ table.data tbody tr.is-editing {
             };
             const term = isMonthly ? 'monthly' : 'annual';
             currentCalc = LicenseEngine.recommend(i, { term }, LICENSE_DATA);
+            Object.assign(currentCalc, LicenseCSV.priceInfo(currentCalc, LICENSE_DATA));
             render();
+        }
+
+        function priceStand(item) {
+            const date = item.priceDate ? item.priceDate.split('-').reverse().join('.') : 'nicht belegt';
+            return `${item.priceNote}, Stand ${date}`;
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
         }
 
         function render() {
@@ -1544,6 +1576,7 @@ table.data tbody tr.is-editing {
             document.getElementById('recName').innerText = c.base;
             document.getElementById('recPrice').innerText = "€ " + c.price.toFixed(2);
             document.getElementById('recReason').innerText = c.reason;
+            document.getElementById('recPriceStand').innerText = priceStand(c);
 
             const delta = comparison.delta;
             const deltaEl = document.getElementById('priceDelta');
@@ -1626,7 +1659,8 @@ table.data tbody tr.is-editing {
                 grand += total;
 
                 // CALC SPLIT FOR DASHBOARD
-                const baseUnit = (PRICES[item.base] || 0) * mult;
+                const entry = PRICE_ENTRIES[item.base];
+                const baseUnit = (item.teamsVariant === 'no_teams' ? entry?.price_no_teams ?? PRICES[item.base] ?? 0 : PRICES[item.base] || 0) * mult;
                 const lineBase = baseUnit * item.count;
                 const lineAddon = total - lineBase;
 
@@ -1636,7 +1670,7 @@ table.data tbody tr.is-editing {
                 let addonHtml = item.addons.length > 0
                     ? item.addons.map(a => {
                         let color = a.includes("Teams") ? "tag-blue" : a.includes("Security") ? "tag-red" : a.includes("Copilot") ? "tag-purple" : "tag-ink";
-                        return `<span class="tag ${color} mr-1 mb-1">${a}</span>`;
+                        return `<span class="tag ${color} mr-1 mb-1">${escapeHTML(a)}</span>`;
                     }).join("")
                     : "<span class='text-slate-400 italic text-xs'>-</span>";
 
@@ -1646,8 +1680,8 @@ table.data tbody tr.is-editing {
                 const editingClass = idx === editingIndex ? 'is-editing' : '';
                 tb.innerHTML += `
                 <tr class="${editingClass}">
-                    <td data-label="Item"><span class="quote-persona">${item.persona}</span><span class="quote-users">${item.count} Users</span></td>
-                    <td data-label="Plan">${item.base}</td>
+                    <td data-label="Item"><span class="quote-persona">${escapeHTML(item.persona)}</span><span class="quote-users">${item.count} Users</span></td>
+                    <td data-label="Plan">${escapeHTML(item.base)}<span class="quote-variant">${item.teamsVariant === 'no_teams' ? 'ohne Teams (EWR-Variante)' : 'Teams im Paket'}</span><span class="price-stand">${escapeHTML(priceStand(item))}</span></td>
                     <td data-label="Add-ons">${addonHtml}</td>
                     <td data-label="Unit" class="num">€${item.price.toFixed(2)}</td>
                     <td data-label="Total" class="num"><strong>€${total.toFixed(2)}</strong></td>
@@ -1710,30 +1744,9 @@ table.data tbody tr.is-editing {
         // DATA MANAGEMENT (EXPORT & IMPORT)
         // ---------------------------------------------------------
 
-        function escapeCSV(str) {
-            if (!str) return "";
-            // Prevent Injection: if starts with = + - @
-            if (/^[=+\-@]/.test(str)) {
-                return "'" + str;
-            }
-            return str.replace(/"/g, '""'); // Escape quotes
-        }
-
         function exportCSV() {
             if (!quoteItems.length) return alert("Die Liste ist leer. Bitte füge erst Personas hinzu.");
-
-            // Header
-            let csv = "Persona,Count,Base,Addons,Price,Total,CurrentLic\n";
-
-            csv += quoteItems.map(i => {
-                // Sanitized Output
-                const pName = escapeCSV(i.persona);
-                const pBase = escapeCSV(i.base);
-                const pAddons = escapeCSV(i.addons.join('|'));
-                const pCur = escapeCSV(i.currentLic);
-
-                return `"${pName}",${i.count},"${pBase}","${pAddons}",${i.price},${(i.price * i.count).toFixed(2)},"${pCur}"`;
-            }).join("\n");
+            const csv = LicenseCSV.exportCSV(quoteItems, LICENSE_DATA);
 
             const a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
@@ -1747,46 +1760,14 @@ table.data tbody tr.is-editing {
 
             const reader = new FileReader();
             reader.onload = function (e) {
-                const text = e.target.result;
-                const lines = text.split('\n');
-
-                let importedCount = 0;
-
-                for (let i = 1; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (!line) continue;
-
-                    // CSV Parser
-                    const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-
-                    if (cols.length < 5) continue;
-
-                    const clean = (str) => str ? str.replace(/^"|"$/g, '').trim() : '';
-
-                    const newItem = {
-                        persona: clean(cols[0]),
-                        count: parseInt(cols[1]) || 1,
-                        base: clean(cols[2]),
-                        addons: clean(cols[3]) ? clean(cols[3]).split('|') : [],
-                        price: parseFloat(cols[4]) || 0,
-                        currentLic: cols[6] ? clean(cols[6]) : "None"
-                    };
-
-                    // Reconstruct Features
-                    newItem.features = [...(FEATURES_MAP[newItem.base] || [])];
-                    if (newItem.addons.some(a => a.includes("Teams"))) {
-                        newItem.features = newItem.features.filter(f => f !== "No Teams");
-                        if (!newItem.features.includes("Teams Collaboration")) newItem.features.push("Teams Collaboration");
-                    }
-
-                    // Note: Imported items do NOT have 'inputs' state, so they are not fully editable yet.
-                    // Future improvement: Reverse-engineer inputs from base/addons.
-                    quoteItems.push(newItem);
-                    importedCount++;
-                }
-
+                const result = LicenseCSV.importCSV(e.target.result, LICENSE_DATA);
+                quoteItems.push(...result.items);
+                const notice = document.getElementById('csvNotice');
+                notice.textContent = `${result.items.length} Personas erfolgreich importiert!` + (result.legacyTeams
+                    ? ' Datei ohne Teams-Angabe: Microsoft Teams wurde als „im Paket“ übernommen.' : '');
+                notice.hidden = false;
                 renderTable();
-                alert(`${importedCount} Personas erfolgreich importiert!`);
+                alert(notice.textContent);
                 input.value = '';
             };
             reader.readAsText(file);

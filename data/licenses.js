@@ -226,6 +226,7 @@
   };
 
   return {
+    PRICE_NOTE: 'Listenpreis in EUR, zzgl. MwSt., jährliche Abrechnung',
     PRICES,
     HIERARCHY,
     FEATURES_MAP,

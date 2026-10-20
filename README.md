@@ -46,7 +46,8 @@ Das Projekt bleibt eine `index.html`-App ohne Build-Schritt, ist aber jetzt logi
 
 - `data/licenses.js`: UMD-Datenmodul mit Preisen, Feature-Mapping, Hierarchie und Persona-Presets
 - `src/engine.js`: UMD-Berechnungslogik (`recommend` und `compare`) ohne DOM-Zugriff
-- `index.html`: UI, Formular-Handling, Rendering und CSV-Logik
+- `src/csv.js`: CSV-Export/-Import mit Teams-Variante, Preisstand und Roundtrip-Schutz
+- `index.html`: UI, Formular-Handling, Rendering und CSV-Dateiauswahl/-Download
 - `test/`: node:test-Regressionstests inkl. Legacy-Referenzwerten und Integrationsprüfungen
 
 Tests lokal ausführen:
