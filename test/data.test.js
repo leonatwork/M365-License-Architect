@@ -3,11 +3,15 @@ const assert = require('node:assert/strict');
 const legacy = require('./fixtures/legacy-constants.js');
 const data = require('../data/licenses.js');
 
-test('unchanged prices and presets retain their legacy values', () => {
+test('unchanged prices and presets retain legacy values except the three removed mailbox keys', () => {
   for (const [key, entry] of Object.entries(data.PRICES)) {
     if (entry.valid_from === null) assert.equal(entry.price, legacy.PRICES[key], key);
   }
-  assert.deepEqual(data.PERSONA_PRESETS, legacy.PERSONA_PRESETS);
+  const expectedPresets = structuredClone(legacy.PERSONA_PRESETS);
+  delete expectedPresets['Executive / C-Level'].largeMailbox;
+  delete expectedPresets['Frontline Worker'].needMailbox;
+  delete expectedPresets['Sales Team'].largeMailbox;
+  assert.deepEqual(data.PERSONA_PRESETS, expectedPresets);
 });
 
 test('every changed price and mapping has a source and effective date', () => {

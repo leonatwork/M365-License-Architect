@@ -172,11 +172,11 @@ function recalcLegacy(document, isMonthly) {
             }
           }
         } else if (i.desktop) {
-          base = i.count < 300 ? 'Business Standard' : 'O365 E3';
+          base = i.count <= 300 ? 'Business Standard' : 'O365 E3';
           reason = 'Desktop Apps req.';
-          alt = i.count < 300 ? 'Business Basic' : 'O365 E1';
+          alt = i.count <= 300 ? 'Business Basic' : 'O365 E1';
         } else {
-          base = i.count < 300 ? 'Business Basic' : 'O365 E1';
+          base = i.count <= 300 ? 'Business Basic' : 'O365 E1';
           reason = 'Cloud only.';
           alt = 'Business Standard';
         }

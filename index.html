@@ -1075,16 +1075,6 @@ table.data tbody tr.is-editing {
             <div class="req-cat-head"><span id="cat-prod">Productivity</span><span class="num">01</span></div>
             <div class="req-grid">
               <label class="req-item">
-                <input type="checkbox" id="needMailbox" onchange="recalc()">
-                <i class="box" aria-hidden="true"></i>
-                <span>Mailbox > 0GB</span>
-              </label>
-              <label class="req-item">
-                <input type="checkbox" id="largeMailbox" onchange="recalc()">
-                <i class="box" aria-hidden="true"></i>
-                <span>Large Mailbox (50GB+)</span>
-              </label>
-              <label class="req-item">
                 <input type="checkbox" id="desktopApps" onchange="recalc()">
                 <i class="box" aria-hidden="true"></i>
                 <span>Desktop Apps</span>
@@ -1388,7 +1378,7 @@ table.data tbody tr.is-editing {
         // IDs for Form Persistence
         const FORM_IDS = [
             'personaName', 'userCount', 'workstyle', 'currentLicense', 'teamsVariant',
-            'needMailbox', 'largeMailbox', 'desktopApps', 'webEdit',
+            'desktopApps', 'webEdit',
             'teamsCollab', 'teamsPhone',
             'mdmMobile', 'mdmDesktop', 'winOS',
             'sec_def_p1', 'sec_def_p2', 'sec_ca', 'sec_risk_ca', 'sec_casb',
@@ -1446,6 +1436,7 @@ table.data tbody tr.is-editing {
         }
 
         function setTerm(term) {
+            const previousMonthly = isMonthly;
             const btnA = document.getElementById('btnAnnual');
             const btnM = document.getElementById('btnMonthly');
 
@@ -1458,7 +1449,19 @@ table.data tbody tr.is-editing {
                 btnM.className = "term-btn active";
                 btnA.className = "term-btn";
             }
+            if (previousMonthly !== isMonthly) {
+                quoteItems = quoteItems.map(item => {
+                    if (item.inputs) {
+                        const updated = LicenseEngine.recommend(LicenseEngine.mapFormInputs(item.inputs), { term }, LICENSE_DATA);
+                        return { ...item, ...updated, ...LicenseCSV.priceInfo(updated, LICENSE_DATA) };
+                    }
+                    // Altpositionen behalten ihren Preisstand; nur das Vertragsmodell wird skaliert.
+                    const factor = isMonthly ? 1.2 : 1 / 1.2;
+                    return { ...item, price: Math.round((item.price * factor + Number.EPSILON) * 100) / 100 };
+                });
+            }
             recalc();
+            renderTable();
         }
 
         function resetForm() {
@@ -1523,36 +1526,17 @@ table.data tbody tr.is-editing {
             if (btnM) btnM.className = mobClass;
         }
 
+        function captureFormInputs() {
+            const inputs = {};
+            FORM_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.type === 'checkbox' ? el.checked : el.value;
+            });
+            return inputs;
+        }
+
         function recalc() {
-            // Build input object dynamically based on FORM_IDS to save state later
-            const i = {
-                count: parseInt(document.getElementById('userCount').value) || 1,
-                style: document.getElementById('workstyle').value,
-                current: document.getElementById('currentLicense').value,
-                teamsVariant: document.getElementById('teamsVariant').value,
-                desktop: document.getElementById('desktopApps').checked,
-                web: document.getElementById('webEdit').checked,
-                teams: document.getElementById('teamsCollab').checked,
-                phone: document.getElementById('teamsPhone').checked,
-                mdm: document.getElementById('mdmMobile').checked || document.getElementById('mdmDesktop').checked,
-                win: document.getElementById('winOS').checked,
-                ca: document.getElementById('sec_ca').checked,
-                risk: document.getElementById('sec_risk_ca').checked,
-                def1: document.getElementById('sec_def_p1').checked,
-                def2: document.getElementById('sec_def_p2').checked,
-                casb: document.getElementById('sec_casb').checked,
-                dlp: document.getElementById('comp_dlp').checked,
-                lbl: document.getElementById('comp_labeling').checked,
-                edisc: document.getElementById('comp_ediscovery').checked,
-                epm: document.getElementById('adv_epm').checked,
-                rh: document.getElementById('adv_remotehelp').checked,
-                copilot: document.getElementById('adv_copilot').checked,
-                visio: document.getElementById('add_visio').checked,
-                project: document.getElementById('add_project').checked,
-                pauto: document.getElementById('add_powerauto').checked,
-                rooms: document.getElementById('add_rooms').checked,
-                serverProt: document.getElementById('serverProt').checked
-            };
+            const i = LicenseEngine.mapFormInputs(captureFormInputs());
             const term = isMonthly ? 'monthly' : 'annual';
             currentCalc = LicenseEngine.recommend(i, { term }, LICENSE_DATA);
             Object.assign(currentCalc, LicenseCSV.priceInfo(currentCalc, LICENSE_DATA));
@@ -1620,13 +1604,7 @@ table.data tbody tr.is-editing {
 
         function addToQuote() {
             // CAPTURE INPUT STATE FOR EDITING LATER
-            const inputState = {};
-            FORM_IDS.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    inputState[id] = (el.type === 'checkbox') ? el.checked : el.value;
-                }
-            });
+            const inputState = captureFormInputs();
 
             const item = { ...currentCalc, persona: document.getElementById('personaName').value || "Persona " + (quoteItems.length + 1), inputs: inputState };
 
@@ -1696,6 +1674,9 @@ table.data tbody tr.is-editing {
             document.getElementById('quoteCount').innerText = quoteItems.length + " Personas";
 
             // UPDATE DASHBOARD
+            // Den gerundeten Add-on-Anteil als Rest bilden, damit die sichtbaren Centbeträge aufgehen.
+            totalBaseCost = Math.round((totalBaseCost + Number.EPSILON) * 100) / 100;
+            totalAddonCost = Math.round((grand + Number.EPSILON) * 100) / 100 - totalBaseCost;
             if (quoteItems.length > 0) {
                 document.getElementById('costDashboard').style.display = "grid";
 
