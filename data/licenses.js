@@ -162,7 +162,6 @@
       personaName: 'Executive',
       workstyle: 'office',
       desktopApps: true,
-      largeMailbox: true,
       teamsPhone: true,
       teamsCollab: true,
       mdmMobile: true,
@@ -178,7 +177,6 @@
       webEdit: true,
       teamsCollab: true,
       mdmMobile: true,
-      needMailbox: false,
     },
     'IT Administrator': {
       personaName: 'IT Admin',
@@ -195,7 +193,6 @@
       personaName: 'Sales Team',
       workstyle: 'office',
       desktopApps: true,
-      largeMailbox: true,
       teamsPhone: true,
       teamsCollab: true,
       mdmMobile: true,

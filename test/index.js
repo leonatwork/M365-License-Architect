@@ -8,3 +8,4 @@ require('./upgrades-e7.test.js');
 require('./intune-suites.test.js');
 require('./csv.test.js');
 require('./teams-ui.test.js');
+require('./issue-30.test.js');
