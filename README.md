@@ -59,8 +59,9 @@ No backend. No build step for normal use. Open `index.html` in a modern browser 
 ## Project layout
 
 ```
-index.html          UI, form handling, rendering, CSV
+index.html          UI, form handling, rendering, CSV file picker/download
 src/engine.js       Pure recommendation / compare logic
+src/csv.js          CSV export/import with Teams variant, price date and roundtrip guard
 data/licenses.js    License catalog and persona presets
 fonts/              Nanum Gothic Coding
 test/               Regression + scenario tests

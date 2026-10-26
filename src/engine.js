@@ -25,6 +25,27 @@
     return Boolean(value);
   }
 
+  // Gemeinsames Mapping für das aktuelle Formular und gespeicherte Quote-Inputs, ohne DOM.
+  function mapFormInputs(form) {
+    const f = form || {};
+    const input = {
+      count: parseInt(f.userCount, 10) || 1,
+      style: f.workstyle || 'office',
+      current: f.currentLicense || 'None',
+      teamsVariant: f.teamsVariant === 'no_teams' ? 'no_teams' : 'included',
+      mdm: toBoolean(f.mdmMobile || f.mdmDesktop),
+    };
+    const flags = {
+      desktopApps: 'desktop', webEdit: 'web', teamsCollab: 'teams', teamsPhone: 'phone',
+      winOS: 'win', sec_ca: 'ca', sec_risk_ca: 'risk', sec_def_p1: 'def1', sec_def_p2: 'def2',
+      sec_casb: 'casb', comp_dlp: 'dlp', comp_labeling: 'lbl', comp_ediscovery: 'edisc',
+      adv_epm: 'epm', adv_remotehelp: 'rh', adv_copilot: 'copilot', add_visio: 'visio',
+      add_project: 'project', add_powerauto: 'pauto', add_rooms: 'rooms', serverProt: 'serverProt',
+    };
+    for (const [id, flag] of Object.entries(flags)) input[flag] = toBoolean(f[id]);
+    return input;
+  }
+
   function recommend(input, options, data) {
     const i = input || {};
     const cfg = options || {};
@@ -118,13 +139,13 @@
         alt = 'Business Premium';
       }
     } else if (state.desktop) {
-      base = state.count < 300 ? 'Business Standard' : 'O365 E3';
+      base = state.count <= 300 ? 'Business Standard' : 'O365 E3';
       reason = 'Desktop Apps req.';
-      alt = state.count < 300 ? 'Business Basic' : 'O365 E1';
+      alt = state.count <= 300 ? 'Business Basic' : 'O365 E1';
     } else {
-      base = state.count < 300 ? 'Business Basic' : 'O365 E1';
+      base = state.count <= 300 ? 'Business Basic' : 'O365 E1';
       reason = 'Cloud only.';
-      alt = 'Business Standard';
+      alt = state.count <= 300 ? 'Business Standard' : 'O365 E3';
     }
 
     const intuneRequirements = { epm: 'EPM', rh: 'Remote Help', aa: 'Advanced Analytics', intune2: 'Intune Plan 2', eam: 'EAM', pki: 'Cloud PKI' };
@@ -368,6 +389,7 @@
   }
 
   return {
+    mapFormInputs: mapFormInputs,
     recommend: recommend,
     compare: compare,
   };
