@@ -1,94 +1,103 @@
-# 🏗️ License Architect by Leon Machnik
+# License Architect
 
-**A modern, intelligent Microsoft 365 licensing calculator for consultants and IT architects.**
+**Microsoft 365 licensing calculator for consultants and IT architects.**
 
-The **License Architect** is a single-page web application designed to simplify complex M365 licensing scenarios. It validates requirements in real-time, calculates cost-efficiency (including Break-Even analysis for E5), and visualizes the "As-Is" vs. "To-Be" state with a high-end Glassmorphism UI.
+License Architect turns persona requirements into a cost-aware SKU recommendation in real time — with Frontline guardrails, E5 break-even logic, Intune Suite optimization, EEA Teams pricing, and an As-Is / To-Be feature delta. The whole workshop flow stays on one page: profile → requirements → live recommendation → quote → CSV.
 
-<img width="1623" height="1142" alt="architect1" src="https://github.com/user-attachments/assets/e768cf4b-8b43-40a7-8848-caab53d78cd3" />
-
----
-
-## 🚀 Key Features
-
-### 1. Intelligent Licensing Engine
-* **Frontline Guardrails:** Automatically detects when a *Frontline* persona requires Enterprise features (e.g., Desktop Apps, Windows OS, Teams Phone) and upgrades the base license recommendation accordingly.
-* **E5 Auto-Upsell:** Continuously calculates the break-even point. If a combination of *Base License + Add-ons* (e.g., E3 + Security + Compliance) becomes more expensive than the **M365 E5 Suite**, the tool automatically recommends the E5 upgrade.
-* **Intune Suite Optimization:** Smartly compares the cost of individual add-ons (e.g., *Endpoint Privilege Management* + *Remote Help*) against the full *Intune Suite* bundle to find the cheapest option.
-
-### 2. Accurate Pricing Logic (2025 Ready)
-* **Teams Unbundling (EEA):** Built for the European Economic Area market. Base licenses use "No-Teams" pricing, and the correct **Teams EEA Add-on** is added dynamically based on the specific license tier (different pricing for Business vs. Enterprise).
-* **Detailed Add-ons:** Includes pricing logic for Copilot, Intune Suite, Defender for Business Servers, and more.
-
-### 3. Advanced Comparison & Analytics
-* **"As-Is" vs. "To-Be":** Define the customer's current licensing state and compare it with the recommendation.
-* **Smart Feature Diff:** A modal view allows you to see exactly which features are **Gained** 🟢 (considering hierarchy, e.g., P2 > P1) and which are **Lost** 🔴.
-* **Investment Delta:** Instantly see the monthly price difference (Invest vs. Saving) per user.
-
-### 4. Modern UI & UX
-* **Glassmorphism Design:** A high-end, modern interface featuring frosted glass effects, vibrant gradients, and smooth transitions.
-* **Deep Dark Mode:** Fully optimized "Deep Dark" mode with high-contrast elements for professional use in low-light environments.
-* **Single-File Solution:** The entire app lives in one `index.html` file. No backend, no build process, no installation required.
+![License Architect desktop overview](docs/screenshots/overview.png)
 
 ---
 
-## 🛠️ Tech Stack
+## Design
 
-* **Core:** Vanilla HTML5 & JavaScript (ES6+)
-* **Styling:** Tailwind CSS (via CDN)
-* **Icons:** FontAwesome (via CDN)
-* **Fonts:** Inter (Google Fonts)
+The UI is an **exposure-record workbench**: cream paper surface, iron-black rules, monospace type (Nanum Gothic Coding), hatch marks for selected requirements, and a single pink accent reserved for prices and primary actions. Numbers stay the visual focus — no glassmorphism, no dashboard chrome.
+
+| Desktop workshop | Feature compare |
+| --- | --- |
+| ![Workshop quote](docs/screenshots/workshop-quote.png) | ![License comparison modal](docs/screenshots/compare.png) |
+
+Mobile and tablet use a stacked layout with the recommendation and quote kept in reach:
+
+![Mobile layout](docs/screenshots/mobile.png)
 
 ---
 
-## 🧱 Projektstruktur & Tests
+## Key features
 
-Das Projekt bleibt eine `index.html`-App ohne Build-Schritt, ist aber jetzt logisch getrennt:
+### Intelligent licensing engine
+- **Frontline guardrails** — upgrades the base when a Frontline persona needs enterprise features (Desktop Apps, Windows OS, Teams Phone, …).
+- **E5 break-even** — if Base + add-ons costs more than M365 E5, the tool recommends E5.
+- **Intune Suite optimization** — compares individual Intune add-ons against the full Suite bundle.
 
-- `data/licenses.js`: UMD-Datenmodul mit Preisen, Feature-Mapping, Hierarchie und Persona-Presets
-- `src/engine.js`: UMD-Berechnungslogik (`recommend` und `compare`) ohne DOM-Zugriff
-- `src/csv.js`: CSV-Export/-Import mit Teams-Variante, Preisstand und Roundtrip-Schutz
-- `index.html`: UI, Formular-Handling, Rendering und CSV-Dateiauswahl/-Download
-- `test/`: node:test-Regressionstests inkl. Legacy-Referenzwerten und Integrationsprüfungen
+### Pricing (EEA / Juli 2026)
+- Base licenses support **with Teams** and **No Teams** variants; the Teams EEA add-on is applied only when needed.
+- Covers Copilot, Intune Suite, Teams Phone, Defender for Business Servers, and more.
+- Annual vs monthly (+20%) term switch.
 
-Tests lokal ausführen:
+### Comparison & quote
+- Live **As-Is vs To-Be** feature delta next to the recommendation.
+- Modal compare from any quote row (hierarchy-aware gained / lost features).
+- Quote list with edit, grand total, CSV import / export.
+
+---
+
+## Tech stack
+
+| Layer | Choice |
+| --- | --- |
+| UI | Vanilla HTML / CSS / JS in `index.html` |
+| Engine | `src/engine.js` (`recommend`, `compare`) — no DOM |
+| Data | `data/licenses.js` — prices, features, hierarchy, presets |
+| Fonts | Local `fonts/NanumGothicCoding-*.ttf` |
+| Icons / tips | Font Awesome, Tippy.js (CDN) |
+| Tests | `node:test` under `test/` |
+
+No backend. No build step for normal use. Open `index.html` in a modern browser (network needed for CDN assets).
+
+---
+
+## Project layout
+
+```
+index.html          UI, form handling, rendering, CSV file picker/download
+src/engine.js       Pure recommendation / compare logic
+src/csv.js          CSV export/import with Teams variant, price date and roundtrip guard
+data/licenses.js    License catalog and persona presets
+fonts/              Nanum Gothic Coding
+test/               Regression + scenario tests
+docs/screenshots/   README screenshots
+```
+
+---
+
+## Usage
+
+1. **Profile** — name, quantity, workstyle (Office / Frontline / Standalone), optional current license.
+2. **Requirements** — toggle productivity, endpoint, security, compliance, and add-ons (or pick a preset).
+3. **Recommendation** — read the live SKU, € price plate, and decision reason; check Compare for the feature delta.
+4. **Add to Quote** — collect personas in the quote table.
+5. **Export** — CSV for Excel / further processing. Import to restore a quote.
+
+---
+
+## Tests
 
 ```bash
 npm test
 ```
 
-Die Tests laufen ohne zusätzliche Pakete und ohne Netzwerkzugriffe.
+Runs without extra packages and without network access. Also available as `npm run check`.
 
 ---
 
-## 📦 Installation
+## Credits
 
-No installation is required. This tool is designed to run client-side in any modern browser.
-
-1.  Download the `index.html` file.
-2.  Open it in **Microsoft Edge**, **Chrome**, or **Firefox**.
-3.  *Note:* An active internet connection is required to load the styling libraries (Tailwind/FontAwesome).
+Feature mapping draws heavily from [Aaron Dinnage / m365maps.com](https://m365maps.com/).
 
 ---
 
-## 📊 Usage Guide
+## License
 
-1.  **Define Persona:** Enter the name, user quantity, and workstyle (Office vs. Frontline).
-2.  **Select Requirements:** Toggle the required features across Productivity, Endpoint, Security, and Compliance.
-3.  **Review Recommendation:** The tool updates instantly. Check the "Decision Logic" box to understand *why* a specific license was chosen.
-4.  **Add to Quote:** Click "Add to Quote" to save the persona to the summary table below.
-5.  **Export:** Use the CSV Export button to download your calculation for further processing in Excel.
+MIT — see [LICENSE](LICENSE).
 
----
-## Special thanks 
-Thanks to Aaron Dinnage https://m365maps.com/ where most of the information for this came from
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
-
-Copyright (c) 2025 **Leon Machnik**
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+Copyright (c) 2025–2026 Leon Machnik
