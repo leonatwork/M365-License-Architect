@@ -78,6 +78,29 @@ docs/screenshots/   README screenshots
 4. **Add to Quote** — collect personas in the quote table.
 5. **Export** — CSV for Excel / further processing. Import to restore a quote.
 
+### Eingabe- und CSV-Importgrenzen
+
+- `MAX_USERS = 100000` in `src/engine.js`: Formular und Engine verwenden dieselbe
+  Anzahl-Regel. Bruchzahlen werden abgeschnitten und auf **1 bis 100.000** begrenzt;
+  nicht numerische Eingaben/`NaN` ergeben 1, positive Unendlichkeit ergibt 100.000.
+- CSV-Dateien: höchstens **1 MB (1.000.000 Bytes, UTF-8)** und **1.000 Datenzeilen**.
+  Kopfzeile und Leerzeilen zählen nicht als Datenzeilen; Zeilenumbrüche innerhalb
+  zitierter Felder bleiben Teil eines Datensatzes. Fehlermeldungen nennen die
+  tatsächliche Zeilennummer im Quelldokument.
+- CSV-Anzahlen werden strikt als ganze Dezimalzahlen von 1 bis `MAX_USERS` geprüft,
+  nicht geklemmt. Preise müssen endlich und mindestens 0 sein (Dezimalpunkt).
+  Basis- und Bestandslizenzen müssen eigene Schlüssel von `PRICES` und
+  `FEATURES_MAP` sein; Add-ons eigene Schlüssel von `PRICES`. `None` bleibt erlaubt,
+  insbesondere für Standalone-Angebote und eine fehlende Bestandslizenz.
+- `LicenseCSV.importCSV` liefert `{ items, legacyTeams, errors }`: ungültige
+  Datensätze werden übersprungen und in `errors` mit `{ line, message }` gemeldet.
+  Strukturfehler und überschrittene Limits lösen eine Ausnahme aus. Im Browser
+  wird bei **jedem Fehler die gesamte Datei abgelehnt**; die Angebotsliste bleibt
+  unverändert. Fehlerfreie Dateien werden wie bisher an die Liste angehängt.
+- Das CSV-Format bleibt erhalten. Formelanfänge (`=`, `+`, `-`, `@`, Tab, CR) und
+  wörtliche Apostrophe werden im Export reversibel geschützt. `src/csv.js` nutzt
+  die gemeinsame Nutzergrenze aus dem zuvor geladenen `src/engine.js`.
+
 ---
 
 ## Tests

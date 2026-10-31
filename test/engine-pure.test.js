@@ -188,6 +188,19 @@ test('engine module can be required in node without browser globals', () => {
   });
 });
 
+test('engine and form mapping share an integer clamp from 1 to MAX_USERS (100000)', () => {
+  const engine = require('../src/engine.js');
+  assert.equal(engine.MAX_USERS, 100000);
+  for (const [value, expected] of [[0, 1], [-3, 1], [1.5, 1], [9.9, 9], [NaN, 1],
+    [100000, 100000], [100001, 100000], [Infinity, 100000], [-Infinity, 1],
+    ['100001', 100000], ['abc', 1], ['12abc', 1], [undefined, 1]]) {
+    withPoisonedGlobals(() => {
+      assert.equal(engine.mapFormInputs({ userCount: value }).count, expected, String(value));
+      assert.equal(engine.recommend({ count: value }, { term: 'annual' }, data).count, expected, String(value));
+    });
+  }
+});
+
 test('recommend matches reviewed upgrade prices and combinations for every preset', () => {
   const engine = require('../src/engine.js');
   const presetNames = Object.keys(legacyConstants.PERSONA_PRESETS).filter((name) => name !== 'Benutzerdefiniert');

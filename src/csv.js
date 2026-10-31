@@ -1,7 +1,9 @@
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory();
-  else root.LicenseCSV = factory();
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('./engine.js'));
+  else root.LicenseCSV = factory(root.LicenseEngine);
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (engine) {
+  const MAX_IMPORT_BYTES = 1000000; // 1 MB (UTF-8), einschließlich Kopfzeile.
+  const MAX_IMPORT_ROWS = 1000; // Datensätze ohne Kopfzeile und Leerzeilen.
   function priceInfo(item, data) {
     const keys = [item.base, ...(item.addons || [])].filter(key => key && key !== 'None');
     const dates = keys.map(key => data.PRICES[key]?.valid_from).filter(Boolean).sort();
@@ -15,7 +17,7 @@
   function escapeCSV(value) {
     let text = String(value ?? '');
     // Double literal apostrophes so the spreadsheet protection prefix is reversible.
-    if (/^['=+\-@]/.test(text)) text = "'" + text;
+    if (/^['=+\-@\t\r]/.test(text)) text = "'" + text;
     return '"' + text.replace(/"/g, '""') + '"';
   }
 
@@ -31,49 +33,109 @@
 
   function parseCSV(text) {
     const rows = [];
-    let row = [], field = '', quoted = false, wasQuoted = false;
+    let row = [], field = '', quoted = false, wasQuoted = false, closedQuote = false;
+    let line = 1, rowLine = 1;
+    function malformed(message) {
+      throw new Error(`CSV-Fehler in Zeile ${line}: ${message}`);
+    }
     function finishField() {
       let value = wasQuoted ? field : field.trim();
-      if (/^'['=+\-@]/.test(value)) value = value.slice(1);
+      if (/^'['=+\-@\t\r]/.test(value)) value = value.slice(1);
       row.push(value);
       field = '';
       wasQuoted = false;
+      closedQuote = false;
+    }
+    function finishRow() {
+      finishField();
+      if (row.length !== 1 || row[0] !== '') {
+        rows.push({ cols: row, line: rowLine });
+        if (rows.length > MAX_IMPORT_ROWS + 1) throw new Error('CSV darf höchstens 1.000 Datenzeilen enthalten.');
+      }
+      row = [];
     }
     text = text.replace(/^\uFEFF/, '');
     for (let index = 0; index < text.length; index++) {
       const char = text[index];
       if (char === '"') {
         if (quoted && text[index + 1] === '"') { field += '"'; index++; }
-        else { quoted = !quoted; wasQuoted = true; }
-      } else if (!quoted && (char === ',' || char === '\n' || char === '\r')) {
-        finishField();
-        if (char !== ',') {
-          rows.push(row);
-          row = [];
-          if (char === '\r' && text[index + 1] === '\n') index++;
+        else if (quoted) { quoted = false; closedQuote = true; }
+        else {
+          if (field || closedQuote) malformed('Unerwartetes Anführungszeichen.');
+          quoted = true;
+          wasQuoted = true;
         }
-      } else field += char;
+      } else if (!quoted && (char === ',' || char === '\n' || char === '\r')) {
+        if (char === ',') finishField();
+        else {
+          finishRow();
+          if (char === '\r' && text[index + 1] === '\n') index++;
+          line++;
+          rowLine = line;
+        }
+      } else {
+        if (closedQuote) malformed('Unerwartetes Zeichen nach dem schließenden Anführungszeichen.');
+        field += char;
+        if (char === '\n' || (char === '\r' && text[index + 1] !== '\n')) line++;
+      }
     }
-    if (field || row.length || wasQuoted) { finishField(); rows.push(row); }
+    if (quoted) malformed('Anführungszeichen wurde nicht geschlossen.');
+    if (field || row.length || wasQuoted) finishRow();
     return rows;
   }
 
   function importCSV(text, data) {
+    if (typeof text !== 'string') throw new Error('CSV-Datei konnte nicht als Text gelesen werden.');
+    if (text.length > MAX_IMPORT_BYTES || new TextEncoder().encode(text).length > MAX_IMPORT_BYTES) {
+      throw new Error('CSV-Datei darf höchstens 1 MB groß sein.');
+    }
     const rows = parseCSV(text);
-    const header = rows.shift() || [];
+    const header = rows.shift()?.cols || [];
+    if (['Persona', 'Count', 'Base', 'Addons', 'Price'].some((name, index) => header[index] !== name)
+      || new Set(header).size !== header.length) {
+      throw new Error('CSV-Kopfzeile ist ungültig. Bitte das CSV-Exportformat verwenden.');
+    }
+    if (!rows.length) throw new Error('CSV-Datei enthält keine Datenzeilen.');
     const teamsIndex = header.indexOf('TeamsVariant');
     const dateIndex = header.indexOf('PriceDate');
     const noteIndex = header.indexOf('PriceNote');
     let legacyTeams = false;
     const items = [];
-    for (const cols of rows) {
-      if (cols.length < 5) continue;
+    const errors = [];
+    const knownPrice = key => Object.hasOwn(data.PRICES, key);
+    const knownLicense = key => knownPrice(key) && Object.hasOwn(data.FEATURES_MAP, key);
+    for (const { cols, line } of rows) {
+      const rowErrors = [];
+      if (cols.length !== header.length) {
+        errors.push({ line, message: `Spaltenanzahl stimmt nicht mit der Kopfzeile überein (erwartet: ${header.length}).` });
+        continue;
+      }
+      const countText = cols[1].trim();
+      const priceText = cols[4].trim();
+      const count = Number(countText);
+      const price = Number(priceText);
+      const addons = cols[3] ? cols[3].split('|') : [];
+      const currentLic = cols[6] ?? 'None';
+      if (!knownLicense(cols[2])) rowErrors.push(`Unbekannte Basislizenz: ${cols[2]}`);
+      for (const addon of addons) {
+        if (!knownPrice(addon)) rowErrors.push(`Unbekanntes Add-on: ${addon}`);
+      }
+      if (currentLic !== 'None' && !knownLicense(currentLic)) rowErrors.push(`Unbekannte Bestandslizenz: ${currentLic}`);
+      if (!/^\d+$/.test(countText) || !Number.isInteger(count) || count < 1 || count > engine.MAX_USERS) {
+        rowErrors.push('Anzahl muss eine ganze Zahl zwischen 1 und 100.000 sein.');
+      }
+      if (!/^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+\-]?\d+)?$/.test(priceText) || !Number.isFinite(price) || price < 0) {
+        rowErrors.push('Preis muss eine endliche Zahl größer oder gleich 0 sein (Dezimalpunkt verwenden).');
+      }
+      if (rowErrors.length) {
+        errors.push({ line, message: rowErrors.join(' ') });
+        continue;
+      }
       const missingTeams = teamsIndex < 0 || !cols[teamsIndex];
       legacyTeams ||= missingTeams;
       const item = {
-        persona: cols[0], count: parseInt(cols[1], 10) || 1, base: cols[2],
-        addons: cols[3] ? cols[3].split('|') : [], price: parseFloat(cols[4]) || 0,
-        currentLic: cols[6] ?? 'None', teamsVariant: cols[teamsIndex] === 'no_teams' ? 'no_teams' : 'included',
+        persona: cols[0], count, base: cols[2], addons, price, currentLic,
+        teamsVariant: cols[teamsIndex] === 'no_teams' ? 'no_teams' : 'included',
       };
       item.features = [...(data.FEATURES_MAP[item.base] || [])];
       if (item.teamsVariant === 'no_teams') {
@@ -90,8 +152,8 @@
       // Imported rows retain offer values; requirement inputs cannot be reconstructed.
       items.push(item);
     }
-    return { items, legacyTeams };
+    return { items, legacyTeams, errors };
   }
 
-  return { exportCSV, importCSV, priceInfo };
+  return { exportCSV, importCSV, priceInfo, MAX_IMPORT_BYTES, MAX_IMPORT_ROWS };
 });
