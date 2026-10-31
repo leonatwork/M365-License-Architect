@@ -116,7 +116,7 @@
       alt = 'None';
     } else if (state.copilot) {
       base = 'M365 E3';
-      reason = 'M365 Copilot selected: Requires E3/E5.';
+      reason = 'Copilot benötigt eine Business- oder M365-Enterprise-Basis.';
       alt = 'M365 E5';
     } else if (state.style === 'frontline') {
       if (state.win) {
@@ -229,10 +229,12 @@
         extra.push('Teams Phone Add-on');
         features.push('Teams Phone');
       }
-      for (const [flag, key] of Object.entries({ serverProt: 'Defender for Business Servers', copilot: 'M365 Copilot', visio: 'Visio Plan 2', project: 'Project Plan 3', pauto: 'Power Automate Premium', rooms: 'Teams Rooms Pro' })) {
-        if (state[flag] && !features.includes(key)) {
-          extra.push(key);
-          if (flag === 'copilot') features.push(key);
+      const copilotKey = candidate.startsWith('Business ') ? 'Copilot Business' : 'M365 Copilot';
+      for (const [flag, key] of Object.entries({ serverProt: 'Defender for Business Servers', copilot: copilotKey, visio: 'Visio Plan 2', project: 'Project Plan 3', pauto: 'Power Automate Premium', rooms: 'Teams Rooms Pro' })) {
+        // Beide Copilot-Varianten liefern dasselbe Feature; E7 enthält es bereits.
+        if (state[flag] && !features.includes(flag === 'copilot' ? 'M365 Copilot' : key)) {
+          if (flag === 'copilot') addProduct(key);
+          else extra.push(key);
         }
       }
       const unitPrice = getPrice(PRICES, candidate, state.teamsVariant) + extra.reduce((sum, key) => sum + getPrice(PRICES, key), 0);
@@ -248,7 +250,7 @@
       if (isFrontlineSku(candidate) && state.style !== 'frontline') return false;
       // Frontline erhält nur F-SKUs oder M365 Enterprise, nie Business-/Office-365-Pläne.
       if (state.style === 'frontline' && !isFrontlineSku(candidate) && !isEnterprise(candidate)) return false;
-      if (state.copilot && !isEnterprise(candidate)) return false;
+      if (state.copilot && !isEnterprise(candidate) && !candidate.startsWith('Business ')) return false;
       // Erweiterte Intune-Funktionen benötigen Plan 1, unabhängig vom Suite-Namen.
       if (needsIntuneAdv && !(FEATURES_MAP[candidate] || []).includes('Intune Plan 1')) return false;
       if ((needsAdvSec || needsAdvComp) && !candidate.startsWith('M365') && candidate !== 'Business Premium') return false;

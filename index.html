@@ -1189,7 +1189,7 @@ table.data tbody tr.is-editing {
               <label class="req-item">
                 <input type="checkbox" id="adv_copilot">
                 <i class="box" aria-hidden="true"></i>
-                <span>Microsoft 365 Copilot (€30)</span>
+                <span id="copilotLabel">Microsoft 365 Copilot</span>
               </label>
             </div>
           </section>
@@ -1210,17 +1210,17 @@ table.data tbody tr.is-editing {
               <label class="req-item">
                 <input type="checkbox" id="add_powerauto">
                 <i class="box" aria-hidden="true"></i>
-                <span>Power Automate (€14)</span>
+                <span id="powerAutoLabel">Power Automate</span>
               </label>
               <label class="req-item">
                 <input type="checkbox" id="add_rooms">
                 <i class="box" aria-hidden="true"></i>
-                <span>Teams Rooms Pro (€33.70)</span>
+                <span id="roomsLabel">Teams Rooms Pro</span>
               </label>
               <label class="req-item">
                 <input type="checkbox" id="serverProt">
                 <i class="box" aria-hidden="true"></i>
-                <span>Defender Server (€2.80)</span>
+                <span id="serverLabel">Defender Server</span>
               </label>
             </div>
           </section>
@@ -1397,6 +1397,7 @@ table.data tbody tr.is-editing {
         let editingIndex = -1; // -1 means adding new, >= 0 means editing index
 
         function init() {
+            initRequirementPrices();
             bindUIEvents();
 
             // System Theme Listener
@@ -1419,6 +1420,22 @@ table.data tbody tr.is-editing {
                 theme: document.documentElement.classList.contains('dark') ? '' : 'light',
                 animation: 'scale',
             });
+        }
+
+        function initRequirementPrices() {
+            // Listenpreise bleiben unabhängig von Vertragslaufzeit und Teams-Variante.
+            const labels = [
+                ['copilotLabel', 'Copilot Business', 'Microsoft 365 Copilot', true],
+                ['powerAutoLabel', 'Power Automate Premium', 'Power Automate'],
+                ['roomsLabel', 'Teams Rooms Pro', 'Teams Rooms Pro'],
+                ['serverLabel', 'Defender for Business Servers', 'Defender Server']
+            ];
+            for (const [id, key, title, from] of labels) {
+                const price = LICENSE_DATA.PRICES[key].price.toLocaleString('de-DE', {
+                    minimumFractionDigits: 2, maximumFractionDigits: 2
+                });
+                document.getElementById(id).textContent = `${title} (${from ? 'ab ' : ''}${price} €)`;
+            }
         }
 
         function bindUIEvents() {

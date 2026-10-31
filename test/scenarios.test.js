@@ -51,8 +51,8 @@ test('frontline persona with voice requirement gets Phone without E5 guardrail',
   assert.deepEqual(result.addons, ['Teams Phone Add-on']);
 });
 
-test('E5 break-even auto-upsell is preserved', () => {
-  const result = recommend({
+test('Copilot compares Business upgrades and preserves enterprise E5 break-even', () => {
+  const input = {
     style: 'office',
     desktop: true,
     teams: true,
@@ -61,11 +61,17 @@ test('E5 break-even auto-upsell is preserved', () => {
     risk: true,
     lbl: true,
     copilot: true,
-  });
+  };
 
-  assert.equal(result.base, 'M365 E5');
+  const result = recommend(input);
+  assert.equal(result.base, 'Business Premium');
+  assert.deepEqual(result.addons, ['BizPrem E5 Upgrade', 'Teams Phone Add-on', 'Copilot Business']);
+  assert.ok(Math.abs(result.price - 58.96) < 1e-9);
   assert.match(result.reason, /günstigste/);
-  assert.ok(result.addons.includes('M365 Copilot'));
+  const enterprise = recommend({ ...input, count: 301 });
+  assert.equal(enterprise.base, 'M365 E5');
+  assert.deepEqual(enterprise.addons, ['M365 Copilot']);
+  assert.ok(Math.abs(enterprise.price - 84.13) < 1e-9);
 });
 
 test('standalone quotes Intune products with a separate Plan 1 prerequisite', () => {

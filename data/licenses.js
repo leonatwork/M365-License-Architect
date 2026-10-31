@@ -107,6 +107,8 @@
   }
   // Add-ons getrennt von Basislizenzen halten, damit sie nie als Basis gewählt werden.
   const ADDON_FEATURES = {
+    'M365 Copilot': ['M365 Copilot'],
+    'Copilot Business': ['M365 Copilot'],
     'Defender Suite for BizPrem': ['Entra P2', 'Def XDR', 'Def O365 P2'],
     'Purview Suite for BizPrem': ['Comp E5'],
     'Defender Suite': ['Entra P2', 'Def XDR', 'Def O365 P2'],
