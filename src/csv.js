@@ -7,10 +7,11 @@
   function priceInfo(item, data) {
     const keys = [item.base, ...(item.addons || [])].filter(key => key && key !== 'None');
     const dates = keys.map(key => data.PRICES[key]?.valid_from).filter(Boolean).sort();
-    const missing = keys.filter(key => !data.PRICES[key]?.valid_from);
+    const missing = keys.filter(key => !data.PRICES[key]?.valid_from || data.PRICES[key]?.todo_source === true);
     return {
       priceDate: dates.at(-1) || '',
       priceNote: data.PRICE_NOTE + (missing.length ? '; Preisstand nicht belegt: ' + missing.join(', ') : ''),
+      unsourced: missing,
     };
   }
 
@@ -24,7 +25,13 @@
   function exportCSV(items, data) {
     const header = 'Persona,Count,Base,Addons,Price,Total,CurrentLic,TeamsVariant,PriceDate,PriceNote\n';
     return header + items.map(item => {
-      const info = { ...priceInfo(item, data), ...item };
+      const catalogInfo = priceInfo(item, data);
+      const info = { ...catalogInfo, ...item };
+      // Retain offer notes, but do not let older metadata hide unconfirmed prices.
+      const warning = catalogInfo.unsourced.length ? 'Preisstand nicht belegt: ' + catalogInfo.unsourced.join(', ') : '';
+      if (warning && !String(info.priceNote ?? '').includes(warning)) {
+        info.priceNote = (info.priceNote ? info.priceNote + '; ' : '') + warning;
+      }
       return [escapeCSV(item.persona), item.count, escapeCSV(item.base), escapeCSV(item.addons.join('|')),
         item.price, (item.price * item.count).toFixed(2), escapeCSV(item.currentLic),
         escapeCSV(item.teamsVariant || 'included'), escapeCSV(info.priceDate), escapeCSV(info.priceNote)].join(',');

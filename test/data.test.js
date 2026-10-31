@@ -41,3 +41,16 @@ test('handover lists every unconfirmed price', () => {
     if (entry.todo_source) assert.ok(handover.includes(`| ${key} |`), key);
   }
 });
+
+test('priceInfo classifies every catalog price including dated todo_source entries', () => {
+  const { priceInfo } = require('../src/csv.js');
+  for (const [key, entry] of Object.entries(data.PRICES)) {
+    const expected = key !== 'None' && (entry.todo_source === true || !entry.valid_from) ? [key] : [];
+    assert.deepEqual(priceInfo({ base: key }, data).unsourced, expected, key);
+    assert.deepEqual(priceInfo({ base: 'None', addons: [key] }, data).unsourced, expected, key);
+  }
+  for (const key of ['O365 E3', 'Entra Suite']) {
+    assert.equal(data.PRICES[key].todo_source, true, key);
+    assert.ok(data.PRICES[key].valid_from, key);
+  }
+});

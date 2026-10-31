@@ -95,3 +95,47 @@ test('engine preserves both Teams variants across office, frontline and standalo
     }
   }
 });
+
+test('recommendation and quote show a clear component warning and clear it for sourced positions', () => {
+  const { elements: el, run } = app();
+  el.workstyle.value = 'standalone';
+  el.add_visio.checked = true;
+  run('recalc()');
+  assert.ok(el.recPriceWarning, 'missing dedicated recommendation warning');
+  assert.equal(el.recPriceWarning.hidden, false);
+  assert.equal(el.recPriceWarning.innerText, 'Preisstand nicht belegt: Visio Plan 2');
+  run('addToQuote()');
+  assert.match(el.quoteBody.innerHTML, /class="price-warning">Preisstand nicht belegt: Visio Plan 2<\/span>/);
+  assert.equal(el.recPriceWarning.hidden, true);
+  assert.equal(el.recPriceWarning.innerText, '');
+  run('addToQuote()');
+  const rows = [...el.quoteBody.innerHTML.matchAll(/<tr\b[\s\S]*?<\/tr>/g)].map(match => match[0]);
+  assert.equal(rows.length, 2);
+  assert.doesNotMatch(rows[1], /price-warning|Preisstand nicht belegt/);
+});
+
+test('dated todo_source components warn in recommendation and imported quote without changing saved notes', () => {
+  const { elements: el, run, context } = app();
+  run('recalc(); Object.assign(currentCalc, { base: "O365 E3", addons: ["Entra Suite"] }); Object.assign(currentCalc, LicenseCSV.priceInfo(currentCalc, LICENSE_DATA)); render()');
+  assert.ok(el.recPriceWarning, 'missing dedicated recommendation warning');
+  assert.equal(el.recPriceWarning.innerText, 'Preisstand nicht belegt: O365 E3, Entra Suite');
+  assert.equal(el.recPriceWarning.hidden, false);
+  context.csvText = 'Persona,Count,Base,Addons,Price,Total,CurrentLic,PriceNote\nImport,1,O365 E3,Entra Suite,36.67,36.67,None,Originalnotiz';
+  run('quoteItems = LicenseCSV.importCSV(csvText, LICENSE_DATA).items; renderTable()');
+  assert.match(el.quoteBody.innerHTML, /class="price-warning">Preisstand nicht belegt: O365 E3, Entra Suite<\/span>/);
+  assert.equal(run('quoteItems[0].priceNote'), 'Originalnotiz');
+  run('setTerm("monthly")');
+  assert.match(el.quoteBody.innerHTML, /class="price-warning">Preisstand nicht belegt: O365 E3, Entra Suite<\/span>/);
+  assert.equal(run('quoteItems[0].priceNote'), 'Originalnotiz');
+});
+
+test('component warnings insert recommendation text and escape quote HTML', () => {
+  const { elements: el, run, context } = app();
+  context.payload = '<Unbelegt> & "Test"';
+  run('recalc(); currentCalc.addons = [payload]; render(); quoteItems = [{ ...currentCalc, persona: "Test" }]; renderTable()');
+  assert.ok(el.recPriceWarning, 'missing dedicated recommendation warning');
+  assert.equal(el.recPriceWarning.innerText, 'Preisstand nicht belegt: ' + context.payload);
+  assert.equal(el.recPriceWarning.innerHTML, '');
+  assert.match(el.quoteBody.innerHTML, /class="price-warning">Preisstand nicht belegt: &lt;Unbelegt&gt; &amp; &quot;Test&quot;<\/span>/);
+  assert.doesNotMatch(el.quoteBody.innerHTML, /<Unbelegt>/);
+});

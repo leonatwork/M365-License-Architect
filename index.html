@@ -394,6 +394,8 @@ table.data tbody tr.is-editing {
 .rec-addon { font-size: 11px; color: var(--mute); min-height: 1em; }
 .price-stand, .quote-variant { display: block; font-size: 11px; color: var(--mute); overflow-wrap: anywhere; }
 .price-stand { margin-top: 4px; }
+.price-warning { display: block; margin-top: 4px; padding: 4px 6px; border: 1px solid currentColor; color: var(--ink); font-size: 12px; font-weight: 700; overflow-wrap: anywhere; }
+.price-warning[hidden] { display: none; }
 .teams-field { border: 0; }
 .teams-field select { border: 1px solid var(--rule); padding: 8px; background: var(--paper); }
 .teams-field select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
@@ -933,6 +935,7 @@ table.data tbody tr.is-editing {
   .tags { margin: 0; }
   .alt-row { margin: 0; padding: 6px 8px; grid-column: 1 / -1; grid-row: 5; }
   .rec-block > .price-stand { grid-column: 1 / -1; grid-row: 6; }
+  .rec-block > .price-warning { grid-column: 1 / -1; grid-row: 7; }
   .rec-block:not(:has(.rec-addon:not(:empty))) .price-row,
   .rec-block:not(:has(.rec-addon:not(:empty))) .rec-meta { grid-row: 3; }
   .rec-block:not(:has(.rec-addon:not(:empty))) .alt-row { grid-row: 4; }
@@ -1306,6 +1309,7 @@ table.data tbody tr.is-editing {
           <div id="altPrice">--</div>
         </div>
         <div class="price-stand" id="recPriceStand"></div>
+        <div class="price-warning" id="recPriceWarning" hidden></div>
       </div>
   </div>
 </div>
@@ -1593,6 +1597,11 @@ table.data tbody tr.is-editing {
             return `${item.priceNote}, Stand ${date}`;
         }
 
+        function priceWarning(item) {
+            const { unsourced } = LicenseCSV.priceInfo(item, LICENSE_DATA);
+            return unsourced.length ? 'Preisstand nicht belegt: ' + unsourced.join(', ') : '';
+        }
+
         function escapeHTML(value) {
             return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
         }
@@ -1606,6 +1615,9 @@ table.data tbody tr.is-editing {
             document.getElementById('recPrice').innerText = "€ " + c.price.toFixed(2);
             document.getElementById('recReason').innerText = c.reason;
             document.getElementById('recPriceStand').innerText = priceStand(c);
+            const warning = document.getElementById('recPriceWarning');
+            warning.innerText = priceWarning(c);
+            warning.hidden = !warning.innerText;
 
             const delta = comparison.delta;
             const deltaEl = document.getElementById('priceDelta');
@@ -1701,12 +1713,14 @@ table.data tbody tr.is-editing {
                 const editBtnStyle = (idx === editingIndex) ? "text-indigo-600 bg-indigo-50 rounded-full ring-2 ring-indigo-200" : "text-blue-500 hover:text-blue-600";
 
                 const editingClass = idx === editingIndex ? 'is-editing' : '';
+                const warning = priceWarning(item);
+                const warningHtml = warning ? `<span class="price-warning">${escapeHTML(warning)}</span>` : '';
                 // addonHtml is composed only of the escaped tag template above (or a constant).
                 // Join markup fragments without re-escaping their already escaped contents.
                 tb.innerHTML += [`
                 <tr class="${escapeHTML(editingClass)}">
                     <td data-label="Item"><span class="quote-persona">${escapeHTML(item.persona)}</span><span class="quote-users">${escapeHTML(item.count)} Users</span></td>
-                    <td data-label="Plan">${escapeHTML(item.base)}<span class="quote-variant">${escapeHTML(item.teamsVariant === 'no_teams' ? 'ohne Teams (EWR-Variante)' : 'Teams im Paket')}</span><span class="price-stand">${escapeHTML(priceStand(item))}</span></td>
+                    <td data-label="Plan">${escapeHTML(item.base)}<span class="quote-variant">${escapeHTML(item.teamsVariant === 'no_teams' ? 'ohne Teams (EWR-Variante)' : 'Teams im Paket')}</span><span class="price-stand">${escapeHTML(priceStand(item))}</span>`, warningHtml, `</td>
                     <td data-label="Add-ons">`, addonHtml, `</td>
                     <td data-label="Unit" class="num">€${escapeHTML(item.price.toFixed(2))}</td>
                     <td data-label="Total" class="num"><strong>€${escapeHTML(total.toFixed(2))}</strong></td>

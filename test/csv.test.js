@@ -22,8 +22,12 @@ test('CSV export-import-export preserves special characters, formula prefixes an
   const imported = csv.importCSV(exported, catalog);
   assert.equal(imported.legacyTeams, false);
   assert.deepEqual(imported.items.map(i => i.persona), names);
+  // Unconfirmed synthetic components append a warning; all original metadata survives.
+  const expectedItems = items.map((item, index) => ({ ...item,
+    priceNote: item.priceNote + '; Preisstand nicht belegt: ' + (index % 2 ? '=Basis,"Test", ' : '') + '+Zusatz,"Test"' }));
   assert.deepEqual(imported.items.map(({ persona, count, base, addons, price, currentLic, teamsVariant, priceDate, priceNote }) =>
-    ({ persona, count, base, addons, price, currentLic, teamsVariant, priceDate, priceNote })), items);
+    ({ persona, count, base, addons, price, currentLic, teamsVariant, priceDate, priceNote })), expectedItems);
+  assert.equal(items[0].priceNote, 'Listenpreis, "EUR"', 'export must not mutate stored notes');
   assert.equal(csv.exportCSV(imported.items, data), exported);
   const browser = {};
   vm.runInNewContext(fs.readFileSync(require.resolve('../src/csv.js'), 'utf8'), browser);
@@ -244,10 +248,61 @@ test('price metadata uses catalog dates and copy, preserves gaps and standalone 
   const catalog = structuredClone(data);
   catalog.PRICES['M365 E3'].valid_from = '2027-02-03';
   catalog.PRICE_NOTE = 'Eigener Hinweis';
-  assert.deepEqual(csv.priceInfo({ base: 'M365 E3', addons: [] }, catalog), { priceDate: '2027-02-03', priceNote: 'Eigener Hinweis' });
+  assert.deepEqual(csv.priceInfo({ base: 'M365 E3', addons: [] }, catalog), { priceDate: '2027-02-03', priceNote: 'Eigener Hinweis', unsourced: [] });
   assert.match(csv.priceInfo({ base: 'M365 E3', addons: ['Visio Plan 2'] }, data).priceNote, /Preisstand nicht belegt: Visio Plan 2/);
   assert.equal(csv.priceInfo({ base: 'None', addons: ['Teams Phone Add-on'] }, data).priceDate, '2026-07-01');
   assert.equal(csv.priceInfo({ base: 'None', addons: ['Visio Plan 2'] }, data).priceDate, '');
+});
+
+test('priceInfo flags todo_source with a valid date on base licenses and standalone add-ons', () => {
+  for (const item of [{ base: 'O365 E3', addons: [] }, { base: 'None', addons: ['Entra Suite'] },
+    { base: 'O365 E3', addons: ['Entra Suite', 'Teams Phone Add-on'] }]) {
+    const expected = [item.base, ...item.addons].filter(key => key === 'O365 E3' || key === 'Entra Suite');
+    const info = load().priceInfo(item, data);
+    assert.deepEqual(info.unsourced, expected);
+    assert.equal(info.priceDate, '2026-07-01');
+    assert.equal(info.priceNote, data.PRICE_NOTE + '; Preisstand nicht belegt: ' + expected.join(', '));
+  }
+});
+
+test('priceInfo treats missing dates as unconfirmed even without todo_source and ignores None', () => {
+  const catalog = structuredClone(data);
+  delete catalog.PRICES['Visio Plan 2'].todo_source;
+  const info = load().priceInfo({ base: 'None', addons: ['Visio Plan 2'] }, catalog);
+  assert.deepEqual(info.unsourced, ['Visio Plan 2']);
+  assert.equal(info.priceNote, data.PRICE_NOTE + '; Preisstand nicht belegt: Visio Plan 2');
+  for (const item of [{ base: 'M365 E3', addons: [] }, { base: 'None', addons: ['Teams Phone Add-on'] }, { base: 'None' }]) {
+    assert.deepEqual(load().priceInfo(item, data).unsourced, []);
+    assert.equal(load().priceInfo(item, data).priceNote, data.PRICE_NOTE);
+  }
+});
+
+test('CSV PriceNote warns about all unconfirmed components and survives repeated roundtrips', () => {
+  const csv = load();
+  for (const priceNote of [undefined, '', 'Eigene Angebotsnotiz']) {
+    const item = { persona: 'Test', count: 2, base: 'O365 E3', addons: ['Entra Suite'],
+      price: 36.67, currentLic: 'None', ...(priceNote === undefined ? {} : { priceNote }) };
+    const exported = csv.exportCSV([item], data);
+    const imported = csv.importCSV(exported, data);
+    assert.deepEqual(imported.errors, []);
+    const warning = 'Preisstand nicht belegt: O365 E3, Entra Suite';
+    assert.ok(imported.items[0].priceNote.includes(warning));
+    if (priceNote) assert.ok(imported.items[0].priceNote.startsWith(priceNote + '; '));
+    assert.equal(imported.items[0].price, item.price);
+    assert.equal(csv.exportCSV(imported.items, data), exported);
+  }
+});
+
+test('CSV import preserves supplied PriceNote verbatim; sourced exports add no warning', () => {
+  const csv = load();
+  const result = csv.importCSV(header + ',PriceNote\n' + validRow.replace('M365 E3', 'O365 E3') + ',Originalnotiz', data);
+  assert.equal(result.items[0].priceNote, 'Originalnotiz');
+  for (const priceNote of [undefined, '', 'Eigene Angebotsnotiz']) {
+    const exported = csv.exportCSV([{ persona: 'Belegt', count: 1, base: 'M365 E3', addons: [],
+      price: 37.78, currentLic: 'None', ...(priceNote === undefined ? {} : { priceNote }) }], data);
+    assert.equal(csv.importCSV(exported, data).items[0].priceNote, priceNote ?? data.PRICE_NOTE);
+    assert.doesNotMatch(exported, /Preisstand nicht belegt/);
+  }
 });
 
 test('new CSV implementation and tests have no external URLs or fetch calls', () => {
