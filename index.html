@@ -1509,6 +1509,16 @@ table.data tbody tr.is-editing {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function removePersona(idx) {
+            quoteItems.splice(idx, 1);
+            if (editingIndex === idx) {
+                resetForm();
+            } else if (editingIndex > idx) {
+                editingIndex -= 1;
+            }
+            renderTable();
+        }
+
         function updateActionButton() {
             const editing = editingIndex > -1;
             const label = editing ? "UPDATE PERSONA" : "ADD TO QUOTE";
@@ -1608,7 +1618,7 @@ table.data tbody tr.is-editing {
 
             const item = { ...currentCalc, persona: document.getElementById('personaName').value || "Persona " + (quoteItems.length + 1), inputs: inputState };
 
-            if (editingIndex > -1) {
+            if (Number.isInteger(editingIndex) && editingIndex >= 0 && editingIndex < quoteItems.length) {
                 // UPDATE EXISTING
                 quoteItems[editingIndex] = item;
                 editingIndex = -1; // Reset edit mode
@@ -1666,7 +1676,7 @@ table.data tbody tr.is-editing {
                     <td class="quote-actions">
                         <button type="button" onclick="editPersona(${idx})" class="icon-btn ${editBtnStyle}" title="Edit" aria-label="Edit"><i class="fas fa-pen"></i></button>
                         <button type="button" onclick="showComparison(${idx})" class="icon-btn" title="Compare" aria-label="Compare"><i class="fas fa-balance-scale"></i></button>
-                        <button type="button" onclick="quoteItems.splice(${idx},1);renderTable()" class="icon-btn" title="Remove" aria-label="Remove"><i class="fas fa-trash"></i></button>
+                        <button type="button" onclick="removePersona(${idx})" class="icon-btn" title="Remove" aria-label="Remove"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
             });
