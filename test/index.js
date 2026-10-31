@@ -11,3 +11,4 @@ require('./teams-ui.test.js');
 require('./issue-30.test.js');
 require('./issue-34.test.js');
 require('./repo-hygiene.test.js');
+require('./issue-36.test.js');

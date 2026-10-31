@@ -55,7 +55,7 @@ test('notices cover every local font and CDN asset loaded by the application', (
 });
 
 test('historical handovers live under docs and the source-consistency test uses the relocated file', () => {
-  for (const issue of [8, 15, 19, 23, 30, 34]) {
+  for (const issue of [8, 15, 19, 23, 30, 34, 36]) {
     const name = `ISSUE-${issue}-HANDOVER.md`;
     assert.equal(fs.existsSync(path.join(root, name)), false, `handover remains in root: ${issue}`);
     assert.ok(read(`docs/handover/${name}`).length > 0, `missing handover: ${issue}`);

@@ -20,7 +20,7 @@ function app() {
   elements.currentLicense.value = 'None';
   elements.teamsVariant.value = 'included';
   const context = { LICENSE_DATA: data, LicenseEngine: engine, LicenseCSV: require('../src/csv.js'),
-    document: { getElementById: id => elements[id] }, window: { scrollTo() {} }, alert() {} };
+    document: { getElementById: id => elements[id] }, window: { scrollTo() {}, addEventListener() {} }, alert() {} };
   vm.createContext(context);
   vm.runInContext(html.match(/<script>([\s\S]*?)<\/script>/)[1], context);
   return { elements, run: code => vm.runInContext(code, context) };

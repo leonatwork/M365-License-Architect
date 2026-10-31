@@ -158,7 +158,12 @@ function importUI() {
   let reader;
   const context = { LICENSE_DATA: data, LicenseCSV: load(), LicenseEngine: require('../src/engine.js'),
     document: { getElementById: () => notice }, alert: message => messages.push(message),
-    FileReader: class { constructor() { reader = this; } readAsText() {} } };
+    window: { addEventListener() {} },
+    FileReader: class {
+      constructor() { reader = this; this.listeners = {}; }
+      addEventListener(type, callback) { this.listeners[type] = callback; }
+      readAsText() {}
+    } };
   vm.createContext(context);
   vm.runInContext(html.match(/<script>([\s\S]*?)<\/script>/)[1], context);
   vm.runInContext('quoteItems = [{ persona: "Vorhanden" }]; renderTable = function () {};', context);
@@ -172,19 +177,22 @@ for (const scenario of ['size', 'rows', 'malformed', 'mixed', 'read-error', 'rea
   test(`UI CSV ${scenario} failure preserves quoteItems and shows a German message`, () => {
     const app = importUI();
     if (scenario === 'size') app.input.files[0].size = 1000001;
-    if (scenario === 'read-throw') app.context.FileReader = class { readAsText() { throw new Error('read failed'); } };
+    if (scenario === 'read-throw') app.context.FileReader = class {
+      addEventListener() {}
+      readAsText() { throw new Error('read failed'); }
+    };
     if (scenario === 'render-throw') app.run('renderTable = function () { throw new Error("render failed"); };');
     app.context.input = app.input;
     app.run('handleFileSelect(input)');
     if (scenario === 'read-error') {
-      assert.equal(typeof app.reader().onerror, 'function');
-      app.reader().onerror();
+      assert.equal(typeof app.reader().listeners.error, 'function');
+      app.reader().listeners.error();
     } else if (!['size', 'read-throw'].includes(scenario)) {
       const text = scenario === 'rows' ? header + '\n' + Array(1001).fill(validRow).join('\n')
         : scenario === 'malformed' ? header + '\n"Offen'
           : scenario === 'mixed' ? header + '\n' + validRow + '\nTest,0,M365 E3,,0,0,None'
             : scenario === 'empty' ? header : header + '\n' + validRow;
-      app.reader().onload({ target: { result: text } });
+      app.reader().listeners.load({ target: { result: text } });
     }
     assert.strictEqual(app.run('quoteItems'), app.original);
     assert.equal(app.original.length, 1);
@@ -201,7 +209,7 @@ test('UI successful CSV import appends once, renders and resets the file picker'
   const app = importUI();
   app.context.input = app.input;
   app.run('let renders = 0; renderTable = function () { renders++; }; handleFileSelect(input);');
-  app.reader().onload({ target: { result: header + '\n' + validRow } });
+  app.reader().listeners.load({ target: { result: header + '\n' + validRow } });
   assert.equal(app.run('quoteItems.length'), 2);
   assert.equal(app.run('renders'), 1);
   assert.match(app.notice.textContent, /1 Personas erfolgreich importiert/);

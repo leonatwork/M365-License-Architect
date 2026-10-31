@@ -981,17 +981,17 @@ table.data tbody tr.is-editing {
 
     </style>
 </head>
-<body onload="init()">
-<input type="file" id="csvInput" accept=".csv" class="hidden" style="display:none" onchange="handleFileSelect(this)">
+<body>
+<input type="file" id="csvInput" accept=".csv" class="hidden" style="display:none">
 
 <div class="app">
   <header class="topbar">
     <h1 class="brand">License Architect</h1>
     <div class="top-actions">
-      <button type="button" class="ghost-btn" onclick="document.getElementById('csvInput').click()">Import</button>
-      <button type="button" class="ghost-btn" onclick="exportCSV()">Export</button>
-      <button type="button" class="ghost-btn" onclick="toggleTheme()" title="Theme" id="themeBtn">Theme</button>
-      <button type="button" class="ghost-btn" onclick="resetForm()">Clear</button>
+      <button type="button" class="ghost-btn" id="importBtn">Import</button>
+      <button type="button" class="ghost-btn" id="exportBtn">Export</button>
+      <button type="button" class="ghost-btn" title="Theme" id="themeBtn">Theme</button>
+      <button type="button" class="ghost-btn" id="clearBtn">Clear</button>
     </div>
   </header>
 
@@ -1011,11 +1011,11 @@ table.data tbody tr.is-editing {
         </div>
         <div class="field">
           <label>Qty</label>
-          <input type="number" id="userCount" value="10" min="1" max="100000" oninput="recalc()">
+          <input type="number" id="userCount" value="10" min="1" max="100000">
         </div>
         <div class="field">
           <label>Workstyle</label>
-          <select id="workstyle" onchange="recalc()">
+          <select id="workstyle">
             <option value="office">Office</option>
             <option value="frontline">Frontline</option>
             <option value="standalone">Standalone / Add-ons</option>
@@ -1023,7 +1023,7 @@ table.data tbody tr.is-editing {
         </div>
         <div class="field">
           <label>Current License</label>
-          <select id="currentLicense" onchange="recalc()">
+          <select id="currentLicense">
             <option value="None">-- New Hire / No License --</option>
             <option value="M365 F1">Microsoft 365 F1</option>
             <option value="M365 F3">Microsoft 365 F3</option>
@@ -1040,11 +1040,11 @@ table.data tbody tr.is-editing {
 
       <div class="tools-row">
         <div class="term-row">
-          <button type="button" id="btnAnnual" class="term-btn active" onclick="setTerm('annual')">Annual</button>
-          <button type="button" id="btnMonthly" class="term-btn" onclick="setTerm('monthly')">Monthly (+20%)</button>
+          <button type="button" id="btnAnnual" class="term-btn active">Annual</button>
+          <button type="button" id="btnMonthly" class="term-btn">Monthly (+20%)</button>
         </div>
         <div class="preset">
-          <select id="presetSelector" onchange="applyPreset(this.value)">
+          <select id="presetSelector">
             <option value="Benutzerdefiniert">-- Preset --</option>
             <option value="Marketing Team">Marketing Team</option>
             <option value="Development Team">Development Team</option>
@@ -1065,7 +1065,7 @@ table.data tbody tr.is-editing {
             <div class="req-cat-head"><span id="cat-teams">Microsoft Teams</span></div>
             <div class="field teams-field">
               <label for="teamsVariant">Teams-Variante pro Persona</label>
-              <select id="teamsVariant" onchange="recalc()">
+              <select id="teamsVariant">
                 <option value="included">im Paket (Standard)</option>
                 <option value="no_teams">ohne Teams (EWR-Variante)</option>
               </select>
@@ -1075,22 +1075,22 @@ table.data tbody tr.is-editing {
             <div class="req-cat-head"><span id="cat-prod">Productivity</span><span class="num">01</span></div>
             <div class="req-grid">
               <label class="req-item">
-                <input type="checkbox" id="desktopApps" onchange="recalc()">
+                <input type="checkbox" id="desktopApps">
                 <i class="box" aria-hidden="true"></i>
                 <span>Desktop Apps</span>
               </label>
               <label class="req-item">
-                <input type="checkbox" id="webEdit" onchange="recalc()">
+                <input type="checkbox" id="webEdit">
                 <i class="box" aria-hidden="true"></i>
                 <span>Web Editing</span>
               </label>
               <label class="req-item">
-                <input type="checkbox" id="teamsCollab" onchange="recalc()">
+                <input type="checkbox" id="teamsCollab">
                 <i class="box" aria-hidden="true"></i>
                 <span>Teams Collaboration</span>
               </label>
               <label class="req-item" data-tooltip="VoIP-Telefonie über Microsoft Teams">
-                <input type="checkbox" id="teamsPhone" onchange="recalc()">
+                <input type="checkbox" id="teamsPhone">
                 <i class="box" aria-hidden="true"></i>
                 <span>Teams Phone</span>
               </label>
@@ -1101,27 +1101,27 @@ table.data tbody tr.is-editing {
             <div class="req-cat-head"><span id="cat-endpoint">Endpoint &amp; OS</span><span class="num">02</span></div>
             <div class="req-grid">
               <label class="req-item">
-                <input type="checkbox" id="mdmMobile" onchange="recalc()">
+                <input type="checkbox" id="mdmMobile">
                 <i class="box" aria-hidden="true"></i>
                 <span>Mobile MDM</span>
               </label>
               <label class="req-item" data-tooltip="Mobile Device Management für Windows/Mac Geräte">
-                <input type="checkbox" id="mdmDesktop" onchange="recalc()">
+                <input type="checkbox" id="mdmDesktop">
                 <i class="box" aria-hidden="true"></i>
                 <span>Desktop MDM (Intune)</span>
               </label>
               <label class="req-item" data-tooltip="Windows Enterprise Lizenz mit erweiterten Features">
-                <input type="checkbox" id="winOS" onchange="recalc()">
+                <input type="checkbox" id="winOS">
                 <i class="box" aria-hidden="true"></i>
                 <span>Windows OS (E3/E5)</span>
               </label>
               <label class="req-item" data-tooltip="Basis Antivirus und Endpoint Protection">
-                <input type="checkbox" id="sec_def_p1" onchange="recalc()">
+                <input type="checkbox" id="sec_def_p1">
                 <i class="box" aria-hidden="true"></i>
                 <span>Defender P1 (AV)</span>
               </label>
               <label class="req-item" data-tooltip="Extended Detection & Response">
-                <input type="checkbox" id="sec_def_p2" onchange="recalc()">
+                <input type="checkbox" id="sec_def_p2">
                 <i class="box" aria-hidden="true"></i>
                 <span>Defender P2 (XDR)</span>
               </label>
@@ -1132,17 +1132,17 @@ table.data tbody tr.is-editing {
             <div class="req-cat-head"><span id="cat-sec">Security</span><span class="num">03</span></div>
             <div class="req-grid">
               <label class="req-item">
-                <input type="checkbox" id="sec_ca" onchange="recalc()">
+                <input type="checkbox" id="sec_ca">
                 <i class="box" aria-hidden="true"></i>
                 <span>Conditional Access</span>
               </label>
               <label class="req-item">
-                <input type="checkbox" id="sec_risk_ca" onchange="recalc()">
+                <input type="checkbox" id="sec_risk_ca">
                 <i class="box" aria-hidden="true"></i>
                 <span>Risk-Based CA</span>
               </label>
               <label class="req-item">
-                <input type="checkbox" id="sec_casb" onchange="recalc()">
+                <input type="checkbox" id="sec_casb">
                 <i class="box" aria-hidden="true"></i>
                 <span>CASB / Defender for Cloud Apps</span>
               </label>
@@ -1153,17 +1153,17 @@ table.data tbody tr.is-editing {
             <div class="req-cat-head"><span id="cat-comp">Compliance</span><span class="num">04</span></div>
             <div class="req-grid">
               <label class="req-item">
-                <input type="checkbox" id="comp_dlp" onchange="recalc()">
+                <input type="checkbox" id="comp_dlp">
                 <i class="box" aria-hidden="true"></i>
                 <span>DLP</span>
               </label>
               <label class="req-item">
-                <input type="checkbox" id="comp_labeling" onchange="recalc()">
+                <input type="checkbox" id="comp_labeling">
                 <i class="box" aria-hidden="true"></i>
                 <span>Sensitivity Labels</span>
               </label>
               <label class="req-item">
-                <input type="checkbox" id="comp_ediscovery" onchange="recalc()">
+                <input type="checkbox" id="comp_ediscovery">
                 <i class="box" aria-hidden="true"></i>
                 <span>eDiscovery</span>
               </label>
@@ -1174,17 +1174,17 @@ table.data tbody tr.is-editing {
             <div class="req-cat-head"><span id="cat-adv">Advanced Cloud &amp; AI</span><span class="num">05</span></div>
             <div class="req-grid">
               <label class="req-item">
-                <input type="checkbox" id="adv_epm" onchange="recalc()">
+                <input type="checkbox" id="adv_epm">
                 <i class="box" aria-hidden="true"></i>
                 <span>Endpoint Privilege Management</span>
               </label>
               <label class="req-item">
-                <input type="checkbox" id="adv_remotehelp" onchange="recalc()">
+                <input type="checkbox" id="adv_remotehelp">
                 <i class="box" aria-hidden="true"></i>
                 <span>Remote Help</span>
               </label>
               <label class="req-item">
-                <input type="checkbox" id="adv_copilot" onchange="recalc()">
+                <input type="checkbox" id="adv_copilot">
                 <i class="box" aria-hidden="true"></i>
                 <span>Microsoft 365 Copilot (€30)</span>
               </label>
@@ -1195,27 +1195,27 @@ table.data tbody tr.is-editing {
             <div class="req-cat-head"><span id="cat-add">Additional Products</span><span class="num">06</span></div>
             <div class="req-grid">
               <label class="req-item">
-                <input type="checkbox" id="add_visio" onchange="recalc()">
+                <input type="checkbox" id="add_visio">
                 <i class="box" aria-hidden="true"></i>
                 <span>Visio Plan 2</span>
               </label>
               <label class="req-item">
-                <input type="checkbox" id="add_project" onchange="recalc()">
+                <input type="checkbox" id="add_project">
                 <i class="box" aria-hidden="true"></i>
                 <span>Project Plan 3</span>
               </label>
               <label class="req-item">
-                <input type="checkbox" id="add_powerauto" onchange="recalc()">
+                <input type="checkbox" id="add_powerauto">
                 <i class="box" aria-hidden="true"></i>
                 <span>Power Automate (€14)</span>
               </label>
               <label class="req-item">
-                <input type="checkbox" id="add_rooms" onchange="recalc()">
+                <input type="checkbox" id="add_rooms">
                 <i class="box" aria-hidden="true"></i>
                 <span>Teams Rooms Pro (€33.70)</span>
               </label>
               <label class="req-item">
-                <input type="checkbox" id="serverProt" onchange="recalc()">
+                <input type="checkbox" id="serverProt">
                 <i class="box" aria-hidden="true"></i>
                 <span>Defender Server (€2.80)</span>
               </label>
@@ -1282,7 +1282,7 @@ table.data tbody tr.is-editing {
         </div>
         <div class="compare-foot">
           <span class="meta-chip">Live feature delta</span>
-          <button type="button" class="hold-btn" id="actionBtn" onclick="addToQuote()"><span id="actionBtnText">ADD TO QUOTE</span></button>
+          <button type="button" class="hold-btn" id="actionBtn"><span id="actionBtnText">ADD TO QUOTE</span></button>
         </div>
       </div>
 
@@ -1311,16 +1311,16 @@ table.data tbody tr.is-editing {
 </div>
 
       <div class="mobile-cta" aria-hidden="false">
-        <button type="button" class="btn-primary" id="actionBtnMobile" onclick="addToQuote()"><span id="actionBtnTextMobile">ADD TO QUOTE</span></button>
+        <button type="button" class="btn-primary" id="actionBtnMobile"><span id="actionBtnTextMobile">ADD TO QUOTE</span></button>
       </div>
 
 <!-- Modal kept for quote-row compare -->
 <div id="compModal" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-backdrop" onclick="closeModal()"></div>
+  <div class="modal-backdrop" id="modalBackdrop"></div>
   <div class="modal-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <h3 style="margin:0;letter-spacing:0.1em">LICENSE COMPARISON</h3>
-      <button type="button" class="ghost-btn" onclick="closeModal()">Close</button>
+      <button type="button" class="ghost-btn" id="closeModalBtn">Close</button>
     </div>
     <div class="compare-cols">
       <div>
@@ -1393,6 +1393,8 @@ table.data tbody tr.is-editing {
         let editingIndex = -1; // -1 means adding new, >= 0 means editing index
 
         function init() {
+            bindUIEvents();
+
             // System Theme Listener
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             mediaQuery.addEventListener('change', e => {
@@ -1412,6 +1414,39 @@ table.data tbody tr.is-editing {
                 content: (reference) => reference.getAttribute('data-tooltip'),
                 theme: document.documentElement.classList.contains('dark') ? '' : 'light',
                 animation: 'scale',
+            });
+        }
+
+        function bindUIEvents() {
+            const on = (id, event, handler) => document.getElementById(id).addEventListener(event, handler);
+            on('importBtn', 'click', () => document.getElementById('csvInput').click());
+            on('csvInput', 'change', event => handleFileSelect(event.target));
+            on('exportBtn', 'click', exportCSV);
+            on('themeBtn', 'click', toggleTheme);
+            on('clearBtn', 'click', resetForm);
+            on('btnAnnual', 'click', () => setTerm('annual'));
+            on('btnMonthly', 'click', () => setTerm('monthly'));
+            on('presetSelector', 'change', event => applyPreset(event.target.value));
+            on('actionBtn', 'click', addToQuote);
+            on('actionBtnMobile', 'click', addToQuote);
+            on('modalBackdrop', 'click', closeModal);
+            on('closeModalBtn', 'click', closeModal);
+
+            FORM_IDS.filter(id => id !== 'personaName').forEach(id => {
+                on(id, id === 'userCount' ? 'input' : 'change', () => recalc());
+            });
+
+            // The tbody survives renderTable(); clicks on nested icons resolve to the button.
+            on('quoteBody', 'click', event => {
+                const button = event.target.closest('button[data-action][data-index]');
+                if (!button) return;
+                const idx = Number(button.dataset.index);
+                if (!Number.isInteger(idx) || idx < 0 || idx >= quoteItems.length) return;
+                switch (button.dataset.action) {
+                    case 'edit': editPersona(idx); break;
+                    case 'compare': showComparison(idx); break;
+                    case 'remove': removePersona(idx); break;
+                }
             });
         }
 
@@ -1596,7 +1631,7 @@ table.data tbody tr.is-editing {
             const tags = document.getElementById('featureTags');
             tags.innerHTML = "";
             c.features.forEach(f => {
-                tags.innerHTML += `<span class="tag">${f}</span>`;
+                tags.innerHTML += `<span class="tag">${escapeHTML(f)}</span>`;
             });
 
             // Live Compare panel (As-Is / To-Be) — always on-page
@@ -1605,10 +1640,10 @@ table.data tbody tr.is-editing {
             const gList = document.getElementById('liveGained');
             const lList = document.getElementById('liveLost');
             gList.innerHTML = comparison.gained.length
-                ? comparison.gained.map(f => `<li>+ ${f}</li>`).join('')
+                ? comparison.gained.map(f => `<li>+ ${escapeHTML(f)}</li>`).join('')
                 : '<li class="muted">No new features</li>';
             lList.innerHTML = comparison.lost.length
-                ? comparison.lost.map(f => `<li>− ${f}</li>`).join('')
+                ? comparison.lost.map(f => `<li>− ${escapeHTML(f)}</li>`).join('')
                 : '<li class="muted">No features lost</li>';
         }
 
@@ -1658,7 +1693,7 @@ table.data tbody tr.is-editing {
                 let addonHtml = item.addons.length > 0
                     ? item.addons.map(a => {
                         let color = a.includes("Teams") ? "tag-blue" : a.includes("Security") ? "tag-red" : a.includes("Copilot") ? "tag-purple" : "tag-ink";
-                        return `<span class="tag ${color} mr-1 mb-1">${escapeHTML(a)}</span>`;
+                        return `<span class="tag ${escapeHTML(color)} mr-1 mb-1">${escapeHTML(a)}</span>`;
                     }).join("")
                     : "<span class='text-slate-400 italic text-xs'>-</span>";
 
@@ -1666,19 +1701,21 @@ table.data tbody tr.is-editing {
                 const editBtnStyle = (idx === editingIndex) ? "text-indigo-600 bg-indigo-50 rounded-full ring-2 ring-indigo-200" : "text-blue-500 hover:text-blue-600";
 
                 const editingClass = idx === editingIndex ? 'is-editing' : '';
-                tb.innerHTML += `
-                <tr class="${editingClass}">
-                    <td data-label="Item"><span class="quote-persona">${escapeHTML(item.persona)}</span><span class="quote-users">${item.count} Users</span></td>
-                    <td data-label="Plan">${escapeHTML(item.base)}<span class="quote-variant">${item.teamsVariant === 'no_teams' ? 'ohne Teams (EWR-Variante)' : 'Teams im Paket'}</span><span class="price-stand">${escapeHTML(priceStand(item))}</span></td>
-                    <td data-label="Add-ons">${addonHtml}</td>
-                    <td data-label="Unit" class="num">€${item.price.toFixed(2)}</td>
-                    <td data-label="Total" class="num"><strong>€${total.toFixed(2)}</strong></td>
+                // addonHtml is composed only of the escaped tag template above (or a constant).
+                // Join markup fragments without re-escaping their already escaped contents.
+                tb.innerHTML += [`
+                <tr class="${escapeHTML(editingClass)}">
+                    <td data-label="Item"><span class="quote-persona">${escapeHTML(item.persona)}</span><span class="quote-users">${escapeHTML(item.count)} Users</span></td>
+                    <td data-label="Plan">${escapeHTML(item.base)}<span class="quote-variant">${escapeHTML(item.teamsVariant === 'no_teams' ? 'ohne Teams (EWR-Variante)' : 'Teams im Paket')}</span><span class="price-stand">${escapeHTML(priceStand(item))}</span></td>
+                    <td data-label="Add-ons">`, addonHtml, `</td>
+                    <td data-label="Unit" class="num">€${escapeHTML(item.price.toFixed(2))}</td>
+                    <td data-label="Total" class="num"><strong>€${escapeHTML(total.toFixed(2))}</strong></td>
                     <td class="quote-actions">
-                        <button type="button" onclick="editPersona(${idx})" class="icon-btn ${editBtnStyle}" title="Edit" aria-label="Edit"><i class="fas fa-pen"></i></button>
-                        <button type="button" onclick="showComparison(${idx})" class="icon-btn" title="Compare" aria-label="Compare"><i class="fas fa-balance-scale"></i></button>
-                        <button type="button" onclick="removePersona(${idx})" class="icon-btn" title="Remove" aria-label="Remove"><i class="fas fa-trash"></i></button>
+                        <button type="button" data-action="edit" data-index="${escapeHTML(idx)}" class="icon-btn ${escapeHTML(editBtnStyle)}" title="Edit" aria-label="Edit"><i class="fas fa-pen"></i></button>
+                        <button type="button" data-action="compare" data-index="${escapeHTML(idx)}" class="icon-btn" title="Compare" aria-label="Compare"><i class="fas fa-balance-scale"></i></button>
+                        <button type="button" data-action="remove" data-index="${escapeHTML(idx)}" class="icon-btn" title="Remove" aria-label="Remove"><i class="fas fa-trash"></i></button>
                     </td>
-                </tr>`;
+                </tr>`].join('');
             });
             document.getElementById('grandTotal').innerText = "€" + grand.toFixed(2);
             document.getElementById('quoteCount').innerText = quoteItems.length + " Personas";
@@ -1718,12 +1755,12 @@ table.data tbody tr.is-editing {
 
             const gList = document.getElementById('listGained');
             gList.innerHTML = rawGained.length
-                ? rawGained.map(f => `<li class="flex items-start gap-2"><i class="fas fa-check text-green-500 mt-1"></i><span>${f}</span></li>`).join('')
+                ? rawGained.map(f => `<li class="flex items-start gap-2"><i class="fas fa-check text-green-500 mt-1"></i><span>${escapeHTML(f)}</span></li>`).join('')
                 : '<li class="italic text-slate-400">No new features</li>';
 
             const lList = document.getElementById('listLost');
             lList.innerHTML = smartLost.length
-                ? smartLost.map(f => `<li class="flex items-start gap-2"><i class="fas fa-times text-red-500 mt-1"></i><span>${f}</span></li>`).join('')
+                ? smartLost.map(f => `<li class="flex items-start gap-2"><i class="fas fa-times text-red-500 mt-1"></i><span>${escapeHTML(f)}</span></li>`).join('')
                 : '<li class="italic text-slate-400">No features lost</li>';
 
             document.getElementById('compModal').classList.remove('hidden');
@@ -1761,10 +1798,10 @@ table.data tbody tr.is-editing {
                     throw new Error('Die Datei darf höchstens 1 MB groß sein.');
                 }
                 const reader = new FileReader();
-                reader.onerror = function () {
+                reader.addEventListener('error', function () {
                     showMessage('CSV-Import fehlgeschlagen: Die Datei konnte nicht gelesen werden. Bitte erneut auswählen. Die Angebotsliste bleibt unverändert.');
-                };
-                reader.onload = function (e) {
+                });
+                reader.addEventListener('load', function (e) {
                     const previousItems = quoteItems;
                     try {
                         // importCSV begrenzt auf 1.000 Datenzeilen; erst nach vollständiger Prüfung übernehmen.
@@ -1780,12 +1817,14 @@ table.data tbody tr.is-editing {
                         quoteItems = previousItems;
                         showMessage('CSV-Import abgebrochen. Die Angebotsliste bleibt unverändert.\n' + error.message);
                     }
-                };
+                });
                 reader.readAsText(file);
             } catch (error) {
                 showMessage('CSV-Import fehlgeschlagen. Die Angebotsliste bleibt unverändert.\n' + error.message);
             }
         }
+
+        window.addEventListener('load', init, { once: true });
     
 </script>
 </body>
