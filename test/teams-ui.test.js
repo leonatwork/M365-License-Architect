@@ -17,7 +17,7 @@ function app() {
   elements.currentLicense.value = 'M365 E3';
   if (elements.teamsVariant) elements.teamsVariant.value = 'included';
   const context = { LICENSE_DATA: data, LicenseEngine: engine,
-    document: { getElementById: id => elements[id] }, window: { scrollTo() {} }, alert() {} };
+    document: { getElementById: id => elements[id] }, window: { scrollTo() {}, addEventListener() {} }, alert() {} };
   const csvPath = require('node:path').join(__dirname, '..', 'src/csv.js');
   if (fs.existsSync(csvPath)) context.LicenseCSV = require(csvPath);
   vm.createContext(context);
@@ -69,7 +69,10 @@ test('Teams selection drives engine, comparison, alternative, quote editing and 
 
 test('legacy CSV import renders persistent notice in UI', () => {
   const { elements, run, context } = app();
-  context.FileReader = class { readAsText() { this.onload({ target: { result: 'Persona,Count,Base,Addons,Price,Total,CurrentLic\nAlt,1,M365 E3,,37.78,37.78,None' } }); } };
+  context.FileReader = class {
+    addEventListener(type, callback) { assert.equal(type, 'load'); this.loaded = callback; }
+    readAsText() { this.loaded({ target: { result: 'Persona,Count,Base,Addons,Price,Total,CurrentLic\nAlt,1,M365 E3,,37.78,37.78,None' } }); }
+  };
   run('handleFileSelect({ files: [{}], value: "old.csv" })');
   assert.ok(elements.csvNotice, 'missing visible import notice');
   assert.match(elements.csvNotice.textContent, /im Paket/);

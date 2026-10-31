@@ -1,31 +1,11 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const vm = require('node:vm');
-const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const { app: createApp } = require('./fixtures/ui-app.js');
 
 function app() {
-  const elements = {};
-  for (const match of html.matchAll(/<(input|select|div|span|button|tbody|td|ul)[^>]*id="([^"]+)"[^>]*>/g)) {
-    const el = elements[match[2]] = { tagName: match[1].toUpperCase(),
-      type: /type="checkbox"/.test(match[0]) ? 'checkbox' : 'text', value: '', checked: false,
-      innerText: '', innerHTML: '', style: {}, classList: { add() {}, remove() {} } };
-    if (el.tagName === 'SELECT') {
-      const options = html.slice(match.index).match(/^[\s\S]*?<\/select>/)[0];
-      const firstValue = options.match(/<option[^>]*value="([^"]*)"/)[1];
-      Object.defineProperty(el, 'selectedIndex', { set(index) {
-        assert.equal(index, 0, 'DOM stub only supports resetting to the first option');
-        this.value = firstValue;
-      } });
-    }
-  }
-  const context = { LICENSE_DATA: require('../data/licenses.js'), LicenseEngine: require('../src/engine.js'),
-    LicenseCSV: require('../src/csv.js'), document: { getElementById: id => elements[id] },
-    window: { scrollTo() {} }, alert() {} };
-  vm.createContext(context);
-  vm.runInContext(html.match(/<script>([\s\S]*?)<\/script>/)[1], context);
-  const run = code => vm.runInContext(code, context);
+  const ui = createApp();
+  const { elements, run } = ui;
+  ui.load();
   run('resetForm()');
   for (const [index, persona] of ['Erste', 'Zweite', 'Dritte'].entries()) {
     elements.personaName.value = persona;
@@ -34,12 +14,7 @@ function app() {
     elements.desktopApps.checked = true;
     run('recalc(); addToQuote()');
   }
-  return { elements, run, items: () => JSON.parse(run('JSON.stringify(quoteItems)')),
-    remove(index) {
-      const buttons = [...elements.quoteBody.innerHTML.matchAll(/<button[^>]*onclick="([^"]+)"[^>]*aria-label="Remove"/g)];
-      assert.ok(buttons[index], 'missing rendered Remove button');
-      run(buttons[index][1]);
-    } };
+  return { ...ui, remove: index => ui.rowAction('remove', index) };
 }
 
 function assertAddMode({ elements: el, run }) {
@@ -100,10 +75,15 @@ for (const [position, removedIndex, expectedIndex] of [['before', 0, 0], ['after
   });
 }
 
-test('Remove buttons call the named removePersona function without inline splice', () => {
+test('Remove buttons delegate to the named removePersona function without inline splice', () => {
   const ui = app();
   assert.equal(ui.run('typeof removePersona'), 'function');
-  assert.match(ui.elements.quoteBody.innerHTML, /onclick="removePersona\(0\)"/);
+  assert.match(ui.elements.quoteBody.innerHTML, /data-action="remove" data-index="0"/);
+  let removedIndex;
+  ui.context.removePersona = index => { removedIndex = index; };
+  ui.remove(0);
+  assert.equal(removedIndex, 0);
+  assert.doesNotMatch(ui.elements.quoteBody.innerHTML, /\bon[a-z]+\s*=/i);
   assert.doesNotMatch(ui.elements.quoteBody.innerHTML, /splice\s*\(/);
 });
 

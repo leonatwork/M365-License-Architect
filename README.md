@@ -90,6 +90,19 @@ Runs without extra packages and without network access. Also available as `npm r
 
 ---
 
+## UI-Härtung und CSP-Folgeschritt
+
+`index.html` verwendet registrierte Event-Listener und Event-Delegation statt Inline-Handlern. Dynamische Werte in HTML-Templates werden mit `escapeHTML` escaped; reine Textausgaben verwenden Text-Properties. Regressionstests prüfen Handler-Freiheit, Template-Interpolationen und die Kernabläufe einschließlich CSV-Rundlauf.
+
+Eine Content Security Policy (CSP) wird derzeit noch nicht als Meta-Tag gesetzt. Der Folgeschritt ist:
+
+1. Nach Erledigung von [#9](https://github.com/leonatwork/M365-License-Architect/issues/9) die externen CDN-Assets lokal bereitstellen.
+2. Inline-Script und Inline-Style aus `index.html` in lokale Dateien auslagern; verbliebene `style`-Attribute in CSS-Klassen überführen.
+3. Anschließend eine restriktive CSP mit `default-src 'self'` und `script-src 'self'` ohne `'unsafe-inline'` für Scripts setzen. Styles ebenfalls auf lokale Quellen beschränken; benötigte Ausnahmen (z. B. Blob-Downloads und Tooltip-Styling) gezielt prüfen.
+4. Import/Export, Theme, Clear, Laufzeit-Umschaltung, Presets, Angebot und Vergleiche unter der gesetzten CSP im Browser testen.
+
+---
+
 ## Credits
 
 Feature mapping draws heavily from [Aaron Dinnage / m365maps.com](https://m365maps.com/).
