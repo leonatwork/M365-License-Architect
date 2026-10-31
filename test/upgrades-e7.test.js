@@ -79,10 +79,14 @@ test('upgrade comparison considers E3/E5, user limits and all requested features
   assert.equal(intune.base, 'Business Premium');
   close(intune.price, 30.76);
   assert.ok(intune.features.includes('Remote Help'));
-  for (const input of [{ count: 301 }, { style: 'frontline' }, { style: 'standalone' }, { copilot: true }]) {
+  for (const input of [{ count: 301 }, { style: 'frontline' }, { style: 'standalone' }, { count: 301, copilot: true }]) {
     const result = rec({ ...input, risk: true, lbl: true });
     assert.equal(result.addons.some(key => upgrades.includes(key)), false);
   }
+  const copilot = rec({ copilot: true, risk: true, lbl: true });
+  assert.equal(copilot.base, 'Business Premium');
+  assert.deepEqual(copilot.addons, ['BizPrem E5 Upgrade', 'Copilot Business']);
+  close(copilot.price, 50.26);
 });
 
 test('upgrades and E7 preserve explicit Teams/Phone need without double charging', () => {
