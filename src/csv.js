@@ -5,9 +5,16 @@
   const MAX_IMPORT_BYTES = 1000000; // 1 MB (UTF-8), einschließlich Kopfzeile.
   const MAX_IMPORT_ROWS = 1000; // Datensätze ohne Kopfzeile und Leerzeilen.
   function priceInfo(item, data) {
-    const keys = [item.base, ...(item.addons || [])].filter(key => key && key !== 'None');
-    const dates = keys.map(key => data.PRICES[key]?.valid_from).filter(Boolean).sort();
-    const missing = keys.filter(key => !data.PRICES[key]?.valid_from || data.PRICES[key]?.todo_source === true);
+    // Anwendung und Node nutzen die Engine. Der bisherige eigenständige Browser-
+    // Export bleibt ohne Engine nutzbar; Paritätstests sichern diesen Fallback ab.
+    const statuses = engine ? engine.priceStatus(item, data)
+      : [item.base, ...(item.addons || [])].filter(key => key && key !== 'None').map(key => ({
+        key,
+        validFrom: data.PRICES[key]?.valid_from || null,
+        sourced: Boolean(data.PRICES[key]?.valid_from) && data.PRICES[key]?.todo_source !== true,
+      }));
+    const dates = statuses.map(status => status.validFrom).filter(Boolean).sort();
+    const missing = statuses.filter(status => !status.sourced).map(status => status.key);
     return {
       priceDate: dates.at(-1) || '',
       priceNote: data.PRICE_NOTE + (missing.length ? '; Preisstand nicht belegt: ' + missing.join(', ') : ''),

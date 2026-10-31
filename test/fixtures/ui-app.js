@@ -12,8 +12,8 @@ function eventTarget() {
       callbacks.push(callback);
       listeners.set(type, callbacks);
     },
-    dispatch(type, target = this) {
-      for (const callback of listeners.get(type) || []) callback({ target });
+    dispatch(type, target = this, properties = {}) {
+      for (const callback of listeners.get(type) || []) callback({ target, ...properties });
     },
     click() { this.dispatch('click'); },
   };
