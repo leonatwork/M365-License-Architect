@@ -396,6 +396,9 @@ table.data tbody tr.is-editing {
 .price-stand { margin-top: 4px; }
 .price-warning { display: block; margin-top: 4px; padding: 4px 6px; border: 1px solid currentColor; color: var(--ink); font-size: 12px; font-weight: 700; overflow-wrap: anywhere; }
 .price-warning[hidden] { display: none; }
+/* Mengenfeld für tenantweite Raum-/Serverlizenzen */
+.req-grid .field.unit-qty { border: 1px solid var(--rule); padding: 4px 8px; }
+.req-grid .field.unit-qty[hidden] { display: none; }
 .teams-field { border: 0; }
 .teams-field select { border: 1px solid var(--rule); padding: 8px; background: var(--paper); }
 .teams-field select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
@@ -1215,13 +1218,21 @@ table.data tbody tr.is-editing {
               <label class="req-item">
                 <input type="checkbox" id="add_rooms">
                 <i class="box" aria-hidden="true"></i>
-                <span>Teams Rooms Pro (€33.70)</span>
+                <span>Teams Rooms Pro (€33.70 pro Raum)</span>
               </label>
+              <div class="field unit-qty" id="roomCountField" hidden>
+                <label for="roomCount">Anzahl Räume (tenantweit)</label>
+                <input type="number" id="roomCount" value="1" min="1" max="100000" step="1">
+              </div>
               <label class="req-item">
                 <input type="checkbox" id="serverProt">
                 <i class="box" aria-hidden="true"></i>
-                <span>Defender Server (€2.80)</span>
+                <span>Defender Server (€2.80 pro Server)</span>
               </label>
+              <div class="field unit-qty" id="serverCountField" hidden>
+                <label for="serverCount">Anzahl Server (tenantweit)</label>
+                <input type="number" id="serverCount" value="1" min="1" max="100000" step="1">
+              </div>
             </div>
           </section>
         </div>
@@ -1388,8 +1399,56 @@ table.data tbody tr.is-editing {
             'sec_def_p1', 'sec_def_p2', 'sec_ca', 'sec_risk_ca', 'sec_casb',
             'comp_dlp', 'comp_labeling', 'comp_ediscovery',
             'adv_epm', 'adv_remotehelp', 'adv_copilot',
-            'add_visio', 'add_project', 'add_powerauto', 'add_rooms', 'serverProt'
+            'add_visio', 'add_project', 'add_powerauto', 'add_rooms', 'serverProt',
+            'roomCount', 'serverCount'
         ];
+
+        // Tenantweite Positionen (je Art genau eine Angebotszeile) mit eigenem Mengenfeld.
+        const UNITS = LICENSE_DATA.UNITS;
+        const UNIT_FIELDS = [
+            { flag: 'add_rooms', input: 'roomCount', field: 'roomCountField', key: 'Teams Rooms Pro' },
+            { flag: 'serverProt', input: 'serverCount', field: 'serverCountField', key: 'Defender for Business Servers' },
+        ];
+        const QUANTITY_IDS = UNIT_FIELDS.map(field => field.input);
+
+        function isUnitRow(item) {
+            return Boolean(item && item.unit) && item.unit !== 'user';
+        }
+
+        function unitLabel(unit) {
+            return UNITS[unit] || { per: 'pro ' + unit, many: unit };
+        }
+
+        function findUnitRow(items, key) {
+            return items.findIndex(item => isUnitRow(item) && item.addons[0] === key);
+        }
+
+        // Je Art eine Zeile: vorhandene Zeile ersetzen, sonst anhängen (Indizes der Personas bleiben stabil).
+        function upsertUnitRows(items, rows) {
+            const result = [...items];
+            for (const row of rows) {
+                const index = findUnitRow(result, row.addons[0]);
+                if (index >= 0) result[index] = row;
+                else result.push(row);
+            }
+            return result;
+        }
+
+        function unitRow(unitItem) {
+            const row = { persona: `${unitItem.key} (${unitLabel(unitItem.unit).per})`, unit: unitItem.unit,
+                count: unitItem.quantity, base: 'None', addons: [unitItem.key], price: unitItem.price,
+                currentLic: 'None', teamsVariant: 'included', features: [] };
+            return { ...row, ...LicenseCSV.priceInfo(row, LICENSE_DATA) };
+        }
+
+        // Mengenfelder zeigen die bereits im Angebot geführte tenantweite Menge.
+        function syncUnitQuantities(defaultValue) {
+            UNIT_FIELDS.forEach(({ input, key }) => {
+                const index = findUnitRow(quoteItems, key);
+                if (index >= 0) document.getElementById(input).value = String(quoteItems[index].count);
+                else if (defaultValue !== undefined) document.getElementById(input).value = defaultValue;
+            });
+        }
 
         let quoteItems = [];
         let currentCalc = {};
@@ -1439,6 +1498,8 @@ table.data tbody tr.is-editing {
             FORM_IDS.filter(id => id !== 'personaName').forEach(id => {
                 on(id, id === 'userCount' ? 'input' : 'change', () => recalc());
             });
+            // Mengenfelder reagieren wie die Benutzeranzahl bereits während der Eingabe.
+            QUANTITY_IDS.forEach(id => on(id, 'input', () => recalc()));
 
             // The tbody survives renderTable(); clicks on nested icons resolve to the button.
             on('quoteBody', 'click', event => {
@@ -1491,10 +1552,11 @@ table.data tbody tr.is-editing {
             if (previousMonthly !== isMonthly) {
                 quoteItems = quoteItems.map(item => {
                     if (item.inputs) {
-                        const updated = LicenseEngine.recommend(LicenseEngine.mapFormInputs(item.inputs), { term }, LICENSE_DATA);
+                        // Raum-/Serverzeilen sind eigene Positionen und werden unten skaliert.
+                        const { unitItems, ...updated } = LicenseEngine.recommend(LicenseEngine.mapFormInputs(item.inputs), { term }, LICENSE_DATA);
                         return { ...item, ...updated, ...LicenseCSV.priceInfo(updated, LICENSE_DATA) };
                     }
-                    // Altpositionen behalten ihren Preisstand; nur das Vertragsmodell wird skaliert.
+                    // Altpositionen und Raum-/Serverzeilen behalten ihren Preisstand; nur das Vertragsmodell wird skaliert.
                     const factor = isMonthly ? 1.2 : 1 / 1.2;
                     return { ...item, price: Math.round((item.price * factor + Number.EPSILON) * 100) / 100 };
                 });
@@ -1516,6 +1578,7 @@ table.data tbody tr.is-editing {
             document.getElementById('workstyle').value = 'office';
             document.getElementById('currentLicense').value = 'None';
             document.getElementById('teamsVariant').value = 'included';
+            syncUnitQuantities('1');
 
             // Exit edit mode
             editingIndex = -1;
@@ -1536,6 +1599,8 @@ table.data tbody tr.is-editing {
                 if (el.type === 'checkbox') el.checked = savedVal;
                 else el.value = savedVal;
             });
+            // Tenantweite Mengen: aktuelle Angebotsmenge statt eines veralteten gespeicherten Werts.
+            syncUnitQuantities();
 
             // Set edit mode
             editingIndex = idx;
@@ -1589,6 +1654,9 @@ table.data tbody tr.is-editing {
             const term = isMonthly ? 'monthly' : 'annual';
             currentCalc = LicenseEngine.recommend(i, { term }, LICENSE_DATA);
             Object.assign(currentCalc, LicenseCSV.priceInfo(currentCalc, LICENSE_DATA));
+            UNIT_FIELDS.forEach(({ flag, field }) => {
+                document.getElementById(field).hidden = !document.getElementById(flag).checked;
+            });
             render();
         }
 
@@ -1631,6 +1699,12 @@ table.data tbody tr.is-editing {
             if (c.teamsPrice > 0) {
                 subHtml = `Teams (+€${c.teamsPrice.toFixed(2)})` + (subHtml ? " + " + subHtml : "");
             }
+            // Raum-/Serverlizenzen sind nicht im Benutzerpreis enthalten; eigene Angebotszeile je Art.
+            const unitText = (c.unitItems || []).map(u => {
+                const label = unitLabel(u.unit);
+                return `${u.key}: ${u.quantity} ${label.many} × €${u.price.toFixed(2)} (${label.per}, eigene Position)`;
+            });
+            subHtml = [subHtml, ...unitText].filter(Boolean).join(" + ");
             document.getElementById('recAddon').innerText = subHtml || "";
 
             document.getElementById('altName').innerText = c.alt;
@@ -1663,9 +1737,13 @@ table.data tbody tr.is-editing {
             // CAPTURE INPUT STATE FOR EDITING LATER
             const inputState = captureFormInputs();
 
-            const item = { ...currentCalc, persona: document.getElementById('personaName').value || "Persona " + (quoteItems.length + 1), inputs: inputState };
+            // Raum-/Serverlizenzen werden als eigene tenantweite Zeilen geführt, nicht pro Benutzer.
+            const { unitItems = [], ...calc } = currentCalc;
+            const personaCount = quoteItems.filter(entry => !isUnitRow(entry)).length;
+            const item = { ...calc, ...LicenseCSV.priceInfo(calc, LICENSE_DATA),
+                persona: document.getElementById('personaName').value || "Persona " + (personaCount + 1), inputs: inputState };
 
-            if (Number.isInteger(editingIndex) && editingIndex >= 0 && editingIndex < quoteItems.length) {
+            if (Number.isInteger(editingIndex) && editingIndex >= 0 && editingIndex < quoteItems.length && !isUnitRow(quoteItems[editingIndex])) {
                 // UPDATE EXISTING
                 quoteItems[editingIndex] = item;
                 editingIndex = -1; // Reset edit mode
@@ -1674,6 +1752,7 @@ table.data tbody tr.is-editing {
                 // ADD NEW
                 quoteItems.push(item);
             }
+            quoteItems = upsertUnitRows(quoteItems, unitItems.map(unitRow));
 
             resetForm(); // Clear form after adding/updating
             renderTable();
@@ -1702,7 +1781,15 @@ table.data tbody tr.is-editing {
                 totalBaseCost += lineBase;
                 totalAddonCost += lineAddon;
 
-                let addonHtml = item.addons.length > 0
+                // Raum-/Serverzeilen: Menge × Preis pro Raum/Server, tenantweit und ohne Basislizenz.
+                const unitInfo = isUnitRow(item) ? unitLabel(item.unit) : null;
+                const quantityText = unitInfo ? `${item.count} ${unitInfo.many}` : `${item.count} Users`;
+                const planText = unitInfo ? item.addons.join(', ') : item.base;
+                const variantText = unitInfo ? `tenantweit, ${unitInfo.per}`
+                    : item.teamsVariant === 'no_teams' ? 'ohne Teams (EWR-Variante)' : 'Teams im Paket';
+                const unitSuffixHtml = unitInfo ? `<span class="quote-variant">${escapeHTML(unitInfo.per)}</span>` : '';
+
+                let addonHtml = item.addons.length > 0 && !unitInfo
                     ? item.addons.map(a => {
                         let color = a.includes("Teams") ? "tag-blue" : a.includes("Security") ? "tag-red" : a.includes("Copilot") ? "tag-purple" : "tag-ink";
                         return `<span class="tag ${escapeHTML(color)} mr-1 mb-1">${escapeHTML(a)}</span>`;
@@ -1715,24 +1802,26 @@ table.data tbody tr.is-editing {
                 const editingClass = idx === editingIndex ? 'is-editing' : '';
                 const warning = priceWarning(item);
                 const warningHtml = warning ? `<span class="price-warning">${escapeHTML(warning)}</span>` : '';
-                // addonHtml is composed only of the escaped tag template above (or a constant).
+                // addonHtml/unitSuffixHtml are composed only of the escaped templates above (or constants).
                 // Join markup fragments without re-escaping their already escaped contents.
                 tb.innerHTML += [`
                 <tr class="${escapeHTML(editingClass)}">
-                    <td data-label="Item"><span class="quote-persona">${escapeHTML(item.persona)}</span><span class="quote-users">${escapeHTML(item.count)} Users</span></td>
-                    <td data-label="Plan">${escapeHTML(item.base)}<span class="quote-variant">${escapeHTML(item.teamsVariant === 'no_teams' ? 'ohne Teams (EWR-Variante)' : 'Teams im Paket')}</span><span class="price-stand">${escapeHTML(priceStand(item))}</span>`, warningHtml, `</td>
+                    <td data-label="Item"><span class="quote-persona">${escapeHTML(item.persona)}</span><span class="quote-users">${escapeHTML(quantityText)}</span></td>
+                    <td data-label="Plan">${escapeHTML(planText)}<span class="quote-variant">${escapeHTML(variantText)}</span><span class="price-stand">${escapeHTML(priceStand(item))}</span>`, warningHtml, `</td>
                     <td data-label="Add-ons">`, addonHtml, `</td>
-                    <td data-label="Unit" class="num">€${escapeHTML(item.price.toFixed(2))}</td>
+                    <td data-label="Unit" class="num">€${escapeHTML(item.price.toFixed(2))}`, unitSuffixHtml, `</td>
                     <td data-label="Total" class="num"><strong>€${escapeHTML(total.toFixed(2))}</strong></td>
-                    <td class="quote-actions">
+                    <td class="quote-actions">`, unitInfo ? '' : `
                         <button type="button" data-action="edit" data-index="${escapeHTML(idx)}" class="icon-btn ${escapeHTML(editBtnStyle)}" title="Edit" aria-label="Edit"><i class="fas fa-pen"></i></button>
-                        <button type="button" data-action="compare" data-index="${escapeHTML(idx)}" class="icon-btn" title="Compare" aria-label="Compare"><i class="fas fa-balance-scale"></i></button>
+                        <button type="button" data-action="compare" data-index="${escapeHTML(idx)}" class="icon-btn" title="Compare" aria-label="Compare"><i class="fas fa-balance-scale"></i></button>`, `
                         <button type="button" data-action="remove" data-index="${escapeHTML(idx)}" class="icon-btn" title="Remove" aria-label="Remove"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`].join('');
             });
             document.getElementById('grandTotal').innerText = "€" + grand.toFixed(2);
-            document.getElementById('quoteCount').innerText = quoteItems.length + " Personas";
+            const unitRowCount = quoteItems.filter(isUnitRow).length;
+            document.getElementById('quoteCount').innerText = (quoteItems.length - unitRowCount) + " Personas"
+                + (unitRowCount ? ` + ${unitRowCount} Raum-/Serverposition${unitRowCount > 1 ? 'en' : ''}` : '');
 
             // UPDATE DASHBOARD
             // Den gerundeten Add-on-Anteil als Rest bilden, damit die sichtbaren Centbeträge aufgehen.
@@ -1823,10 +1912,27 @@ table.data tbody tr.is-editing {
                         if (result.errors.length) {
                             throw new Error(result.errors.map(error => `Zeile ${error.line}: ${error.message}`).join('\n'));
                         }
-                        quoteItems = [...quoteItems, ...result.items];
+                        // Raum-/Serverzeilen sind tenantweit: je Art ersetzt die importierte Zeile eine vorhandene.
+                        // Alt-CSV-Platzhalter (Menge 1) überschreiben keine bereits erfasste Menge;
+                        // ihr Katalogpreis folgt der aktuell gewählten Laufzeit.
+                        const kept = [];
+                        const unitRows = result.items.filter(isUnitRow).filter(item => {
+                            if (!item.migrated) return true;
+                            if (findUnitRow(quoteItems, item.addons[0]) >= 0) { kept.push(item.addons[0]); return false; }
+                            return true;
+                        }).map(item => item.migrated && isMonthly
+                            ? { ...item, price: Math.round((item.price * 1.2 + Number.EPSILON) * 100) / 100 } : item);
+                        const personas = result.items.filter(item => !isUnitRow(item));
+                        quoteItems = upsertUnitRows([...quoteItems, ...personas], unitRows);
                         renderTable();
-                        showMessage(`${result.items.length} Personas erfolgreich importiert!` + (result.legacyTeams
-                            ? ' Datei ohne Teams-Angabe: Microsoft Teams wurde als „im Paket“ übernommen.' : ''));
+                        const migrated = result.migratedUnits || [];
+                        showMessage(`${personas.length} Personas erfolgreich importiert!`
+                            + (unitRows.length ? ` ${unitRows.length} Raum-/Serverposition(en) übernommen.` : '')
+                            + (result.legacyTeams
+                                ? ' Datei ohne Teams-Angabe: Microsoft Teams wurde als „im Paket“ übernommen.' : '')
+                            + (migrated.length ? ` Alt-CSV: ${migrated.join(', ')} aus dem Benutzerpreis herausgerechnet und als eigene Position`
+                                + ' mit Menge 1 übernommen. Bitte Anzahl Räume/Server prüfen.' : '')
+                            + (kept.length ? ` Vorhandene Menge beibehalten: ${kept.join(', ')}.` : ''));
                     } catch (error) {
                         quoteItems = previousItems;
                         showMessage('CSV-Import abgebrochen. Die Angebotsliste bleibt unverändert.\n' + error.message);

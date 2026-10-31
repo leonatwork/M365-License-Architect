@@ -93,7 +93,7 @@ docs/screenshots/   README screenshots
   Basis- und Bestandslizenzen müssen eigene Schlüssel von `PRICES` und
   `FEATURES_MAP` sein; Add-ons eigene Schlüssel von `PRICES`. `None` bleibt erlaubt,
   insbesondere für Standalone-Angebote und eine fehlende Bestandslizenz.
-- `LicenseCSV.importCSV` liefert `{ items, legacyTeams, errors }`: ungültige
+- `LicenseCSV.importCSV` liefert `{ items, legacyTeams, errors, migratedUnits }`: ungültige
   Datensätze werden übersprungen und in `errors` mit `{ line, message }` gemeldet.
   Strukturfehler und überschrittene Limits lösen eine Ausnahme aus. Im Browser
   wird bei **jedem Fehler die gesamte Datei abgelehnt**; die Angebotsliste bleibt
@@ -101,6 +101,29 @@ docs/screenshots/   README screenshots
 - Das CSV-Format bleibt erhalten. Formelanfänge (`=`, `+`, `-`, `@`, Tab, CR) und
   wörtliche Apostrophe werden im Export reversibel geschützt. `src/csv.js` nutzt
   die gemeinsame Nutzergrenze aus dem zuvor geladenen `src/engine.js`.
+
+### Mengenarten: pro Benutzer, pro Raum, pro Server
+
+- Jeder `PRICES`-Eintrag in `data/licenses.js` hat ein Feld `unit` (`user`, `room`,
+  `server`; Beschriftungen in `UNITS`). `Teams Rooms Pro` ist `room`,
+  `Defender for Business Servers` ist `server`, alle übrigen Einträge `user`.
+- `LicenseEngine.recommend` rechnet Nicht-Benutzer-Produkte nicht in den
+  Benutzerpreis `price` ein, sondern liefert sie getrennt als
+  `unitItems: [{ key, unit, quantity, price }]` (Preis je Raum/Server inklusive
+  Monatsfaktor). Die Mengen `roomCount` / `serverCount` folgen der Benutzer-Regel
+  (ganzzahlig, 1 bis `MAX_USERS`, Klemmen wie bei der Anzahl).
+- Im Angebot steht je Art genau eine tenantweite Zeile („pro Raum“ / „pro Server“).
+  Erneutes Hinzufügen oder Importieren ersetzt die vorhandene Zeile dieser Art;
+  das Mengenfeld zeigt die bereits im Angebot geführte Menge. Die Zeile bleibt
+  bestehen, wenn eine Persona bearbeitet oder entfernt wird, und wird über ihren
+  eigenen Entfernen-Button gelöscht. Im Dashboard zählt sie zu den Add-ons.
+- CSV: Spalte `Unit` (nach `CurrentLic`). Raum-/Serverzeilen haben `Base = None`
+  und genau ein passendes Produkt in `Addons`; je Art ist nur eine Zeile erlaubt.
+  Alt-CSV ohne `Unit`-Spalte: Raum-/Serverprodukte in Benutzerzeilen werden in
+  eine eigene Position mit Menge 1 überführt (Hinweis im `PriceNote` und beim
+  Import), der Benutzerpreis wird um den Katalog-Listenpreis (jährlich) gekürzt.
+  Eine bereits im Angebot vorhandene Zeile dieser Art behält ihre Menge; die neue
+  Position übernimmt die aktuell gewählte Laufzeit.
 
 ---
 

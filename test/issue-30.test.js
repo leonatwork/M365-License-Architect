@@ -65,7 +65,8 @@ test('form mapping is DOM-free, complete and ignores obsolete mailbox fields', (
     add_powerauto: 'pauto', add_rooms: 'rooms', serverProt: 'serverProt' };
   const form = { userCount: '300', workstyle: 'frontline', currentLicense: 'M365 F3', teamsVariant: 'no_teams',
     mdmMobile: true, mdmDesktop: false, needMailbox: true, largeMailbox: true };
-  const expected = { count: 300, style: 'frontline', current: 'M365 F3', teamsVariant: 'no_teams', mdm: true };
+  // #45: Mengenfelder für Räume/Server werden wie die Benutzeranzahl normalisiert (fehlend → 1).
+  const expected = { count: 300, style: 'frontline', current: 'M365 F3', teamsVariant: 'no_teams', mdm: true, roomCount: 1, serverCount: 1 };
   for (const [id, flag] of Object.entries(flags)) { form[id] = true; expected[flag] = true; }
   const context = { module: { exports: {} } };
   Object.defineProperty(context, 'document', { get() { throw new Error('DOM access'); } });

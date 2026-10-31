@@ -41,7 +41,7 @@
     'Purview Suite': enterpriseAddon(10.40),
     'M365 F5 Security Add-on': { price: 8.00, currency: 'EUR', source: SOURCE, valid_from: null },
     'M365 F5 Compliance Add-on': { price: 8.00, currency: 'EUR', source: SOURCE, valid_from: null },
-    'Defender for Business Servers': { price: 2.80, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Defender for Business Servers': { price: 2.80, currency: 'EUR', source: SOURCE, valid_from: null, unit: 'server' },
     // Kein belegter EUR-Bündelpreis: Bestandswert bleibt dokumentiert, nicht preisvergleichbar.
     'Intune Suite Add-on': { price: 9.40, currency: 'EUR', source: INTUNE, valid_from: null, requires: 'Intune Plan 1', source_checked: '2026-10-19' },
     'EPM Add-on': intuneAddon(2.60),
@@ -63,7 +63,7 @@
     'Visio Plan 2': { price: 12.70, currency: 'EUR', source: SOURCE, valid_from: null },
     'Project Plan 3': { price: 25.30, currency: 'EUR', source: SOURCE, valid_from: null },
     'Power Automate Premium': { price: 14.00, currency: 'EUR', source: SOURCE, valid_from: null },
-    'Teams Rooms Pro': { price: 33.70, currency: 'EUR', source: SOURCE, valid_from: null },
+    'Teams Rooms Pro': { price: 33.70, currency: 'EUR', source: SOURCE, valid_from: null, unit: 'room' },
     'Defender Suite for BizPrem': upgrade(8.70),
     'Purview Suite for BizPrem': upgrade(8.70),
     // Bestehender Schlüssel bleibt kompatibel; das Produkt ist das gemeinsame Paket,
@@ -73,7 +73,14 @@
   // Unbelegte Bestandswerte sind kein bestätigter Preisstand Juli 2026.
   for (const [key, entry] of Object.entries(PRICES)) {
     if (key !== 'None' && entry.valid_from === null) entry.todo_source = true;
+    // Mengenart: Standard pro Benutzer; Raum-/Serverlizenzen werden tenantweit mit eigener Menge gerechnet.
+    if (!entry.unit) entry.unit = 'user';
   }
+  const UNITS = {
+    user: { per: 'pro Benutzer', many: 'Benutzer' },
+    room: { per: 'pro Raum', many: 'Räume' },
+    server: { per: 'pro Server', many: 'Server' },
+  };
 
   const HIERARCHY = {
     Mail: ['2GB Mail', 'Exch 50GB', 'Exch 100GB'],
@@ -225,6 +232,7 @@
   return {
     PRICE_NOTE: 'Listenpreis in EUR, zzgl. MwSt., jährliche Abrechnung',
     PRICES,
+    UNITS,
     HIERARCHY,
     FEATURES_MAP,
     ADDON_FEATURES,
