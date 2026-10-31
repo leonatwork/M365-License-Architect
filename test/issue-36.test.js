@@ -67,9 +67,9 @@ test('quote rendering escapes persona, plan, add-ons, count and price metadata',
   ui.context.payload = `"><svg onload='alert(1)'> &`;
   ui.run('Object.assign(quoteItems[0], { persona: payload, base: payload, addons: [payload], count: payload, priceNote: payload }); renderTable()');
   assert.doesNotMatch(ui.elements.quoteBody.innerHTML, /<svg\b/);
-  // Five existing text fields plus base/add-on names inside the new price warning.
-  assert.equal((ui.elements.quoteBody.innerHTML.match(/&lt;svg/g) || []).length, 7);
-  assert.match(ui.elements.quoteBody.innerHTML, /class="price-warning">Preisstand nicht belegt: &quot;&gt;&lt;svg/);
+  // Four row fields, two warning names, two detail names; CSV notes stay in CSV.
+  assert.equal((ui.elements.quoteBody.innerHTML.match(/&lt;svg/g) || []).length, 8);
+  assert.match(ui.elements.quoteBody.innerHTML, /class="price-warning">Preis unbestätigt: &quot;&gt;&lt;svg/);
   for (const [tag] of ui.elements.quoteBody.innerHTML.matchAll(/<[^>]*>/g)) {
     assert.doesNotMatch(tag, /\bon[a-z]+\s*=/i);
   }

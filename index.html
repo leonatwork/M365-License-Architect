@@ -396,6 +396,16 @@ table.data tbody tr.is-editing {
 .price-stand { margin-top: 4px; }
 .price-warning { display: block; margin-top: 4px; padding: 4px 6px; border: 1px solid currentColor; color: var(--ink); font-size: 12px; font-weight: 700; overflow-wrap: anywhere; }
 .price-warning[hidden] { display: none; }
+.price-info { margin-top: 4px; padding: 4px 8px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); font: inherit; font-size: 12px; cursor: pointer; }
+.price-info:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* Fest im Viewport, damit die scrollbaren Angebots-/Empfehlungsbereiche das Detail nicht abschneiden. */
+.price-popover { position: fixed; right: 16px; bottom: 16px; z-index: 1100; width: min(36rem, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: 12px; border: 2px solid var(--rule); background: var(--paper); color: var(--ink); font-size: 13px; font-weight: 400; letter-spacing: normal; text-align: left; white-space: normal; overflow-wrap: anywhere; }
+.price-popover[hidden] { display: none; }
+.price-popover:focus-visible { outline: 2px solid var(--ink); outline-offset: -4px; }
+.price-component + .price-component { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--rule); }
+.price-component span { display: block; }
+.price-popover-hint { margin-top: 10px; font-size: 11px; }
+.price-summary { min-width: 0; }
 .teams-field { border: 0; }
 .teams-field select { border: 1px solid var(--rule); padding: 8px; background: var(--paper); }
 .teams-field select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
@@ -941,7 +951,6 @@ table.data tbody tr.is-editing {
   .tags { margin: 0; }
   .alt-row { margin: 0; padding: 6px 8px; grid-column: 1 / -1; grid-row: 5; }
   .rec-block > .price-stand { grid-column: 1 / -1; grid-row: 6; }
-  .rec-block > .price-warning { grid-column: 1 / -1; grid-row: 7; }
   .rec-block:not(:has(.rec-addon:not(:empty))) .price-row,
   .rec-block:not(:has(.rec-addon:not(:empty))) .rec-meta { grid-row: 3; }
   .rec-block:not(:has(.rec-addon:not(:empty))) .alt-row { grid-row: 4; }
@@ -1254,8 +1263,8 @@ table.data tbody tr.is-editing {
           <tbody id="quoteBody"></tbody>
           <tfoot>
             <tr>
-              <td colspan="4" class="quote-total-label"><strong>Grand Total</strong></td>
-              <td class="num" id="grandTotal">€0.00</td>
+              <td colspan="4" class="quote-total-label"><strong>Grand Total</strong><span id="grandTotalWarning" class="price-warning" role="status" hidden></span></td>
+              <td class="num" id="grandTotal" aria-describedby="grandTotalWarning">€0.00</td>
               <td class="quote-total-spacer"></td>
             </tr>
           </tfoot>
@@ -1304,7 +1313,11 @@ table.data tbody tr.is-editing {
         <div class="rec-name" id="recName">--</div>
         <div class="rec-addon" id="recAddon"></div>
         <div class="price-row">
-          <div class="price-plate"><span></span><span id="recPrice">€ 0.00</span></div>
+          <div class="price-summary">
+            <div class="price-plate"><span></span><span id="recPrice">€ 0.00</span></div>
+            <div class="price-warning" id="recPriceWarning" hidden></div>
+            <div id="recPriceDetails"></div>
+          </div>
           <div class="delta-hatch" id="priceDelta">—</div>
         </div>
         <div class="rec-meta">
@@ -1316,7 +1329,6 @@ table.data tbody tr.is-editing {
           <div id="altPrice">--</div>
         </div>
         <div class="price-stand" id="recPriceStand"></div>
-        <div class="price-warning" id="recPriceWarning" hidden></div>
       </div>
   </div>
 </div>
@@ -1402,6 +1414,7 @@ table.data tbody tr.is-editing {
         let currentCalc = {};
         let isMonthly = false;
         let editingIndex = -1; // -1 means adding new, >= 0 means editing index
+        let openPricePopover = null;
 
         function init() {
             bindUIEvents();
@@ -1442,6 +1455,17 @@ table.data tbody tr.is-editing {
             on('actionBtnMobile', 'click', addToQuote);
             on('modalBackdrop', 'click', closeModal);
             on('closeModalBtn', 'click', closeModal);
+            on('recPriceDetails', 'click', togglePricePopover);
+            on('quoteBody', 'click', togglePricePopover);
+            window.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && openPricePopover) {
+                    event.preventDefault();
+                    closePricePopover(true);
+                }
+            });
+            window.addEventListener('click', event => {
+                if (!event.target.closest?.('[data-price-info], .price-popover')) closePricePopover();
+            });
 
             FORM_IDS.filter(id => id !== 'personaName').forEach(id => {
                 on(id, id === 'userCount' ? 'input' : 'change', () => recalc());
@@ -1600,13 +1624,51 @@ table.data tbody tr.is-editing {
         }
 
         function priceStand(item) {
-            const date = item.priceDate ? item.priceDate.split('-').reverse().join('.') : 'nicht belegt';
-            return `${item.priceNote}, Stand ${date}`;
+            const dates = LicenseEngine.priceStatus(item, LICENSE_DATA).map(status => status.validFrom).filter(Boolean).sort();
+            return `${LICENSE_DATA.PRICE_NOTE}, Stand ${priceDate(dates.at(-1), 'nicht belegt')}`;
         }
 
         function priceWarning(item) {
-            const { unsourced } = LicenseCSV.priceInfo(item, LICENSE_DATA);
-            return unsourced.length ? 'Preisstand nicht belegt: ' + unsourced.join(', ') : '';
+            const missing = LicenseEngine.priceStatus(item, LICENSE_DATA).filter(status => !status.sourced).map(status => status.key);
+            return missing.length ? 'Preis unbestätigt: ' + missing.join(', ') : '';
+        }
+
+        function priceDate(value, fallback) {
+            if (!value) return fallback;
+            return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value.split('-').reverse().join('.') : value;
+        }
+
+        function priceDetails(item, id, label) {
+            const components = LicenseEngine.priceStatus(item, LICENSE_DATA).map(status =>
+                `<div class="price-component"><strong>${escapeHTML(status.key)}</strong><span>${escapeHTML(status.sourced ? 'Preis belegt' : 'Preis unbestätigt')}</span><span>Quelle: ${escapeHTML(status.source || 'nicht vorhanden')}</span><span>Stand: ${escapeHTML(priceDate(status.validFrom, 'nicht belegt'))}</span><span>Prüfdatum: ${escapeHTML(priceDate(status.checked, 'nicht vorhanden'))}</span></div>`
+            ).join('');
+            if (!components) return '';
+            return [
+                `<button type="button" class="price-info" data-price-info="" aria-label="${escapeHTML(label)}" aria-expanded="false" aria-controls="${escapeHTML(id)}" aria-describedby="${escapeHTML(id)}">Info</button><div id="${escapeHTML(id)}" class="price-popover" role="region" aria-label="${escapeHTML(label)}" tabindex="0" hidden>`,
+                components, '<div class="price-popover-hint">Esc oder erneuter Klick auf Info schließt die Preisinformationen.</div></div>'
+            ].join('');
+        }
+
+        function closePricePopover(restoreFocus = false) {
+            if (!openPricePopover) return;
+            const { button, panel } = openPricePopover;
+            panel.hidden = true;
+            button.setAttribute('aria-expanded', 'false');
+            openPricePopover = null;
+            if (restoreFocus) button.focus();
+        }
+
+        function togglePricePopover(event) {
+            const button = event.target.closest('button[data-price-info]');
+            if (!button || button.dataset.priceInfo === undefined) return;
+            const wasOpen = openPricePopover?.button === button;
+            closePricePopover();
+            if (wasOpen) return;
+            const panel = document.getElementById(button.getAttribute('aria-controls'));
+            panel.hidden = false;
+            button.setAttribute('aria-expanded', 'true');
+            button.focus();
+            openPricePopover = { button, panel };
         }
 
         function escapeHTML(value) {
@@ -1614,6 +1676,7 @@ table.data tbody tr.is-editing {
         }
 
         function render() {
+            closePricePopover();
             const c = currentCalc;
             const term = isMonthly ? 'monthly' : 'annual';
             const comparison = LicenseEngine.compare(c.currentLic, c, term, LICENSE_DATA);
@@ -1625,6 +1688,7 @@ table.data tbody tr.is-editing {
             const warning = document.getElementById('recPriceWarning');
             warning.innerText = priceWarning(c);
             warning.hidden = !warning.innerText;
+            document.getElementById('recPriceDetails').innerHTML = priceDetails(c, 'recPricePopover', 'Preisinformationen zur Empfehlung');
 
             const delta = comparison.delta;
             const deltaEl = document.getElementById('priceDelta');
@@ -1700,6 +1764,7 @@ table.data tbody tr.is-editing {
         }
 
         function renderTable() {
+            closePricePopover();
             renderQuoteFindings();
             const tb = document.getElementById('quoteBody');
             tb.innerHTML = "";
@@ -1741,9 +1806,9 @@ table.data tbody tr.is-editing {
                 tb.innerHTML += [`
                 <tr class="${escapeHTML(editingClass)}">
                     <td data-label="Item"><span class="quote-persona">${escapeHTML(item.persona)}</span><span class="quote-users">${escapeHTML(item.count)} Users</span></td>
-                    <td data-label="Plan">${escapeHTML(item.base)}<span class="quote-variant">${escapeHTML(item.teamsVariant === 'no_teams' ? 'ohne Teams (EWR-Variante)' : 'Teams im Paket')}</span><span class="price-stand">${escapeHTML(priceStand(item))}</span>`, warningHtml, `</td>
+                    <td data-label="Plan">${escapeHTML(item.base)}<span class="quote-variant">${escapeHTML(item.teamsVariant === 'no_teams' ? 'ohne Teams (EWR-Variante)' : 'Teams im Paket')}</span><span class="price-stand">${escapeHTML(priceStand(item))}</span></td>
                     <td data-label="Add-ons">`, addonHtml, `</td>
-                    <td data-label="Unit" class="num">€${escapeHTML(item.price.toFixed(2))}</td>
+                    <td data-label="Unit" class="num"><div class="price-summary">€${escapeHTML(item.price.toFixed(2))}`, warningHtml, priceDetails(item, 'quotePricePopover-' + idx, 'Preisinformationen zu Einzel- und Gesamtpreis, Zeile ' + (idx + 1)), `</div></td>
                     <td data-label="Total" class="num"><strong>€${escapeHTML(total.toFixed(2))}</strong></td>
                     <td class="quote-actions">
                         <button type="button" data-action="edit" data-index="${escapeHTML(idx)}" class="icon-btn ${escapeHTML(editBtnStyle)}" title="Edit" aria-label="Edit"><i class="fas fa-pen"></i></button>
@@ -1753,6 +1818,10 @@ table.data tbody tr.is-editing {
                 </tr>`].join('');
             });
             document.getElementById('grandTotal').innerText = "€" + grand.toFixed(2);
+            const totalWarning = document.getElementById('grandTotalWarning');
+            const hasUnconfirmedPrice = quoteItems.some(item => LicenseEngine.priceStatus(item, LICENSE_DATA).some(status => !status.sourced));
+            totalWarning.innerText = hasUnconfirmedPrice ? 'Gesamtsumme enthält unbestätigte Preise.' : '';
+            totalWarning.hidden = !hasUnconfirmedPrice;
             document.getElementById('quoteCount').innerText = quoteItems.length + " Personas";
 
             // UPDATE DASHBOARD
