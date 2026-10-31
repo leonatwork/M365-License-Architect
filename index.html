@@ -400,6 +400,12 @@ table.data tbody tr.is-editing {
 .teams-field select { border: 1px solid var(--rule); padding: 8px; background: var(--paper); }
 .teams-field select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .csv-notice { margin: 6px 0; color: var(--ink); overflow-wrap: anywhere; }
+.quote-findings { margin: 6px 0; color: var(--ink); overflow-wrap: anywhere; }
+.quote-findings[hidden] { display: none; }
+.quote-finding { margin: 4px 0; padding: 6px 8px; border: 1px solid currentColor; background: var(--paper); }
+.quote-finding-warning { border-left: 5px solid #8a6200; }
+.quote-finding-error { border-left: 5px double #b42318; }
+.quote-finding-items { display: block; margin-top: 3px; font-size: 11px; }
 .price-row {
   display: grid;
   grid-template-columns: 1fr 0.45fr;
@@ -1233,6 +1239,7 @@ table.data tbody tr.is-editing {
           <div id="quoteCount">0 Personas</div>
         </div>
         <div id="csvNotice" class="csv-notice" role="status" hidden></div>
+        <div id="quoteFindings" class="quote-findings" role="status" aria-live="polite" aria-atomic="true" hidden></div>
         <table class="data">
           <thead>
             <tr>
@@ -1663,7 +1670,8 @@ table.data tbody tr.is-editing {
             // CAPTURE INPUT STATE FOR EDITING LATER
             const inputState = captureFormInputs();
 
-            const item = { ...currentCalc, persona: document.getElementById('personaName').value || "Persona " + (quoteItems.length + 1), inputs: inputState };
+            const item = { ...currentCalc, persona: document.getElementById('personaName').value || "Persona " + (quoteItems.length + 1), inputs: inputState,
+                standalone: currentCalc.base === 'None' || inputState.workstyle === 'standalone' };
 
             if (Number.isInteger(editingIndex) && editingIndex >= 0 && editingIndex < quoteItems.length) {
                 // UPDATE EXISTING
@@ -1679,7 +1687,20 @@ table.data tbody tr.is-editing {
             renderTable();
         }
 
+        function renderQuoteFindings() {
+            const findings = LicenseEngine.validateQuote(quoteItems, LICENSE_DATA);
+            const region = document.getElementById('quoteFindings');
+            region.innerHTML = findings.map(finding => {
+                const label = finding.severity === 'error' ? 'Fehler' : 'Warnung';
+                const style = finding.severity === 'error' ? 'quote-finding-error' : 'quote-finding-warning';
+                const references = finding.items.map(index => `Zeile ${index + 1}: ${quoteItems[index].persona}`).join('; ');
+                return `<div class="quote-finding ${escapeHTML(style)}"><strong>${escapeHTML(label)} (${escapeHTML(finding.rule)})</strong>: ${escapeHTML(finding.message)}<span class="quote-finding-items">${escapeHTML(references)}</span></div>`;
+            }).join('');
+            region.hidden = findings.length === 0;
+        }
+
         function renderTable() {
+            renderQuoteFindings();
             const tb = document.getElementById('quoteBody');
             tb.innerHTML = "";
             let grand = 0;
@@ -1788,6 +1809,8 @@ table.data tbody tr.is-editing {
 
         function exportCSV() {
             if (!quoteItems.length) return alert("Die Liste ist leer. Bitte füge erst Personas hinzu.");
+            // Dieselben sichtbaren Befunde vor dem Download aktualisieren, ohne Dialog oder Sperre.
+            renderQuoteFindings();
             const csv = LicenseCSV.exportCSV(quoteItems, LICENSE_DATA);
 
             const a = document.createElement('a');
@@ -1823,7 +1846,7 @@ table.data tbody tr.is-editing {
                         if (result.errors.length) {
                             throw new Error(result.errors.map(error => `Zeile ${error.line}: ${error.message}`).join('\n'));
                         }
-                        quoteItems = [...quoteItems, ...result.items];
+                        quoteItems = [...quoteItems, ...result.items.map(item => ({ ...item, standalone: item.base === 'None' }))];
                         renderTable();
                         showMessage(`${result.items.length} Personas erfolgreich importiert!` + (result.legacyTeams
                             ? ' Datei ohne Teams-Angabe: Microsoft Teams wurde als „im Paket“ übernommen.' : ''));

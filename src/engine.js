@@ -304,6 +304,48 @@
     };
   }
 
+  // Befunde beziehen sich auf nullbasierte Zeilenindizes; das Angebot bleibt unverändert.
+  function validateQuote(items, data) {
+    const sourceData = data || {};
+    const prices = sourceData.PRICES || {};
+    const featuresMap = sourceData.FEATURES_MAP || {};
+    const hierarchy = sourceData.HIERARCHY || {};
+    const findings = [];
+    const businessBases = ['Business Basic', 'Business Standard', 'Business Premium'];
+    const businessItems = [];
+    let businessUsers = 0;
+    items.forEach((item, index) => {
+      if (businessBases.includes(item.base)) {
+        businessItems.push(index);
+        businessUsers += Number(item.count);
+      }
+    });
+    if (businessUsers > 300) {
+      findings.push({ rule: 'R1', severity: 'warning', items: businessItems,
+        message: `${businessUsers} Nutzer mit Business-Basis überschreiten die tenantweite Grenze von 300 Business-Lizenzen.` });
+    }
+    items.forEach((item, index) => {
+      // CSV enthält keine Workstyle-Spalte: None kennzeichnet dort Standalone.
+      if (item.standalone === true || item.base === 'None' || item.inputs?.workstyle === 'standalone') return;
+      const features = [...(featuresMap[item.base] || []), ...(item.features || [])];
+      for (const addon of item.addons || []) {
+        const requires = prices[addon]?.requires;
+        // Arrays sind explizite Basislisten; String-Features können auch durch
+        // eine höhere Stufe derselben Kataloghierarchie erfüllt werden.
+        const fulfilled = Array.isArray(requires) ? requires.includes(item.base)
+          : !requires || requires === item.base || features.includes(requires)
+            || Object.values(hierarchy).some(group => group.includes(requires)
+              && features.some(feature => group.indexOf(feature) >= group.indexOf(requires)));
+        if (!fulfilled) {
+          const prerequisite = Array.isArray(requires) ? requires.join(' oder ') : requires;
+          findings.push({ rule: 'R2', severity: 'error', items: [index],
+            message: `${addon}: Voraussetzung ${prerequisite} ist in derselben Angebotszeile nicht erfüllt.` });
+        }
+      }
+    });
+    return findings;
+  }
+
   function compare(currentLic, result, term, data) {
     const sourceData = data || {};
     const PRICES = sourceData.PRICES || {};
@@ -400,6 +442,7 @@
     MAX_USERS: MAX_USERS,
     mapFormInputs: mapFormInputs,
     recommend: recommend,
+    validateQuote: validateQuote,
     compare: compare,
   };
 });
