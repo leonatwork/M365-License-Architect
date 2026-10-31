@@ -1011,7 +1011,7 @@ table.data tbody tr.is-editing {
         </div>
         <div class="field">
           <label>Qty</label>
-          <input type="number" id="userCount" value="10" min="1">
+          <input type="number" id="userCount" value="10" min="1" max="100000">
         </div>
         <div class="field">
           <label>Workstyle</label>
@@ -1786,19 +1786,42 @@ table.data tbody tr.is-editing {
             const file = input.files[0];
             if (!file) return;
 
-            const reader = new FileReader();
-            reader.addEventListener('load', function (e) {
-                const result = LicenseCSV.importCSV(e.target.result, LICENSE_DATA);
-                quoteItems.push(...result.items);
+            function showMessage(message) {
                 const notice = document.getElementById('csvNotice');
-                notice.textContent = `${result.items.length} Personas erfolgreich importiert!` + (result.legacyTeams
-                    ? ' Datei ohne Teams-Angabe: Microsoft Teams wurde als „im Paket“ übernommen.' : '');
+                notice.textContent = message;
                 notice.hidden = false;
-                renderTable();
-                alert(notice.textContent);
                 input.value = '';
-            });
-            reader.readAsText(file);
+                alert(message);
+            }
+            try {
+                if (file.size > LicenseCSV.MAX_IMPORT_BYTES) {
+                    throw new Error('Die Datei darf höchstens 1 MB groß sein.');
+                }
+                const reader = new FileReader();
+                reader.addEventListener('error', function () {
+                    showMessage('CSV-Import fehlgeschlagen: Die Datei konnte nicht gelesen werden. Bitte erneut auswählen. Die Angebotsliste bleibt unverändert.');
+                });
+                reader.addEventListener('load', function (e) {
+                    const previousItems = quoteItems;
+                    try {
+                        // importCSV begrenzt auf 1.000 Datenzeilen; erst nach vollständiger Prüfung übernehmen.
+                        const result = LicenseCSV.importCSV(e.target.result, LICENSE_DATA);
+                        if (result.errors.length) {
+                            throw new Error(result.errors.map(error => `Zeile ${error.line}: ${error.message}`).join('\n'));
+                        }
+                        quoteItems = [...quoteItems, ...result.items];
+                        renderTable();
+                        showMessage(`${result.items.length} Personas erfolgreich importiert!` + (result.legacyTeams
+                            ? ' Datei ohne Teams-Angabe: Microsoft Teams wurde als „im Paket“ übernommen.' : ''));
+                    } catch (error) {
+                        quoteItems = previousItems;
+                        showMessage('CSV-Import abgebrochen. Die Angebotsliste bleibt unverändert.\n' + error.message);
+                    }
+                });
+                reader.readAsText(file);
+            } catch (error) {
+                showMessage('CSV-Import fehlgeschlagen. Die Angebotsliste bleibt unverändert.\n' + error.message);
+            }
         }
 
         window.addEventListener('load', init, { once: true });

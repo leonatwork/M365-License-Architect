@@ -70,8 +70,11 @@ test('Teams selection drives engine, comparison, alternative, quote editing and 
 test('legacy CSV import renders persistent notice in UI', () => {
   const { elements, run, context } = app();
   context.FileReader = class {
-    addEventListener(type, callback) { assert.equal(type, 'load'); this.loaded = callback; }
-    readAsText() { this.loaded({ target: { result: 'Persona,Count,Base,Addons,Price,Total,CurrentLic\nAlt,1,M365 E3,,37.78,37.78,None' } }); }
+    addEventListener(type, callback) {
+      assert.ok(type === 'load' || type === 'error');
+      this[type] = callback;
+    }
+    readAsText() { this.load({ target: { result: 'Persona,Count,Base,Addons,Price,Total,CurrentLic\nAlt,1,M365 E3,,37.78,37.78,None' } }); }
   };
   run('handleFileSelect({ files: [{}], value: "old.csv" })');
   assert.ok(elements.csvNotice, 'missing visible import notice');

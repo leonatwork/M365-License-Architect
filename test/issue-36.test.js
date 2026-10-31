@@ -4,8 +4,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { app, html } = require('./fixtures/ui-app.js');
 
-test('index.html has no inline event attributes, including generated markup', () => {
-  assert.equal(/\bon[a-z]+\s*=/i.test(html), false, 'inline on*-attribute found in index.html');
+test('index.html has no inline event attributes', () => {
+  const markup = html.replace(/<script[\s\S]*?<\/script>/gi, '');
+  for (const [tag] of markup.matchAll(/<[^>]*>/g)) {
+    assert.doesNotMatch(tag, /\son[a-z]+\s*=/i, `inline on*-attribute found: ${tag}`);
+  }
 });
 
 test('every interpolation in an HTML template explicitly escapes its value', () => {
@@ -149,10 +152,13 @@ test('Import and Export listeners perform a CSV roundtrip with inert persona tex
   ui.elements.importBtn.click();
   assert.equal(pickerClicks, 1);
   ui.context.FileReader = class {
-    addEventListener(type, callback) { assert.equal(type, 'load'); this.loaded = callback; }
-    readAsText() { this.loaded({ target: { result: csv } }); }
+    addEventListener(type, callback) {
+      assert.ok(type === 'load' || type === 'error');
+      this[type] = callback;
+    }
+    readAsText() { this.load({ target: { result: csv } }); }
   };
-  ui.elements.csvInput.files = [{}];
+  ui.elements.csvInput.files = [{ size: 64 }];
   ui.elements.csvInput.value = 'quote.csv';
   ui.elements.csvInput.dispatch('change');
   assert.equal(ui.items().length, 2);

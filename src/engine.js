@@ -5,6 +5,14 @@
     root.LicenseEngine = factory();
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  // Gemeinsame Nutzergrenze für Formular, Engine und CSV-Import: 100.000.
+  const MAX_USERS = 100000;
+
+  function normalizeCount(value) {
+    const count = Number(value);
+    return Number.isNaN(count) ? 1 : Math.min(MAX_USERS, Math.max(1, Math.trunc(count)));
+  }
+
   function getPrice(prices, key, teamsVariant) {
     const entry = prices[key];
     if (typeof entry === 'number') {
@@ -29,7 +37,7 @@
   function mapFormInputs(form) {
     const f = form || {};
     const input = {
-      count: parseInt(f.userCount, 10) || 1,
+      count: normalizeCount(f.userCount),
       style: f.workstyle || 'office',
       current: f.currentLicense || 'None',
       teamsVariant: f.teamsVariant === 'no_teams' ? 'no_teams' : 'included',
@@ -61,7 +69,7 @@
     const mdmDesktop = toBoolean(i.mdmDesktop);
 
     const state = {
-      count: parseInt(i.count, 10) || 1,
+      count: normalizeCount(i.count),
       style: i.style || 'office',
       current: i.current || 'None',
       desktop: toBoolean(i.desktop),
@@ -389,6 +397,7 @@
   }
 
   return {
+    MAX_USERS: MAX_USERS,
     mapFormInputs: mapFormInputs,
     recommend: recommend,
     compare: compare,
