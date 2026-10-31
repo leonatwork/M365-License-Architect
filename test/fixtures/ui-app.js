@@ -31,6 +31,7 @@ function app() {
     const el = elements[match[2]] = { ...eventTarget(), tagName: match[1].toUpperCase(),
       type: /type="checkbox"/.test(match[0]) ? 'checkbox' : 'text',
       value: match[0].match(/value="([^"]*)"/)?.[1] || '', checked: false,
+      hidden: /\shidden(?:\s|>)/.test(match[0]),
       innerText: '', innerHTML: '', textContent: '', style: {}, classList: classList() };
     if (el.tagName === 'SELECT') {
       const options = html.slice(match.index).match(/^[\s\S]*?<\/select>/)[0];
