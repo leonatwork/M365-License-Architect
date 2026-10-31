@@ -8,6 +8,12 @@
   // Gemeinsame Nutzergrenze für Formular, Engine und CSV-Import: 100.000.
   const MAX_USERS = 100000;
 
+  // Mengenfeld je Nicht-Benutzer-Einheit (PRICES[key].unit); weitere Einheiten lassen sich hier ergänzen.
+  const QUANTITY_INPUTS = { room: 'roomCount', server: 'serverCount' };
+  // Zusatzprodukte je Anforderungsflag; die Einheit entscheidet über Benutzer-unitPrice oder unitItems.
+  const PRODUCT_FLAGS = { serverProt: 'Defender for Business Servers', copilot: 'M365 Copilot', visio: 'Visio Plan 2',
+    project: 'Project Plan 3', pauto: 'Power Automate Premium', rooms: 'Teams Rooms Pro' };
+
   function normalizeCount(value) {
     const count = Number(value);
     return Number.isNaN(count) ? 1 : Math.min(MAX_USERS, Math.max(1, Math.trunc(count)));
@@ -51,6 +57,8 @@
       add_project: 'project', add_powerauto: 'pauto', add_rooms: 'rooms', serverProt: 'serverProt',
     };
     for (const [id, flag] of Object.entries(flags)) input[flag] = toBoolean(f[id]);
+    // Tenantweite Mengen (Räume, Server) folgen denselben Grenzen wie die Benutzeranzahl.
+    for (const id of Object.values(QUANTITY_INPUTS)) input[id] = normalizeCount(f[id]);
     return input;
   }
 
@@ -64,6 +72,10 @@
     const PRICES = sourceData.PRICES || {};
     const FEATURES_MAP = sourceData.FEATURES_MAP || {};
     const ADDON_FEATURES = sourceData.ADDON_FEATURES || {};
+
+    const unitOf = key => (PRICES[key] && PRICES[key].unit) || 'user';
+    // Raum-/Serverlizenzen fließen nie in den Benutzer-unitPrice ein.
+    const isUnitProduct = key => unitOf(key) !== 'user';
 
     const mdmMobile = toBoolean(i.mdmMobile);
     const mdmDesktop = toBoolean(i.mdmDesktop);
@@ -229,7 +241,8 @@
         extra.push('Teams Phone Add-on');
         features.push('Teams Phone');
       }
-      for (const [flag, key] of Object.entries({ serverProt: 'Defender for Business Servers', copilot: 'M365 Copilot', visio: 'Visio Plan 2', project: 'Project Plan 3', pauto: 'Power Automate Premium', rooms: 'Teams Rooms Pro' })) {
+      for (const [flag, key] of Object.entries(PRODUCT_FLAGS)) {
+        if (isUnitProduct(key)) continue;
         if (state[flag] && !features.includes(key)) {
           extra.push(key);
           if (flag === 'copilot') features.push(key);
@@ -289,6 +302,11 @@
     }
     // Teams EWR steht in addons; ein separater teamsPrice würde es doppelt anzeigen.
     const teamsPrice = 0;
+    // Tenantweite Positionen mit eigener Menge; der Monatsfaktor gilt wie beim Benutzerpreis.
+    const unitItems = Object.entries(PRODUCT_FLAGS)
+      .filter(([flag, key]) => toBoolean(i[flag]) && isUnitProduct(key))
+      .map(([, key]) => ({ key, unit: unitOf(key), quantity: normalizeCount(i[QUANTITY_INPUTS[unitOf(key)]]),
+        price: getPrice(PRICES, key) * mult }));
 
     return {
       base: base,
@@ -301,6 +319,7 @@
       currentLic: state.current,
       teamsPrice: teamsPrice,
       teamsVariant: state.teamsVariant,
+      unitItems: unitItems,
     };
   }
 
@@ -398,6 +417,7 @@
 
   return {
     MAX_USERS: MAX_USERS,
+    QUANTITY_INPUTS: QUANTITY_INPUTS,
     mapFormInputs: mapFormInputs,
     recommend: recommend,
     compare: compare,
