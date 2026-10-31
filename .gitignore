@@ -1,1 +1,9 @@
 Agents/*
+
+# Design- und Review-Artefakte; nur das zur Laufzeit geladene CSS behalten.
+/.impeccable/*
+!/.impeccable/build/
+/.impeccable/build/*
+!/.impeccable/build/scaffold/
+/.impeccable/build/scaffold/*
+!/.impeccable/build/scaffold/layout.css

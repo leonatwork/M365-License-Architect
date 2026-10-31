@@ -65,6 +65,7 @@ src/csv.js          CSV export/import with Teams variant, price date and roundtr
 data/licenses.js    License catalog and persona presets
 fonts/              Nanum Gothic Coding
 test/               Regression + scenario tests
+docs/handover/      Issue handovers and review notes
 docs/screenshots/   README screenshots
 ```
 
@@ -87,6 +88,24 @@ npm test
 ```
 
 Runs without extra packages and without network access. Also available as `npm run check`.
+
+---
+
+## Betrieb und Release
+
+Die Anwendung wird statisch ohne Backend, Build oder Bundler ausgeliefert.
+Für ein Release die zusammengehörigen Dateien aus einem geprüften Commit bereitstellen:
+`index.html`, `src/`, `data/`, `fonts/` und `.impeccable/build/scaffold/layout.css`
+sowie die Lizenztexte und [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+Den CSS-Pfad einschließlich des versteckten Verzeichnisses bei der Auslieferung erhalten.
+`layout.css` bleibt getrackt, weil `index.html` es direkt als Laufzeit-Stylesheet lädt;
+die übrigen `.impeccable/`-Mocks und Review-Artefakte sind lokal und per `.gitignore` ausgeschlossen.
+
+Font Awesome 6.4.0 (cdnjs), Popper 2 und tippy.js 6 (unpkg) sind bestehende
+CDN-Abhängigkeiten und benötigen Netzwerkzugriff. Die Major-Aliase von Popper und Tippy
+fixieren keine Patch-Version. Vor einem Release `npm test` und `npm run check` ausführen
+und beim lokalen Auslieferungstest prüfen, dass das Stylesheet ohne 404 geladen wird.
+Sicherheitsmeldungen erfolgen privat gemäß [SECURITY.md](SECURITY.md).
 
 ---
 
