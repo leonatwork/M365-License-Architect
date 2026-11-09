@@ -13,6 +13,22 @@
     return Number.isNaN(count) ? 1 : Math.min(MAX_USERS, Math.max(1, Math.trunc(count)));
   }
 
+  // Preisbeleg je Komponente; None ist ein Platzhalter, kein zu prüfender Preis.
+  function priceStatus(itemOrKeys, data) {
+    const keys = Array.isArray(itemOrKeys) ? itemOrKeys : [itemOrKeys.base, ...(itemOrKeys.addons || [])];
+    return keys.filter(key => key && key !== 'None').map(key => {
+      const entry = data.PRICES[key];
+      return {
+        key,
+        sourced: Boolean(entry?.valid_from) && entry?.todo_source !== true,
+        source: entry?.source || null,
+        validFrom: entry?.valid_from || null,
+        // Ein eigener Preisnachweis ist genauer als das allgemeine Quellen-Prüfdatum.
+        checked: entry?.price_source_checked || entry?.source_checked || null,
+      };
+    });
+  }
+
   function getPrice(prices, key, teamsVariant) {
     const entry = prices[key];
     if (typeof entry === 'number') {
@@ -440,6 +456,7 @@
 
   return {
     MAX_USERS: MAX_USERS,
+    priceStatus: priceStatus,
     mapFormInputs: mapFormInputs,
     recommend: recommend,
     validateQuote: validateQuote,

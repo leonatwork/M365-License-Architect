@@ -13,3 +13,4 @@ require('./issue-34.test.js');
 require('./repo-hygiene.test.js');
 require('./issue-36.test.js');
 require('./issue-46.test.js');
+require('./price-status.test.js');
